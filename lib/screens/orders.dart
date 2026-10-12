@@ -30,8 +30,12 @@ Future<void> showOrderSuccess({required String oNo, required String date, requir
     backgroundColor: Colors.transparent,
     builder: (b) => _Success(oNo: oNo, date: date, shopName: shopName, sub: sub, del: del, tot: tot, oid: oid, ph: ph),
   );
-  if (track == true && kUuid.hasMatch(oid)) {
-    openTrack(oid);
+  if (track == true) {
+    if (kUuid.hasMatch(oid)) {
+      openTrack(oid);
+    } else {
+      Nav.go('orders'); // HTML: openOrders()
+    }
   }
 }
 
@@ -109,7 +113,7 @@ class _SuccessState extends State<_Success> with TickerProviderStateMixin {
                 _row('பணம்', '💵 பொருள் வந்ததும்'),
               ]),
             ),
-            if (widget.ph.isNotEmpty) PushBlock(oid: widget.oid, ph: widget.ph, margin: const EdgeInsets.only(bottom: 10)),
+            if (widget.ph.isNotEmpty) PushBlock(oid: widget.oid, ph: widget.ph, margin: const EdgeInsets.only(bottom: 14)),
             GreenButton('🛵 ஆர்டரைப் பின்தொடர', onTap: () => Navigator.pop(context, true)),
             const SizedBox(height: 8),
             OutlinedButton(
@@ -220,13 +224,21 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 : list.isEmpty
                     ? ListView(children: [
                         const StateBox('📋', 'இன்னும் எந்த ஆர்டரும் இல்லை'),
-                        Center(child: SizedBox(width: 220, child: GreenButton('🛍️ பொருட்களை பார்க்க', onTap: () => Nav.go('home')))),
+                        Center(child: SizedBox(width: 220, child: GreenButton('🛍️ பொருட்களை பார்க்க', onTap: _browse))),
                       ])
                     : _list(list),
           ),
         );
       },
     );
+  }
+
+  // HTML: closeOrders(); if(homeOpen) closeHome(); → கீழே உள்ள கடைப் பக்கம்
+  void _browse() {
+    final s = AppState.I;
+    final sh = s.shopById(s.activeShop);
+    Nav.go('home');
+    if (sh != null && !sh.hidden) Nav.openShop(sh.id);
   }
 
   Widget _list(List<OrderV> list) {
@@ -458,6 +470,9 @@ Future<void> reorderFrom(OrderV o) async {
     toast(plan.error);
     return;
   }
+  // HTML: முதலில் கடை மாற்றச் சோதனை, பிறகு மாற்று pack கேள்வி
+  final first = (plan.matched.isNotEmpty ? plan.matched.first : plan.alts.first).p;
+  if (!await CartOps.conflictOk(first)) return;
   var use = plan.matched;
   if (plan.alts.isNotEmpty) {
     final yes = await _askAlts(plan);
@@ -467,7 +482,6 @@ Future<void> reorderFrom(OrderV o) async {
     toast('⚠️ எதுவும் சேர்க்கப்படவில்லை');
     return;
   }
-  if (!await CartOps.conflictOk(use.first.p)) return;
   final s = AppState.I;
   for (final l in use) {
     final have = s.qtyOf(l.p, l.pi);

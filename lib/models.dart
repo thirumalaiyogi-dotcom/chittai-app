@@ -26,7 +26,7 @@ class Product {
   dynamic get id => m['id'];
   String get key => js(m['id']);
   String get shopId => js(m['shop_id']).isEmpty ? kDefaultShopId : js(m['shop_id']);
-  String get category => js(m['category_id'] ?? m['category']);
+  String get category => js(m['category_id']).isNotEmpty ? js(m['category_id']) : js(m['category']); // HTML: category_id||category
   String get name => js(m['name']);
   String get brand => js(m['brand']);
   String get emoji => js(m['emoji']).isEmpty ? '🛒' : js(m['emoji']);

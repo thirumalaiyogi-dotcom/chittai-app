@@ -156,7 +156,8 @@ class OItem {
   final double? up;
   final dynamic pid;
   final bool na;
-  OItem(this.n, this.w, this.q, this.t, this.up, this.pid, this.na);
+  final String full; // இந்த phone-ல் சேமித்த முழுப் பெயர் (HTML it.full)
+  OItem(this.n, this.w, this.q, this.t, this.up, this.pid, this.na, {this.full = ''});
 }
 
 class OrderV {
@@ -335,7 +336,7 @@ class Orders extends ChangeNotifier {
       final sh = sid != null ? S.shopById(sid) : null;
       final its = (o['its'] is List ? o['its'] as List : const [])
           .whereType<Map>()
-          .map((i) => OItem(js(i['n']), js(i['w']), jz(i['q']).toInt(), jz(i['t']), i['up'] != null ? jz(i['up']) : null, i['pid'], false))
+          .map((i) => OItem(js(i['n']), js(i['w']), jz(i['q']).toInt(), jz(i['t']), i['up'] != null ? jz(i['up']) : null, i['pid'], false, full: js(i['full'])))
           .toList();
       out.add(OrderV()
         ..no = no
@@ -362,6 +363,8 @@ class Orders extends ChangeNotifier {
 
   // கீழ் பட்டை badge: உறுதி செய்யப்படாத ஆர்டர்கள்
   int get badge {
+    // HTML updateOrderBadge: cloud தோல்வி → இந்த phone-ன் ஆர்டர்களின் எண்ணிக்கை
+    if (lastFail) return local().length;
     if (cache == null) return 0;
     return build().where((o) => o.status == 'ORDER_RECEIVED').length;
   }
@@ -431,7 +434,7 @@ ReoPlan reorderPlan(OrderV o) {
   }
   bool pkOk(Pack pk) => !pk.isOut;
   for (final it in o.its) {
-    final nm = it.n;
+    final nm = it.full.isNotEmpty ? it.full : it.n;
     Product? p = it.pid != null ? s.prods.where((x) => x.key == js(it.pid) && !x.hidden).first0 : null;
     p ??= s.prods.where((x) => !x.hidden && x.shopId == sid && x.name == it.n).first0;
     if (p == null || p.oos || p.packs.isEmpty) {

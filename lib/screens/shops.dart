@@ -29,10 +29,19 @@ class _ShopsTabState extends State<ShopsTab> {
     super.initState();
     TypingHint.attach();
     _f.addListener(() => setState(() {}));
+    Nav.shopsReset.addListener(_rst);
+  }
+
+  // HTML pickType: homeQ='' (கடைத் தேடல் எழுத்தை அழி)
+  void _rst() {
+    if (!mounted) return;
+    _q.clear();
+    setState(() => _query = '');
   }
 
   @override
   void dispose() {
+    Nav.shopsReset.removeListener(_rst);
     TypingHint.detach();
     _q.dispose();
     _f.dispose();
@@ -608,7 +617,7 @@ class _ShopScreenState extends State<ShopScreen> {
         ),
         IconButton(icon: Icon(Icons.search, color: P.text), onPressed: () => Nav.push(ShopSearchScreen(shopId: widget.shopId))),
         GestureDetector(
-          onTap: () => Nav.go('shops'),
+          onTap: () => Nav.openShops(),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
             decoration: BoxDecoration(color: P.gc, borderRadius: BorderRadius.circular(12)),
@@ -804,7 +813,7 @@ class _ShopScreenState extends State<ShopScreen> {
   Widget _pill(AppState s) {
     final n = s.cartCount;
     return GestureDetector(
-      onTap: () => Nav.go('cart'),
+      onTap: () => Nav.openCart(),
       child: Container(
         height: 52,
         padding: const EdgeInsets.fromLTRB(14, 7, 8, 7),

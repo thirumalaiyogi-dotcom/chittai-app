@@ -78,7 +78,7 @@ class AppState extends ChangeNotifier {
     dark = Store.str(K.theme) == 'wa_dark';
     fs = Store.str(K.fs) ?? '2';
     waNum = Store.str(K.wa) ?? kDefaultWaNum;
-    notice = Store.str(K.notice) ?? '';
+    notice = ''; // HTML: NOTICE='' — server-ல் notice_until சரிபார்த்த பிறகே காட்டு
     activeShop = Store.str(K.activeShop) ?? kDefaultShopId;
 
     final p = Store.json(K.prods), c = Store.json(K.cats), s = Store.json(K.shops);

@@ -199,6 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _exit() {
     Nav.backHandlers.remove(_exit);
+    _deb?.cancel();
     _q.clear();
     _f.unfocus();
     setState(() {
@@ -419,14 +420,10 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     out.add(SliverToBoxAdapter(child: _nearShops(s)));
     out.add(SliverToBoxAdapter(child: _again(s)));
-    out.add(SliverToBoxAdapter(child: _deals(s)));
+    out.add(SliverToBoxAdapter(child: KeyedSubtree(key: Nav.dealsKey, child: _deals(s))));
     out.add(SliverToBoxAdapter(child: _elder(s)));
+    // HTML: வகைகள் இருக்கும்போது home-list மறைந்திருக்கும் (ஏற்றுதல் / பிழைப் பெட்டிகள் ShopList-க்குள்)
     if (allKinds.isEmpty) out.add(const SliverToBoxAdapter(child: ShopList(type: '')));
-    if (s.cloudFail && !s.shopsCached && s.visibleShops.isEmpty) {
-      out.add(const SliverToBoxAdapter(child: StateBox('⚠️', 'தகவல்களை ஏற்ற முடியவில்லை', sub: 'தயவுசெய்து மீண்டும் முயற்சி செய்யுங்கள்.', retry: true)));
-    } else if (s.cloudLoading && !s.shopsCached) {
-      out.add(const SliverToBoxAdapter(child: Skeleton(3)));
-    }
     out.add(const SliverToBoxAdapter(child: SizedBox(height: 90)));
     return out;
   }
@@ -762,6 +759,22 @@ class ShopList extends StatefulWidget {
 
 class _ShopListState extends State<ShopList> {
   String _sort = '';
+
+  void _rst() {
+    if (mounted && _sort.isNotEmpty) setState(() => _sort = '');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    Nav.shopsReset.addListener(_rst);
+  }
+
+  @override
+  void dispose() {
+    Nav.shopsReset.removeListener(_rst);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

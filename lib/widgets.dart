@@ -231,9 +231,10 @@ class CartOps {
     if (showToast) toast('🛒 ${p.name} சேர்க்கப்பட்டது!');
   }
 
-  static void chg(Product p, int pi, int d) {
+  // stock:false = கூடைத் திரை (HTML cartChg: கையிருப்புச் சோதனை இல்லை)
+  static void chg(Product p, int pi, int d, {bool stock = true}) {
     if (S.qtyOf(p, pi) == 0) return;
-    if (d > 0 && oosStop(p)) return;
+    if (stock && d > 0 && oosStop(p)) return;
     if (d > 0) {
       Sfx.add();
     } else {

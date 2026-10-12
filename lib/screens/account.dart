@@ -1,5 +1,6 @@
 // சிட்டை — கணக்கு, விருப்பமானவை, உதவி மையம், சிட்டை பற்றி / தனியுரிமை / விதிமுறைகள்
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -16,11 +17,8 @@ import 'notifs.dart';
 import 'orders.dart';
 import 'stories.dart';
 
-Future<T?> pushFull<T>(Widget w) {
-  final c = Nav.ctx;
-  if (c == null) return Future.value(null);
-  return Navigator.of(c).push<T>(MaterialPageRoute(builder: (_) => w));
-}
+// HTML .ov: கீழ் பட்டைக்கு மேலே திறக்கும்; எந்த tab-உம் ஒளிராது (navSync on='')
+Future<T?> pushFull<T>(Widget w) => Nav.push<T>(w, hl: '');
 
 AppBar plainBar(BuildContext context, String title, {List<Widget>? actions}) => AppBar(
       backgroundColor: P.card,
@@ -39,8 +37,14 @@ Future<void> shareApp() async {
 }
 
 // ═══ கணக்கு ═══
-class AccountScreen extends StatelessWidget {
+class AccountScreen extends StatefulWidget {
   const AccountScreen({super.key});
+  @override
+  State<AccountScreen> createState() => _AccountScreenState();
+}
+
+class _AccountScreenState extends State<AccountScreen> {
+  bool _editing = false; // HTML profEditing
 
   static void _dark(bool v) {
     AppState.I.setDark(v);
@@ -50,6 +54,13 @@ class AccountScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = context.watch<AppState>();
+    if (_editing) {
+      return Scaffold(
+        backgroundColor: P.bg,
+        appBar: plainBar(context, 'என் விவரங்கள்'),
+        body: _ProfileForm(onDone: () => setState(() => _editing = false)),
+      );
+    }
     final p = s.profGet();
     final raw = s.profRaw();
     final nOrd = s.ordLocal().length, nFav = s.favIds.length;
@@ -127,7 +138,7 @@ class AccountScreen extends StatelessWidget {
             ),
             TextButton(
               style: TextButton.styleFrom(backgroundColor: const Color(0x33FFFFFF), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-              onPressed: () => showAddressSheet(),
+              onPressed: () => setState(() => _editing = true),
               child: Text(p != null ? '✏️ மாற்று' : '+ சேர்', style: ts(13, w: w8, c: Colors.white)),
             ),
           ]),
@@ -140,7 +151,11 @@ class AccountScreen extends StatelessWidget {
               Nav.go('orders');
             }),
             const SizedBox(width: 8),
-            quick(Icons.favorite_border, '$nFav', 'விருப்பங்கள்', () => pushFull(const FavScreen())),
+            quick(Icons.favorite_border, '$nFav', 'விருப்பங்கள்', () {
+              // HTML navGo('fav'): கணக்கை மூடி விருப்பங்கள்
+              Nav.popInnerToRoot();
+              pushFull(const FavScreen());
+            }),
             const SizedBox(width: 8),
             quick(Icons.location_on_outlined, area, 'முகவரி', () => showLocationSheet()),
           ]),
@@ -798,3 +813,149 @@ class _InfoScreenState extends State<InfoScreen> {
 
 // app-ன் முதல் திறப்பு நேரம் (popups-க்கு)
 void markFirstRunSeen() => Store.setStr(K.firstRun, '${DateTime.now().millisecondsSinceEpoch}');
+
+
+// ═══ என் விவரங்கள் (HTML renderProfile + profSubmit) — வரைபடம் இல்லை ═══
+class _ProfileForm extends StatefulWidget {
+  final VoidCallback onDone;
+  const _ProfileForm({required this.onDone});
+  @override
+  State<_ProfileForm> createState() => _ProfileFormState();
+}
+
+class _ProfileFormState extends State<_ProfileForm> {
+  late final Map<String, dynamic> _p = AppState.I.profRaw();
+  late final _nm = TextEditingController(text: js(_p['nm']));
+  late final _ph = TextEditingController(text: js(_p['ph']));
+  final Map<String, TextEditingController> _ad = {};
+  final Map<String, String> _err = {};
+
+  @override
+  void initState() {
+    super.initState();
+    final pa = adPartsOf(_p);
+    for (final f in kAdF) {
+      _ad[f.k] = TextEditingController(text: pa[f.k] ?? '');
+    }
+  }
+
+  @override
+  void dispose() {
+    _nm.dispose();
+    _ph.dispose();
+    for (final c in _ad.values) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  void _submit() {
+    final nm = _nm.text.trim(), ph = _ph.text.trim();
+    final a = {for (final f in kAdF) f.k: _ad[f.k]!.text.replaceAll(RegExp(r'\s+'), ' ').trim()};
+    final e = <String, String>{};
+    if (nm.isEmpty) e['nm'] = 'பெயரை உள்ளிடுங்கள்';
+    if (!RegExp(r'^[6-9]\d{9}$').hasMatch(ph)) e['ph'] = ph.isEmpty ? 'மொபைல் எண்ணை உள்ளிடுங்கள்' : 'சரியான 10 இலக்க மொபைல் எண் உள்ளிடுங்கள்';
+    e.addAll(adCheck(a));
+    setState(() {
+      _err
+        ..clear()
+        ..addAll(e);
+    });
+    if (e.isNotEmpty) return;
+    // profSave + adStoreParts: மற்ற விவரங்கள் (இடம், lat/lng, adHint) அப்படியே இருக்கும்
+    final o = AppState.I.profRaw();
+    o['nm'] = nm;
+    o['ph'] = ph;
+    o['ad'] = adCompose(a).trim();
+    o['adp'] = a;
+    profPut(o);
+    AppState.I.ping();
+    widget.onDone();
+    toast('✅ விவரங்கள் சேமிக்கப்பட்டன');
+  }
+
+  InputDecoration _dec(String hint, String key) => InputDecoration(
+        hintText: hint,
+        hintStyle: ts(14, c: P.mu),
+        isDense: true,
+        filled: true,
+        fillColor: P.card2,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: P.bd)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: _err.containsKey(key) ? const Color(0xFFDC2626) : P.bd)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: P.g)),
+      );
+
+  Widget _errTxt(String key) => _err[key] == null
+      ? const SizedBox(height: 12)
+      : Padding(padding: const EdgeInsets.only(top: 4, bottom: 8), child: Text(_err[key]!, style: ts(12, w: w7, c: const Color(0xFFDC2626))));
+
+  Widget _lbl(String t, {bool req = true}) => Padding(
+        padding: const EdgeInsets.only(bottom: 6),
+        child: Text.rich(TextSpan(style: ts(13, w: w8, c: P.mu2), children: [
+          TextSpan(text: t),
+          req ? const TextSpan(text: ' *', style: TextStyle(color: Color(0xFFDC2626))) : TextSpan(text: ' (விருப்பம்)', style: ts(11.5, c: P.mu)),
+        ])),
+      );
+
+  Widget _adf(AdField f) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        _lbl(f.l, req: f.req),
+        TextField(
+          controller: _ad[f.k],
+          keyboardType: f.num ? TextInputType.number : TextInputType.text,
+          inputFormatters: [if (f.num) FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(f.num ? 6 : 80)],
+          onChanged: (_) {
+            if (_err.containsKey(f.k)) setState(() => _err.remove(f.k));
+          },
+          style: ts(15, w: w6),
+          decoration: _dec(f.ph, f.k),
+        ),
+        _err[f.k] == null ? const SizedBox(height: 11) : Padding(padding: const EdgeInsets.only(top: 3, bottom: 8), child: Text('⚠️ ${_err[f.k]}', style: ts(12, w: w7, c: const Color(0xFFDC2626)))),
+      ]);
+
+  @override
+  Widget build(BuildContext context) {
+    AdField f(String k) => kAdF.firstWhere((x) => x.k == k);
+    return ListView(padding: const EdgeInsets.fromLTRB(16, 16, 16, 30), children: [
+      _lbl('பெயர்'),
+      TextField(controller: _nm, style: ts(15, w: w6), decoration: _dec('உங்கள் பெயர்', 'nm')),
+      _errTxt('nm'),
+      _lbl('மொபைல் எண்'),
+      TextField(
+        controller: _ph,
+        keyboardType: TextInputType.phone,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(10)],
+        style: ts(15, w: w6),
+        decoration: _dec('9XXXXXXXXX', 'ph'),
+      ),
+      _errTxt('ph'),
+      _lbl('வீட்டு முகவரி'),
+      Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(child: _adf(f('door'))),
+        const SizedBox(width: 10),
+        Expanded(child: _adf(f('pin'))),
+      ]),
+      _adf(f('street')),
+      _adf(f('village')),
+      _adf(f('land')),
+      Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Text('🛵 "அடையாளம்" சரியாக இருந்தால் டெலிவரி நபர் வீட்டை எளிதில் கண்டுபிடிப்பார்.', style: ts(11.5, c: P.mu, h: 1.5)),
+      ),
+      GreenButton('💾 சேமிக்க', onTap: _submit),
+      const SizedBox(height: 10),
+      OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          backgroundColor: P.card2,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          side: BorderSide(color: P.bd),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        onPressed: widget.onDone,
+        child: Text('ரத்து', style: ts(13, w: w8, c: P.mu2)),
+      ),
+      const SizedBox(height: 12),
+      Text('🔒 இந்த விவரங்கள் இந்த phone-ல் மட்டும் சேமிக்கப்படும். ஆர்டர் செய்யும்போது தானாக நிரப்பப்படும்.', style: ts(12, c: P.mu)),
+    ]);
+  }
+}

@@ -314,10 +314,6 @@ class SuggestView extends StatelessWidget {
                   Text(lb[s['g']] ?? '', style: ts(11.5, w: w7, c: P.mu)),
                 ]),
               ),
-              GestureDetector(
-                onTap: () => onFill(s['q'] ?? s['label']!),
-                child: Padding(padding: const EdgeInsets.all(6), child: Icon(Icons.north_west, size: 18, color: P.mu)),
-              ),
             ]),
           ),
         ),
@@ -1006,8 +1002,9 @@ class _ShopSearchScreenState extends State<ShopSearchScreen> {
                 title: Text('🏪 ${o?.name ?? e.key}', style: ts(14, w: w8)),
                 trailing: Text('${e.value} பொருட்கள் ›', style: ts(12.5, w: w8, c: P.g2)),
                 onTap: () {
+                  // HTML: closeSearch(); selectShop(id) — இப்போதைய கடையை மாற்று, அடுக்காதே
                   Navigator.of(context).pop();
-                  Nav.openShop(e.key);
+                  Nav.replaceShop(e.key);
                   Future.delayed(const Duration(milliseconds: 350), () => Nav.push(ShopSearchScreen(shopId: e.key, initial: q)));
                 },
               ),

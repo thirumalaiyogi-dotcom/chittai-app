@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'models.dart';
+import 'screens/cart.dart';
 import 'screens/product_sheet.dart';
 import 'screens/shops.dart';
 import 'state.dart';
@@ -23,6 +24,12 @@ class Nav {
   static final List<VoidCallback> backHandlers = [];
   // முகப்பு திரையை மேலே scroll / தேடல் மூட
   static final ValueNotifier<int> homeReset = ValueNotifier(0);
+  // கடைகள் tab: தேடல் எழுத்து + வரிசையை அழி (HTML pickType: homeQ='', homeSort='')
+  static final ValueNotifier<int> shopsReset = ValueNotifier(0);
+  // முகப்பின் "சலுகைகள்" பகுதி (வெளியேறும் sheet → அங்கே scroll)
+  static final GlobalKey dealsKey = GlobalKey();
+  // HTML _navFrom: ஆர்டர்கள் / கூடை tab-லிருந்து back → வந்த முகப்பு நிலைக்கு (முகப்பு / கடைகள்)
+  static String? _from;
 
   static AppState get S => AppState.I;
   static BuildContext? get ctx => root.currentState?.overlay?.context ?? root.currentContext;
@@ -36,9 +43,15 @@ class Nav {
 
   // navGo: எல்லா உள் திரைகளையும் மூடி அந்த tab-க்கு
   static void go(String t) {
+    final cur = tab.value;
+    if (t == 'orders' || t == 'cart') {
+      _from = (cur == 'home' || cur == 'shops') && (innerHl.value == null) ? cur : null;
+    } else {
+      _from = null;
+    }
     backHandlers.clear();
     popInnerToRoot();
-    if (t == 'shops' && tab.value != 'shops') shopsType.value = '';
+    if (t == 'shops') shopsType.value = ''; // HTML navGo('shops'): homeType=''
     if (t == 'home') homeReset.value++;
     tab.value = t;
   }
@@ -61,6 +74,44 @@ class Nav {
 
   static void openShopDetail(String shopId) => push(ShopDetailScreen(shopId: shopId));
 
+  // "மற்ற கடைகளில் கிடைக்கிறது": இப்போதைய கடையை மாற்று (அடுக்காதே)
+  static void replaceShop(String shopId) {
+    S.setActiveShop(shopId);
+    final n = inner.currentState;
+    if (n == null) return;
+    final page = MaterialPageRoute(builder: (_) => ShopScreen(shopId: shopId), settings: const RouteSettings(name: 'shops'));
+    if (n.canPop()) {
+      n.pushReplacement(page);
+    } else {
+      n.push(page);
+    }
+  }
+
+  // HTML openCart: கடைக்குள் இருந்தால் அதன் மேலே கூடை (back → கடைக்குத் திரும்பும்)
+  static void openCart() {
+    final n = inner.currentState;
+    if (n != null && n.canPop()) {
+      push(const CartScreen(), hl: 'cart');
+    } else {
+      go('cart');
+    }
+  }
+
+  // HTML goBack(closeCart) / கூடை·ஆர்டர்கள் மூடு: முந்தைய திரைக்கு
+  static void leave() {
+    final n = inner.currentState;
+    if (n != null && n.canPop()) {
+      n.pop();
+      return;
+    }
+    final m = _from;
+    _from = null;
+    go(m ?? 'home');
+  }
+
+  // HTML openShops: கடைகள் tab, வகை இல்லாமல்
+  static void openShops() => go('shops');
+
   // home வகை → கடைகள் tab (ஒரே கடை என்றால் நேராக உள்ளே)
   static void pickType(String id) {
     final list = S.visibleShops.where((x) => S.shopType(x) == id).toList();
@@ -74,7 +125,9 @@ class Nav {
     }
     backHandlers.clear();
     popInnerToRoot();
+    _from = null;
     shopsType.value = id;
+    shopsReset.value++;
     tab.value = 'shops';
   }
 
@@ -103,7 +156,9 @@ class Nav {
       return;
     }
     if (tab.value != 'home') {
-      go('home');
+      final m = (tab.value == 'orders' || tab.value == 'cart') ? _from : null;
+      _from = null;
+      go(m ?? 'home');
       return;
     }
     final c = ctx;
@@ -129,7 +184,14 @@ Future<bool?> showExitSheet(BuildContext context) {
     t = 'இப்போதே போகிறீர்களா?';
     sub = 'அருகிலுள்ள கடைகளில் இன்றைய சலுகைகள் உள்ளன!';
     cta = 'சலுகைகளைப் பார்';
-    fn = () => Nav.go('home');
+    fn = () {
+      Nav.go('home');
+      // HTML exitShowDeals: சலுகைகள் பகுதிக்கு scroll
+      Future.delayed(const Duration(milliseconds: 400), () {
+        final c = Nav.dealsKey.currentContext;
+        if (c != null) Scrollable.ensureVisible(c, duration: const Duration(milliseconds: 350), curve: Curves.easeOut);
+      });
+    };
   } else {
     t = 'இப்போதே போகிறீர்களா?';
     sub = 'உங்கள் ஊர் கடைகள் எப்போதும் இங்கே திறந்திருக்கும்!';

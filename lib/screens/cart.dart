@@ -13,6 +13,7 @@ import '../theme.dart';
 import '../util.dart';
 import '../widgets.dart';
 import '../push.dart';
+import 'account.dart';
 import 'location.dart';
 import 'orders.dart';
 
@@ -92,7 +93,7 @@ class _CartScreenState extends State<CartScreen> {
             const SizedBox(height: 6),
             Text('பிடித்த பொருட்களைச் சேர்த்து தொடங்குங்கள்', style: ts(13, c: P.mu)),
             const SizedBox(height: 20),
-            SizedBox(width: 220, child: GreenButton('பொருட்களைப் பார்க்க', onTap: () => Nav.go('home'))),
+            SizedBox(width: 220, child: GreenButton('பொருட்களைப் பார்க்க', onTap: Nav.leave)),
           ]),
         ),
       );
@@ -173,7 +174,7 @@ class _CartScreenState extends State<CartScreen> {
             Icon(Icons.shopping_bag_outlined, size: 19, color: P.g2),
             const SizedBox(width: 6),
             Expanded(child: Text('$cnt ${cnt == 1 ? 'பொருள்' : 'பொருட்கள்'}', style: ts(14, w: w8))),
-            TextButton(onPressed: () => sh != null ? Nav.openShop(sh.id) : Nav.go('home'), child: Text('+ மேலும் சேர்', style: ts(13, w: w8, c: P.g2))),
+            TextButton(onPressed: Nav.leave, child: Text('+ மேலும் சேர்', style: ts(13, w: w8, c: P.g2))),
           ]),
           for (final i in its) _item(i),
           if (saved > 0)
@@ -267,7 +268,21 @@ class _CartScreenState extends State<CartScreen> {
       if (below) _warn('🧾 குறைந்தபட்ச ஆர்டர் ₹${rupee(minO)} — இன்னும் ₹${rupee(minO - sub)} பொருட்கள் சேர்க்கவும்'),
       Padding(
         padding: const EdgeInsets.all(14),
-        child: Text('ஆர்டர் செய்வதன் மூலம் விதிமுறைகளை ஏற்கிறீர்கள்', textAlign: TextAlign.center, style: ts(12, c: P.mu)),
+        child: Text.rich(
+          TextSpan(style: ts(12, c: P.mu, h: 1.5), children: [
+            const TextSpan(text: 'ஆர்டர் செய்வதன் மூலம் '),
+            WidgetSpan(
+              alignment: PlaceholderAlignment.baseline,
+              baseline: TextBaseline.alphabetic,
+              child: GestureDetector(
+                onTap: () => pushFull(const InfoScreen(page: 'terms')),
+                child: Text('விதிமுறைகளை', style: ts(12, w: w7, c: AppState.I.dark ? P.g2 : const Color(0xFF00856B), h: 1.5)),
+              ),
+            ),
+            const TextSpan(text: ' ஏற்கிறீர்கள்'),
+          ]),
+          textAlign: TextAlign.center,
+        ),
       ),
     ]);
   }
@@ -374,7 +389,7 @@ class _CartScreenState extends State<CartScreen> {
             Sfx.remove();
             S.change(p, c.packIdx, -1);
           },
-          onPlus: () => CartOps.chg(p, c.packIdx, 1),
+          onPlus: () => CartOps.chg(p, c.packIdx, 1, stock: false),
         ),
       ]),
     );

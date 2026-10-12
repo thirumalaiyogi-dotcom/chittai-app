@@ -88,8 +88,18 @@ final RegExp _zw = RegExp('[​-‍﻿]');
 final RegExp _nonWord = RegExp(r'[^\p{L}\p{M}\p{N}\s.]', unicode: true);
 final RegExp _tamil = RegExp('[஀-௿]');
 
+// HTML .normalize('NFC'): தமிழின் canonical இணைப்புகள் (ொ ோ ௌ ஔ) — Latin எழுத்துகள் ஏற்கனவே NFC
+String nfcTa(String s) {
+  if (!_tamil.hasMatch(s)) return s;
+  return s
+      .replaceAll('\u0BC6\u0BBE', '\u0BCA') // ெ + ா → ொ
+      .replaceAll('\u0BC7\u0BBE', '\u0BCB') // ே + ா → ோ
+      .replaceAll('\u0BC6\u0BD7', '\u0BCC') // ெ + ௗ → ௌ
+      .replaceAll('\u0B92\u0BD7', '\u0B94'); // ஒ + ௗ → ஔ
+}
+
 String normalizeSearchText(dynamic t) {
-  var s = (t == null ? '' : t.toString()).replaceAll(_zw, '').toLowerCase();
+  var s = nfcTa(t == null ? '' : t.toString()).replaceAll(_zw, '').toLowerCase();
   s = s.replaceAll(_nonWord, ' ').replaceAll(RegExp(r'\s+'), ' ').trim();
   return s.length > 80 ? s.substring(0, 80) : s;
 }

@@ -27,7 +27,20 @@ Future<void> main() async {
   Popups.firstRun; // முதல் திறப்பா என்று படித்த பிறகு குறி
   Popups.markRun();
   runApp(ChangeNotifierProvider<AppState>.value(value: AppState.I, child: const ChittaiApp()));
+  // HTML: pack_stock / inv — சேமித்த தரவிலும் உடனே, பிறகு +3s, +8s (ஒவ்வொரு cloud load-க்குப் பிறகும் runCloudLoad-ல்)
+  unawaited(AppState.I.applyPackStock());
+  Future.delayed(const Duration(seconds: 3), AppState.I.applyPackStock);
+  Future.delayed(const Duration(seconds: 8), AppState.I.applyPackStock);
   unawaited(AppState.I.runCloudLoad());
+  WidgetsBinding.instance.addObserver(_Resume());
+}
+
+// HTML visibilitychange: app மீண்டும் திறந்ததும் அறிவிப்பு / support எண் புதுப்பி
+class _Resume extends WidgetsBindingObserver {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState st) {
+    if (st == AppLifecycleState.resumed) AppState.I.loadAppSettings();
+  }
 }
 
 class ChittaiApp extends StatelessWidget {

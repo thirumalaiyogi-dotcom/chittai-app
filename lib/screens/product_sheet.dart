@@ -138,7 +138,8 @@ class _ProductSheet extends StatelessWidget {
                       width: 170,
                       child: GreenButton('கூடை பார் ›', height: 48, onTap: () {
                         Navigator.pop(context);
-                        Nav.go('cart');
+                        // HTML psGoCart: sheet மூடி, கூடை மேலே (back → கடைக்கே)
+                        Future.delayed(const Duration(milliseconds: 250), Nav.openCart);
                       }),
                     ),
                   ]),
@@ -173,9 +174,7 @@ class _ProductSheet extends StatelessWidget {
           height: 44,
           child: q > 0
               ? QtyStepper(qty: q, height: 44, btnW: 36, font: 17, onMinus: () => CartOps.chg(p, i, -1), onPlus: () => CartOps.chg(p, i, 1))
-              : (p.oos
-                  ? const Center(child: OosTag(small: true, text: 'இல்லை'))
-                  : GreenButton('சேர்', height: 44, onTap: () => CartOps.add(p, i, showToast: false))),
+              : GreenButton('சேர்', height: 44, onTap: () => CartOps.add(p, i, showToast: false)),
         ),
       ]),
     );
