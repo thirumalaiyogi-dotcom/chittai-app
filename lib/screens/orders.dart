@@ -204,7 +204,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
             backgroundColor: P.card,
             surfaceTintColor: Colors.transparent,
             leading: IconButton(icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Nav.back()),
-            title: Text('என் ஆர்டர்கள்', style: ts(18, w: w8)),
+            title: Text('ஆர்டர்கள்', style: ts(18, w: w8)),
             actions: [
               TextButton.icon(
                 onPressed: () {
@@ -249,17 +249,25 @@ class _OrdersScreenState extends State<OrdersScreen> {
     Widget tb(String k, String l, [int n = 0]) => Expanded(
           child: GestureDetector(
             onTap: () => setState(() => _tab = k),
+            // HTML .co-tabs button / .on
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(color: tab == k ? P.g : Colors.transparent, borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+              decoration: BoxDecoration(
+                color: tab == k ? P.card : Colors.transparent,
+                borderRadius: BorderRadius.circular(11),
+                boxShadow: tab == k ? const [BoxShadow(color: Color(0x14000000), blurRadius: 6, offset: Offset(0, 2))] : null,
+              ),
               child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text(l, style: ts(13.5, w: w8, c: tab == k ? Colors.white : P.mu2)),
+                Text(l, style: ts(14, w: w8, c: tab == k ? P.g2 : P.mu2)),
                 if (n > 0) ...[
                   const SizedBox(width: 6),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
-                    decoration: BoxDecoration(color: tab == k ? Colors.white : P.g, borderRadius: BorderRadius.circular(10)),
-                    child: Text('$n', style: ts(11.5, w: w8, c: tab == k ? P.g2 : Colors.white)),
+                    height: 20,
+                    constraints: const BoxConstraints(minWidth: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 6),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(color: P.g, borderRadius: BorderRadius.circular(10)),
+                    child: Text('$n', style: ts(12, w: w8, c: Colors.white, h: 1)),
                   ),
                 ],
               ]),
@@ -269,24 +277,32 @@ class _OrdersScreenState extends State<OrdersScreen> {
     return ListView(padding: const EdgeInsets.only(bottom: 30), children: [
       if (O.lastFail)
         Padding(
-          padding: const EdgeInsets.fromLTRB(14, 10, 14, 0),
-          child: Text('⚠️ Cloud இணைக்க முடியவில்லை — இந்த phone-ன் வரலாறு காட்டப்படுகிறது', textAlign: TextAlign.center, style: ts(12, w: w7, c: P.or)),
+          padding: const EdgeInsets.fromLTRB(14, 8, 14, 0),
+          child: Text('⚠️ Cloud இணைக்க முடியவில்லை — இந்த device-ன் வரலாறு காட்டப்படுகிறது', textAlign: TextAlign.center, style: ts(12, w: w7, c: P.or)),
         ),
       Container(
-        margin: const EdgeInsets.fromLTRB(12, 12, 12, 4),
+        margin: const EdgeInsets.fromLTRB(14, 12, 14, 4),
         padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(color: P.card, border: Border.all(color: P.bd), borderRadius: BorderRadius.circular(14)),
-        child: Row(children: [tb('all', 'எல்லா ஆர்டர்கள்'), tb('act', 'நடப்பில்', act.length)]),
+        decoration: BoxDecoration(color: P.card2, borderRadius: BorderRadius.circular(14)),
+        child: Row(children: [tb('all', 'எல்லா ஆர்டர்கள்'), const SizedBox(width: 4), tb('act', 'நடப்பில்', act.length)]),
       ),
       if (tab == 'all' && done.isNotEmpty)
+        // HTML .co-clr
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 6, 6, 0),
+          padding: const EdgeInsets.fromLTRB(16, 6, 16, 0),
           child: Row(children: [
-            Expanded(child: Text('${list.length} ஆர்டர்கள்', style: ts(12.5, w: w7, c: P.mu))),
-            TextButton.icon(
-              onPressed: () => _clearDone(done),
-              icon: Icon(Icons.delete_outline, size: 16, color: P.mu2),
-              label: Text('முடிந்தவற்றை அழி (${done.length})', style: ts(12.5, w: w8, c: P.mu2)),
+            Expanded(child: Text('${list.length} ஆர்டர்கள்', style: ts(12.5, w: w7, c: P.mu2))),
+            GestureDetector(
+              onTap: () => _clearDone(done),
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 44),
+                alignment: Alignment.center,
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.delete_outline, size: 16, color: P.red),
+                  const SizedBox(width: 5),
+                  Text('முடிந்தவற்றை அழி (${done.length})', style: ts(13, w: w8, c: P.red)),
+                ]),
+              ),
             ),
           ]),
         ),
@@ -332,7 +348,7 @@ String coDate(OrderV o) {
   final d = DateTime.fromMillisecondsSinceEpoch(o.ts), t = DateTime.now();
   final y = t.subtract(const Duration(days: 1));
   bool same(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
-  final day = same(d, t) ? 'இன்று' : (same(d, y) ? 'நேற்று' : '${d.day} ${kTaMonthsShort[d.month - 1]}');
+  final day = same(d, t) ? 'இன்று' : (same(d, y) ? 'நேற்று' : taDayMon(d));
   return '$day · ${tTime('${d.hour}:${d.minute}')}';
 }
 
@@ -657,16 +673,22 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with WidgetsBindi
         eta = by.isAfter(DateTime.now()) ? '⏱ ${hm12(by)}-க்குள் வந்துவிடும்' : '⏱ சிறிது நேரத்தில் வந்துவிடும்';
       }
     }
-    final heroBg = st == 'CANCELLED'
-        ? const [Color(0xFFDC2626), Color(0xFFB91C1C)]
+    // HTML .tk-hero (160deg): இயல்பு --hdr→--hdr2, .done #0f766e→#14b8a6, .bad #991b1b→#dc2626
+    final bad = st == 'CANCELLED';
+    final heroBg = bad
+        ? const [Color(0xFF991B1B), Color(0xFFDC2626)]
         : st == 'DELIVERED'
-            ? const [Color(0xFF16A34A), Color(0xFF15803D)]
-            : const [Color(0xFF075E54), Color(0xFF00A884)];
+            ? const [Color(0xFF0F766E), Color(0xFF14B8A6)]
+            : [P.hdr, P.hdr2];
     final kids = <Widget>[];
     kids.add(Container(
-      margin: const EdgeInsets.fromLTRB(14, 14, 14, 0),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 22),
-      decoration: BoxDecoration(gradient: LinearGradient(colors: heroBg), borderRadius: BorderRadius.circular(22)),
+      margin: const EdgeInsets.fromLTRB(12, 12, 12, 0),
+      padding: const EdgeInsets.fromLTRB(18, 22, 18, 16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(colors: heroBg, begin: const Alignment(-.342, -.94), end: const Alignment(.342, .94)),
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: bad ? null : const [BoxShadow(color: Color(0x40008069), blurRadius: 22, offset: Offset(0, 8))],
+      ),
       child: Column(children: [
         if (o.cloud && h != null) ...[
           _LiveIcon(h[0], live: active),
@@ -701,7 +723,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with WidgetsBindi
         ],
       ]),
     ));
-    if (o.cloud && active && o.id != null && o.ph.isNotEmpty) kids.add(PushBlock(oid: o.id!, ph: o.ph));
     if (st == 'CANCELLED' && o.cr.isNotEmpty) {
       kids.add(_card(Text.rich(TextSpan(style: ts(13.5, c: const Color(0xFF991B1B)), children: [
         const TextSpan(text: '❌ '),
@@ -764,6 +785,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with WidgetsBindi
           ),
       ])));
     }
+    // HTML: delivery நபருக்குப் பிறகு, பில்லுக்கு முன் 🔔 (margin 10 14 0)
+    if (o.cloud && active && o.id != null && o.ph.isNotEmpty) kids.add(PushBlock(oid: o.id!, ph: o.ph, margin: const EdgeInsets.fromLTRB(14, 10, 14, 0)));
     // பில்
     final sub = o.sub ?? o.its.fold<double>(0, (a, i) => a + i.t);
     kids.add(_card(Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [

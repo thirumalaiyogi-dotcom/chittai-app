@@ -144,14 +144,14 @@ class _NotifScreenState extends State<NotifScreen> {
   String _day(int ts) {
     final d = DateTime.fromMillisecondsSinceEpoch(ts), t = DateTime.now(), y = t.subtract(const Duration(days: 1));
     bool same(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
-    final dm = '${d.day} ${kTaMonthsLong[d.month - 1]} ${d.year}';
+    final dm = taDayMonthYear(d);
     return same(d, t) ? 'இன்று, $dm' : (same(d, y) ? 'நேற்று, $dm' : dm);
   }
 
   String _time(int ts) {
     final d = DateTime.fromMillisecondsSinceEpoch(ts), t = DateTime.now(), y = t.subtract(const Duration(days: 1));
     bool same(DateTime a, DateTime b) => a.year == b.year && a.month == b.month && a.day == b.day;
-    final day = same(d, t) ? 'இன்று' : (same(d, y) ? 'நேற்று' : '${d.day} ${kTaMonthsShort[d.month - 1]}');
+    final day = same(d, t) ? 'இன்று' : (same(d, y) ? 'நேற்று' : taDayMon(d));
     return '$day, ${hm12(d)}';
   }
 

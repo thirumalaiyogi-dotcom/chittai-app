@@ -113,5 +113,33 @@ ThemeData buildTheme(bool dark) {
     textTheme: GoogleFonts.notoSansTamilTextTheme(base.textTheme).apply(bodyColor: p.text, displayColor: p.text),
     bottomSheetTheme: BottomSheetThemeData(backgroundColor: p.card, surfaceTintColor: Colors.transparent),
     dialogTheme: DialogThemeData(backgroundColor: p.card, surfaceTintColor: Colors.transparent),
+    // HTML பொத்தான்கள்: radius 12, 1.5px எல்லை, w800 எழுத்து, Material நிழல்/tint இல்லை
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: p.mu2,
+        backgroundColor: p.card,
+        side: BorderSide(color: p.bd, width: 1.5),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(foregroundColor: p.g2, textStyle: const TextStyle(fontWeight: FontWeight.w800)),
+    ),
+    // HTML .acc-row / பட்டியல் வரிசைகள்
+    listTileTheme: ListTileThemeData(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14),
+      minVerticalPadding: 13,
+      iconColor: p.g2,
+      textColor: p.text,
+      titleTextStyle: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w700, color: p.text),
+      subtitleTextStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: p.mu),
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: const WidgetStatePropertyAll(Colors.white),
+      trackColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? const Color(0xFF00A884) : p.bd),
+      trackOutlineColor: WidgetStatePropertyAll(p.bd),
+    ),
   );
 }

@@ -71,14 +71,19 @@ class _ShopsTabState extends State<ShopsTab> {
                   SliverToBoxAdapter(
                     child: Container(
                       decoration: BoxDecoration(gradient: kHeroGrad, borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28))),
-                      padding: const EdgeInsets.fromLTRB(14, 0, 14, 18),
+                      padding: const EdgeInsets.fromLTRB(12, 6, 12, 18),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text('கடைகள்', style: ts(22, w: w8, c: Colors.white)),
+                        Padding(padding: const EdgeInsets.fromLTRB(4, 2, 4, 0), child: Text('கடைகள்', style: ts(20, w: w8, c: Colors.white))),
                         Container(
-                          height: 52,
+                          height: 54,
                           margin: const EdgeInsets.only(top: 10),
-                          padding: const EdgeInsets.only(left: 14, right: 6),
-                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18)),
+                          padding: const EdgeInsets.only(left: 16, right: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(18),
+                            border: s.dark ? null : Border.all(color: _f.hasFocus ? const Color(0xFF00A884) : const Color(0xFFE3EAE7)),
+                            boxShadow: [s.dark ? const BoxShadow(color: Color(0x2E00281E), blurRadius: 22, offset: Offset(0, 8)) : const BoxShadow(color: Color(0x12143C32), blurRadius: 14, offset: Offset(0, 4))],
+                          ),
                           child: Row(children: [
                             const Icon(Icons.search, color: Color(0xFF00A884)),
                             const SizedBox(width: 8),
@@ -102,12 +107,17 @@ class _ShopsTabState extends State<ShopsTab> {
                               ),
                             ),
                             if (_query.isNotEmpty)
-                              IconButton(
-                                icon: const Icon(Icons.close, size: 20, color: Color(0xFF5D6B68)),
-                                onPressed: () {
+                              GestureDetector(
+                                onTap: () {
                                   _q.clear();
                                   setState(() => _query = '');
                                 },
+                                child: Container(
+                                  width: 38,
+                                  height: 38,
+                                  decoration: const BoxDecoration(color: Color(0xFFEEF2F1), shape: BoxShape.circle),
+                                  child: const Icon(Icons.close, size: 20, color: Color(0xFF5D6B68)),
+                                ),
                               ),
                           ]),
                         ),
@@ -135,14 +145,16 @@ class _KindTabs extends SliverPersistentHeaderDelegate {
   final List<Kind> kinds;
   final String on;
   final bool dark;
-  _KindTabs(this.kinds, this.on, this.dark);
+  // வகைப் பெயர் / படம் / நிறம் — உருவாக்கும்போதே பதிவு (மாறினால் மீண்டும் வரை)
+  final String _sig;
+  _KindTabs(this.kinds, this.on, this.dark) : _sig = kinds.map((k) => '${k.id}|${k.n}|${k.e}|${AppState.I.kindImg[k.id] ?? ''}|${AppState.I.kindBg(k)}').join(',');
 
   @override
   double get minExtent => 104;
   @override
   double get maxExtent => 104;
   @override
-  bool shouldRebuild(covariant _KindTabs o) => o.on != on || o.kinds.length != kinds.length || o.dark != dark;
+  bool shouldRebuild(covariant _KindTabs o) => o.on != on || o.dark != dark || o._sig != _sig;
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
@@ -467,7 +479,7 @@ class RatingSection extends StatelessWidget {
     );
   }
 
-  static String _d(DateTime d) => '${d.day} ${kTaMonthsShort[d.month - 1]} ${d.year}';
+  static String _d(DateTime d) => taDayMonYear(d); // HTML ta-IN {day, month:'short', year}
 }
 
 // ═══ கடைக்குள்: வகை landing → இடது வகைகள் + பொருட்கள் ═══

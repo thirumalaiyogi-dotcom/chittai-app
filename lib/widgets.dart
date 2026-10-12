@@ -713,7 +713,7 @@ class _NoticeBarState extends State<NoticeBar> with SingleTickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    final style = ts(13.5, w: w7, c: const Color(0xFF7A4B00));
+    final style = ts(13.5, w: w8, c: const Color(0xFF7A4B00));
     return GestureDetector(
       onTapDown: (_) => setState(() {
         _hold = true;
@@ -757,3 +757,230 @@ class _NoticeBarState extends State<NoticeBar> with SingleTickerProviderStateMix
     );
   }
 }
+
+// ═══ HTML-ன் அதே line icons (SVG path → Flutter Path) ═══
+// path / circle / rect (rx) மட்டும்; "f" class கொண்டவை active ஆகும்போது 20% நிறம் நிரம்பும்
+class LineIcon extends StatelessWidget {
+  final String svg;
+  final double size, stroke;
+  final Color color;
+  final double fillAlpha; // 0 = நிரப்பு இல்லை
+  const LineIcon(this.svg, {super.key, this.size = 20, this.stroke = 2, required this.color, this.fillAlpha = 0});
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        width: size,
+        height: size,
+        child: CustomPaint(painter: _LinePainter(_SvgShapes.of(svg), stroke, color, fillAlpha)),
+      );
+}
+
+class _SvgShapes {
+  final List<Path> all = [], fill = [];
+  static final Map<String, _SvgShapes> _cache = {};
+  static _SvgShapes of(String svg) => _cache.putIfAbsent(svg, () => _SvgShapes._(svg));
+
+  static double _a(String tag, String n) {
+    final m = RegExp('\\b$n="([-0-9.]+)"').firstMatch(tag);
+    return m == null ? 0 : double.parse(m.group(1)!);
+  }
+
+  _SvgShapes._(String svg) {
+    for (final m in RegExp(r'<(path|circle|rect)\b([^>]*)/?>').allMatches(svg)) {
+      final tag = m.group(2)!;
+      final f = tag.contains('class="f"');
+      Path p;
+      switch (m.group(1)) {
+        case 'circle':
+          p = Path()..addOval(Rect.fromCircle(center: Offset(_a(tag, 'cx'), _a(tag, 'cy')), radius: _a(tag, 'r')));
+          break;
+        case 'rect':
+          final r = Rect.fromLTWH(_a(tag, 'x'), _a(tag, 'y'), _a(tag, 'width'), _a(tag, 'height'));
+          p = Path()..addRRect(RRect.fromRectAndRadius(r, Radius.circular(_a(tag, 'rx'))));
+          break;
+        default:
+          final d = RegExp(r'\bd="([^"]*)"').firstMatch(tag)?.group(1) ?? '';
+          p = _parse(d);
+      }
+      all.add(p);
+      if (f) fill.add(p);
+    }
+  }
+
+  static Path _parse(String d) {
+    final p = Path();
+    final tok = RegExp(r'[MmLlHhVvAaZzCcSsQq]|-?(?:\d+\.?\d*|\.\d+)(?:e-?\d+)?').allMatches(d).map((x) => x.group(0)!).toList();
+    var i = 0;
+    var cmd = 'M';
+    double x = 0, y = 0, sx = 0, sy = 0;
+    bool isCmd(String t) => RegExp(r'^[A-Za-z]$').hasMatch(t);
+    double n() => double.parse(tok[i++]);
+    while (i < tok.length) {
+      if (isCmd(tok[i])) cmd = tok[i++];
+      final rel = cmd == cmd.toLowerCase();
+      switch (cmd.toUpperCase()) {
+        case 'M':
+          var nx = n(), ny = n();
+          if (rel) {
+            nx += x;
+            ny += y;
+          }
+          x = nx;
+          y = ny;
+          sx = x;
+          sy = y;
+          p.moveTo(x, y);
+          cmd = rel ? 'l' : 'L'; // அடுத்த எண்கள் = lineTo
+          break;
+        case 'L':
+          var nx = n(), ny = n();
+          if (rel) {
+            nx += x;
+            ny += y;
+          }
+          x = nx;
+          y = ny;
+          p.lineTo(x, y);
+          break;
+        case 'H':
+          final v = n();
+          x = rel ? x + v : v;
+          p.lineTo(x, y);
+          break;
+        case 'V':
+          final v = n();
+          y = rel ? y + v : v;
+          p.lineTo(x, y);
+          break;
+        case 'C':
+          final v = [n(), n(), n(), n(), n(), n()];
+          if (rel) {
+            for (var k = 0; k < 6; k += 2) {
+              v[k] += x;
+              v[k + 1] += y;
+            }
+          }
+          p.cubicTo(v[0], v[1], v[2], v[3], v[4], v[5]);
+          x = v[4];
+          y = v[5];
+          break;
+        case 'Q':
+          final v = [n(), n(), n(), n()];
+          if (rel) {
+            v[0] += x;
+            v[1] += y;
+            v[2] += x;
+            v[3] += y;
+          }
+          p.quadraticBezierTo(v[0], v[1], v[2], v[3]);
+          x = v[2];
+          y = v[3];
+          break;
+        case 'A':
+          final rx = n(), ry = n(), rot = n(), large = n() != 0, sweep = n() != 0;
+          var nx = n(), ny = n();
+          if (rel) {
+            nx += x;
+            ny += y;
+          }
+          p.arcToPoint(Offset(nx, ny), radius: Radius.elliptical(rx, ry), rotation: rot, largeArc: large, clockwise: sweep);
+          x = nx;
+          y = ny;
+          break;
+        case 'Z':
+          p.close();
+          x = sx;
+          y = sy;
+          break;
+        default:
+          i++; // தெரியாதது: தவிர்
+      }
+    }
+    return p;
+  }
+}
+
+class _LinePainter extends CustomPainter {
+  final _SvgShapes s;
+  final double stroke, fillAlpha;
+  final Color color;
+  _LinePainter(this.s, this.stroke, this.color, this.fillAlpha);
+  @override
+  void paint(Canvas c, Size z) {
+    c.scale(z.width / 24, z.height / 24);
+    if (fillAlpha > 0) {
+      final f = Paint()..color = color.withValues(alpha: fillAlpha);
+      for (final p in s.fill) {
+        c.drawPath(p, f);
+      }
+    }
+    final st = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+    for (final p in s.all) {
+      c.drawPath(p, st);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _LinePainter o) => o.color != color || o.stroke != stroke || o.fillAlpha != fillAlpha || o.s != s;
+}
+
+// HTML .wa-toggle (52×30, knob 22)
+class WaToggle extends StatelessWidget {
+  final bool on;
+  final ValueChanged<bool> onChanged;
+  const WaToggle({super.key, required this.on, required this.onChanged});
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: () => onChanged(!on),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          width: 52,
+          height: 30,
+          decoration: BoxDecoration(
+            color: on ? const Color(0xFF00A884) : P.bd,
+            border: Border.all(color: on ? const Color(0xFF00A884) : P.bd),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: AnimatedAlign(
+            duration: const Duration(milliseconds: 250),
+            alignment: on ? Alignment.centerRight : Alignment.centerLeft,
+            child: Container(
+              width: 22,
+              height: 22,
+              margin: const EdgeInsets.symmetric(horizontal: 3),
+              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x40000000), blurRadius: 4, offset: Offset(0, 1))]),
+            ),
+          ),
+        ),
+      );
+}
+
+// HTML icon தொகுப்புகள்
+const String kIcHome = '<path class="f" d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>';
+const String kIcShops = '<path class="f" d="M4 10v10h16V10"/><path d="M3 10l1.5-6h15L21 10M3 10h18M3 10a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0M10 20v-5h4v5"/>';
+const String kIcOrders = '<rect class="f" x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h4"/>';
+const String kIcCart = '<path d="M3 4h2l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.1L21 8H6.2"/><circle cx="9.5" cy="20" r="1.4"/><circle cx="17.5" cy="20" r="1.4"/>';
+const String kCxCart = '<path d="M3 4h2l2.2 10.2a1.5 1.5 0 0 0 1.5 1.2h8.6a1.5 1.5 0 0 0 1.5-1.1L20.5 8H6.2"/><circle cx="9.5" cy="19.5" r="1.4"/><circle cx="17" cy="19.5" r="1.4"/>';
+const String kCxTruck = '<path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.6"/><circle cx="17.5" cy="17.5" r="1.6"/>';
+const String kCxTag = '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8" r="1.3"/>';
+const String kIcReceipt = '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>';
+const String kIcEdit = '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/>';
+// கணக்குப் பக்கம் (ACC_IC)
+const Map<String, String> kAccIc = {
+  'ord': '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h6M9 18h3"/>',
+  'fav': '<path d="M12 20.5s-8-4.9-8-11A4.5 4.5 0 0 1 12 6.6 4.5 4.5 0 0 1 20 9.5c0 6.1-8 11-8 11z"/>',
+  'loc': '<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  'bell': '<path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+  'font': '<path d="M4 19l5-14 5 14M6 14h6M15 19l3-8 3 8M16 16.5h4"/>',
+  'moon': '<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>',
+  'help': '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14M12 17.3v.2"/>',
+  'info': '<circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.2"/>',
+  'lock': '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+  'doc': '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/>',
+  'share': '<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>',
+  'del': '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+};

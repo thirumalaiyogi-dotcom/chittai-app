@@ -65,51 +65,59 @@ class _AccountScreenState extends State<AccountScreen> {
     final raw = s.profRaw();
     final nOrd = s.ordLocal().length, nFav = s.favIds.length;
     final nm = p != null ? js(p['nm']) : '';
-    final ini = nm.trim().characters.take(2).join();
+    final ini = String.fromCharCodes(nm.trim().runes.take(2)); // HTML [...nm].slice(0,2)
     final ph = p != null ? '+91 ${js(p['ph']).substring(0, 5)} ${js(p['ph']).substring(5)}' : '';
     final area = js(raw['area']).isNotEmpty ? js(raw['area']) : (raw['lat'] != null ? 'இடம் சேமிக்கப்பட்டது' : 'சேர்க்கவில்லை');
-    Widget row(IconData ic, String t, {String sub = '', VoidCallback? onTap, Widget? right, bool red = false}) => InkWell(
+    final dk = s.dark;
+    // HTML .acc-* (வரி 1765-1791; light card நிழல் 2204)
+    final cardShadow = dk ? null : const [BoxShadow(color: Color(0x0D143C32), blurRadius: 8, offset: Offset(0, 2))];
+    final cardBd = dk ? P.bd : const Color(0xFFE3EAE7);
+    Widget ri(String ic, {bool red = false}) => Container(
+          width: 38,
+          height: 38,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(color: red ? const Color(0x1ADC2626) : P.gc, borderRadius: BorderRadius.circular(11)),
+          child: LineIcon(kAccIc[ic]!, size: 21, color: red ? P.red : P.g2),
+        );
+    Widget chev() => Text('›', style: TextStyle(fontSize: 24, height: 1, color: P.mu));
+    Widget row(String ic, String t, {String sub = '', VoidCallback? onTap, Widget? right, bool red = false, Widget? below}) => InkWell(
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
             child: Row(children: [
-              Container(
-                width: 38,
-                height: 38,
-                decoration: BoxDecoration(color: red ? const Color(0xFFFEE2E2) : P.gc, borderRadius: BorderRadius.circular(11)),
-                child: Icon(ic, size: 20, color: red ? const Color(0xFFDC2626) : P.g2),
-              ),
-              const SizedBox(width: 12),
+              ri(ic, red: red),
+              const SizedBox(width: 13),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(t, style: ts(15, w: w7, c: red ? const Color(0xFFDC2626) : P.text)),
-                  if (sub.isNotEmpty) Text(sub, style: ts(12, c: P.mu)),
+                  Text(t, style: ts(14.5, w: w7, c: red ? P.red : P.text)),
+                  if (sub.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 2), child: Text(sub, style: ts(12, w: w6, c: P.mu))),
+                  if (below != null) below,
                 ]),
               ),
-              right ?? Icon(Icons.chevron_right, color: P.mu),
+              if (below == null) right ?? chev(),
             ]),
           ),
         );
     Widget group(List<Widget> k) => Container(
-          margin: const EdgeInsets.fromLTRB(14, 12, 14, 0),
-          decoration: BoxDecoration(color: P.card, border: Border.all(color: P.bd), borderRadius: BorderRadius.circular(18)),
+          margin: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+          decoration: BoxDecoration(color: P.card, border: Border.all(color: cardBd), borderRadius: BorderRadius.circular(16), boxShadow: cardShadow),
           clipBehavior: Clip.antiAlias,
           child: Column(children: [
-            for (var i = 0; i < k.length; i++) ...[if (i > 0) Divider(height: 1, color: P.bd, indent: 66), k[i]],
+            for (var i = 0; i < k.length; i++) ...[if (i > 0) Divider(height: 1, thickness: 1, color: P.bd), k[i]],
           ]),
         );
-    Widget quick(IconData ic, String big, String small, VoidCallback f) => Expanded(
-          child: InkWell(
+    Widget quick(String ic, String big, String small, VoidCallback f, {bool area = false}) => Expanded(
+          child: GestureDetector(
             onTap: f,
-            borderRadius: BorderRadius.circular(16),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
-              decoration: BoxDecoration(color: P.card, border: Border.all(color: P.bd), borderRadius: BorderRadius.circular(16)),
+              padding: const EdgeInsets.fromLTRB(6, 11, 6, 9),
+              decoration: BoxDecoration(color: P.card, border: Border.all(color: cardBd), borderRadius: BorderRadius.circular(14), boxShadow: cardShadow),
               child: Column(children: [
-                Icon(ic, color: P.g2, size: 22),
-                const SizedBox(height: 4),
-                Text(big, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(15, w: w8)),
-                Text(small, style: ts(11.5, c: P.mu)),
+                LineIcon(kAccIc[ic]!, size: 21, color: P.g2),
+                const SizedBox(height: 3),
+                Text(big, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(area ? 12 : 16, w: w8)),
+                const SizedBox(height: 3),
+                Text(small, style: ts(12, w: w7, c: P.mu2)),
               ]),
             ),
           ),
@@ -117,87 +125,117 @@ class _AccountScreenState extends State<AccountScreen> {
     return Scaffold(
       backgroundColor: P.bg,
       appBar: plainBar(context, 'கணக்கு'),
-      body: ListView(padding: const EdgeInsets.only(bottom: 30), children: [
+      body: ListView(padding: const EdgeInsets.fromLTRB(0, 14, 0, 0), children: [
+        // HTML .acc-top
         Container(
-          margin: const EdgeInsets.fromLTRB(14, 14, 14, 0),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(gradient: kHeroGrad, borderRadius: BorderRadius.circular(20)),
-          child: Row(children: [
-            CircleAvatar(
-              radius: 28,
-              backgroundColor: const Color(0x33FFFFFF),
-              child: ini.isNotEmpty ? Text(ini, style: ts(20, w: w8, c: Colors.white)) : const Icon(Icons.person, color: Colors.white, size: 30),
+          margin: const EdgeInsets.fromLTRB(14, 0, 14, 12),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: dk ? [P.hdr, const Color(0xFF0A6B52)] : const [Color(0xFF075E54), Color(0xFF00A884)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            const SizedBox(width: 14),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(children: [
+            Container(
+              width: 60,
+              height: 60,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+              child: ini.isNotEmpty ? Text(ini, style: ts(22, w: w8, c: P.hdr)) : Icon(Icons.person, color: P.hdr, size: 34),
+            ),
+            const SizedBox(width: 13),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('வணக்கம் 👋', style: ts(12.5, c: const Color(0xDDFFFFFF))),
-                if (nm.isNotEmpty) Text(nm, style: ts(18, w: w8, c: Colors.white)),
-                Text(p != null ? ph : 'உங்கள் விவரங்களைச் சேர்க்கவும்', style: ts(13, w: w6, c: const Color(0xEEFFFFFF))),
+                Text('வணக்கம் 👋', style: ts(12.5, w: w7, c: const Color(0xD9FFFFFF))),
+                if (nm.isNotEmpty) ...[
+                  const SizedBox(height: 3),
+                  Text(nm, maxLines: 2, overflow: TextOverflow.ellipsis, style: ts(17, w: w8, c: Colors.white, h: 1.3)),
+                ],
+                const SizedBox(height: 3),
+                Text(p != null ? ph : 'உங்கள் விவரங்களைச் சேர்க்கவும்', maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(13, c: const Color(0xE6FFFFFF))),
               ]),
             ),
-            TextButton(
-              style: TextButton.styleFrom(backgroundColor: const Color(0x33FFFFFF), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-              onPressed: () => setState(() => _editing = true),
-              child: Text(p != null ? '✏️ மாற்று' : '+ சேர்', style: ts(13, w: w8, c: Colors.white)),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () => setState(() => _editing = true),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                decoration: BoxDecoration(
+                  color: const Color(0x24FFFFFF),
+                  border: Border.all(color: const Color(0xB3FFFFFF), width: 1.5),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  if (p != null) ...[const LineIcon(kIcEdit, size: 14, stroke: 2.1, color: Colors.white), const SizedBox(width: 5)],
+                  Text(p != null ? 'மாற்று' : '+ சேர்', style: ts(12.5, w: w8, c: Colors.white)),
+                ]),
+              ),
             ),
           ]),
         ),
+        // HTML .acc-q
         Padding(
-          padding: const EdgeInsets.fromLTRB(14, 12, 14, 0),
+          padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
           child: Row(children: [
-            quick(Icons.receipt_long_outlined, '$nOrd', 'ஆர்டர்கள்', () {
-              Navigator.of(context).pop();
-              Nav.go('orders');
-            }),
-            const SizedBox(width: 8),
-            quick(Icons.favorite_border, '$nFav', 'விருப்பங்கள்', () {
+            quick('ord', '$nOrd', 'ஆர்டர்கள்', () => Nav.go('orders')),
+            const SizedBox(width: 9),
+            quick('fav', '$nFav', 'விருப்பங்கள்', () {
               // HTML navGo('fav'): கணக்கை மூடி விருப்பங்கள்
               Nav.popInnerToRoot();
               pushFull(const FavScreen());
             }),
-            const SizedBox(width: 8),
-            quick(Icons.location_on_outlined, area, 'முகவரி', () => showLocationSheet()),
+            const SizedBox(width: 9),
+            quick('loc', area, 'முகவரி', () => showLocationSheet(), area: true),
           ]),
         ),
         group([
-          row(Icons.notifications_none, 'அறிவிப்புகள்', sub: 'ஆர்டர் நிலை மாறியதும் தெரிவிக்க', onTap: () => pushFull(const NotifScreen())),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(children: [
-              Container(width: 38, height: 38, decoration: BoxDecoration(color: P.gc, borderRadius: BorderRadius.circular(11)), child: Icon(Icons.text_fields, size: 20, color: P.g2)),
-              const SizedBox(width: 12),
-              Expanded(child: Text('எழுத்து அளவு', style: ts(15, w: w7))),
-              for (final x in const [
-                ['1', 'சிறிது'],
-                ['2', 'நடுத்தரம்'],
-                ['3', 'பெரிது']
-              ])
-                GestureDetector(
-                  onTap: () => s.setFs(x[0]),
-                  child: Container(
-                    margin: const EdgeInsets.only(left: 4),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                    decoration: BoxDecoration(color: s.fs == x[0] ? P.g : P.card2, border: Border.all(color: s.fs == x[0] ? P.g : P.bd), borderRadius: BorderRadius.circular(10)),
-                    child: Text(x[1], style: TextStyle(fontSize: 10 + int.parse(x[0]) * 1.5, fontWeight: w8, color: s.fs == x[0] ? Colors.white : P.mu2)),
-                  ),
-                ),
-            ]),
-          ),
-          row(Icons.dark_mode_outlined, 'இரவு நிறம்', sub: s.dark ? 'ஆன்' : 'ஆஃப்', onTap: () => _dark(!s.dark), right: Switch(value: s.dark, activeTrackColor: P.g, onChanged: _dark)),
+          row('bell', 'அறிவிப்புகள்', sub: 'ஆர்டர் நிலை மாறியதும் தெரிவிக்க', onTap: () => pushFull(const NotifScreen())),
+          // HTML .acc-fs + .acc-seg: தலைப்பின் கீழே மூன்று பொத்தான்கள்
+          row('font', 'எழுத்து அளவு',
+              below: Padding(
+                padding: const EdgeInsets.only(top: 7),
+                child: Row(children: [
+                  for (final x in const [
+                    ['1', 'சிறிது'],
+                    ['2', 'நடுத்தரம்'],
+                    ['3', 'பெரிது']
+                  ]) ...[
+                    if (x[0] != '1') const SizedBox(width: 6),
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () => s.setFs(x[0]),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 7),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: s.fs == x[0] ? P.gc : P.card2,
+                            border: Border.all(color: s.fs == x[0] ? P.g : P.bd, width: 1.5),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Text(x[1], style: TextStyle(fontSize: 10 + int.parse(x[0]) * 1.5, fontWeight: w8, color: s.fs == x[0] ? P.g2 : P.text)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ]),
+              )),
+          row('moon', 'இரவு நிறம்', sub: dk ? 'ஆன்' : 'ஆஃப்', onTap: () => _dark(!dk), right: WaToggle(on: dk, onChanged: _dark)),
         ]),
         group([
-          row(Icons.help_outline, 'உதவி & ஆதரவு', sub: 'சிட்டை WhatsApp', onTap: () => pushFull(const HelpScreen())),
-          row(Icons.share_outlined, 'நண்பர்களுக்குப் பகிருங்கள்', onTap: shareApp),
+          row('help', 'உதவி & ஆதரவு', sub: 'சிட்டை WhatsApp', onTap: () => pushFull(const HelpScreen())),
+          row('share', 'நண்பர்களுக்குப் பகிருங்கள்', onTap: shareApp),
         ]),
         group([
-          row(Icons.info_outline, 'சிட்டை பற்றி', onTap: () => pushFull(const InfoScreen(page: 'about'))),
-          row(Icons.lock_outline, 'தனியுரிமைக் கொள்கை', onTap: () => pushFull(const InfoScreen(page: 'privacy'))),
-          row(Icons.description_outlined, 'விதிமுறைகள்', onTap: () => pushFull(const InfoScreen(page: 'terms'))),
+          row('info', 'சிட்டை பற்றி', onTap: () => pushFull(const InfoScreen(page: 'about'))),
+          row('lock', 'தனியுரிமைக் கொள்கை', onTap: () => pushFull(const InfoScreen(page: 'privacy'))),
+          row('doc', 'விதிமுறைகள்', onTap: () => pushFull(const InfoScreen(page: 'terms'))),
         ]),
         if (p != null)
           group([
-            row(Icons.delete_outline, 'என் விவரங்களை நீக்கு', red: true, right: const SizedBox.shrink(), onTap: () async {
+            row('del', 'என் விவரங்களை நீக்கு', red: true, right: const SizedBox.shrink(), onTap: () async {
               final ok = await confirmDialog('பெயர், எண், முகவரி இந்த phone-லிருந்து நீக்கப்படும். சரியா?', danger: true);
               if (!ok) return;
               final o = s.profRaw()
@@ -209,7 +247,7 @@ class _AccountScreenState extends State<AccountScreen> {
               toast('🗑️ விவரங்கள் நீக்கப்பட்டன');
             }),
           ]),
-        Padding(padding: const EdgeInsets.all(18), child: Text(appVersionText, textAlign: TextAlign.center, style: ts(12, c: P.mu))),
+        Padding(padding: const EdgeInsets.fromLTRB(0, 6, 0, 18), child: Text(appVersionText, textAlign: TextAlign.center, style: ts(12, c: P.mu))),
       ]),
     );
   }

@@ -68,57 +68,117 @@ class StoriesRow extends StatelessWidget {
     if (live.isEmpty) return const SizedBox.shrink();
     final seen = stSeen();
     final list = [...live.where((s) => !seen.contains(js(s['id']))), ...live.where((s) => seen.contains(js(s['id'])))];
+    // HTML .st-wrap / .st-rib / .st-ring (வரி 2615-2628)
     return Container(
-      margin: const EdgeInsets.fromLTRB(0, 16, 0, 0),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 14, bottom: 8),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-            decoration: BoxDecoration(color: const Color(0xFFE11D48), borderRadius: BorderRadius.circular(10)),
-            child: Text('இன்று புதிது', style: ts(12, w: w8, c: Colors.white)),
+      margin: const EdgeInsets.fromLTRB(14, 22, 14, 0),
+      child: Stack(clipBehavior: Clip.none, children: [
+        Container(
+          padding: const EdgeInsets.fromLTRB(0, 22, 0, 12),
+          decoration: BoxDecoration(
+            color: P.card,
+            border: Border.all(color: P.bd),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: const [BoxShadow(color: Color(0x12143C32), blurRadius: 14, offset: Offset(0, 4))],
+          ),
+          child: SizedBox(
+            height: 70 + 6 + 20 + 6,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.fromLTRB(14, 4, 14, 2),
+              itemCount: list.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              itemBuilder: (_, i) {
+                final s = list[i];
+                final isSeen = seen.contains(js(s['id']));
+                return GestureDetector(
+                  onTap: () => openStories(list, i),
+                  child: SizedBox(
+                    width: 72,
+                    child: Column(children: [
+                      Container(
+                        width: 70,
+                        height: 70,
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          // conic-gradient(from 210deg, #00a884, #7ad8b8, #f59e0b, #00a884)
+                          gradient: isSeen
+                              ? null
+                              : const SweepGradient(
+                                  colors: [Color(0xFF00A884), Color(0xFF7AD8B8), Color(0xFFF59E0B), Color(0xFF00A884)],
+                                  transform: GradientRotation(120 * 3.141592653589793 / 180),
+                                ),
+                          color: isSeen ? const Color(0xFFC9D4D0) : null,
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: P.card, width: 3), color: P.gc),
+                          clipBehavior: Clip.antiAlias,
+                          child: Img(js(s['image']), emoji: _kind(s)[0], emojiSize: 28),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      SizedBox(
+                        width: 76,
+                        child: Text(stLabel(s), maxLines: 1, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: ts(12, w: isSeen ? w6 : w7, c: isSeen ? P.mu2 : P.text)),
+                      ),
+                    ]),
+                  ),
+                );
+              },
+            ),
           ),
         ),
-        SizedBox(
-          height: 104,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            itemCount: list.length,
-            itemBuilder: (_, i) {
-              final s = list[i];
-              final isSeen = seen.contains(js(s['id']));
-              return GestureDetector(
-                onTap: () => openStories(list, i),
-                child: SizedBox(
-                  width: 78,
-                  child: Column(children: [
-                    Container(
-                      width: 68,
-                      height: 68,
-                      padding: const EdgeInsets.all(3),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: isSeen ? null : const SweepGradient(colors: [Color(0xFF00A884), Color(0xFFF59E0B), Color(0xFFE11D48), Color(0xFF00A884)]),
-                        color: isSeen ? const Color(0xFFCBD5D1) : null,
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: P.card, width: 2.5), color: P.card2),
-                        clipBehavior: Clip.antiAlias,
-                        child: Img(js(s['image']), emoji: _kind(s)[0], emojiSize: 26),
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Text(stLabel(s), maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(11.5, w: w7, c: isSeen ? P.mu : P.text)),
-                  ]),
+        // நடுவில் மேலே ribbon
+        Positioned(
+          top: -13,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              CustomPaint(size: const Size(8, 8), painter: _Fold(P.g2, left: true)),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 5),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(colors: [P.g, P.g2], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(10)),
+                  boxShadow: const [BoxShadow(color: Color(0x40007A63), blurRadius: 8, offset: Offset(0, 3))],
                 ),
-              );
-            },
+                child: Text('இன்று புதிது', style: ts(13, w: w8, c: Colors.white)),
+              ),
+              CustomPaint(size: const Size(8, 8), painter: _Fold(P.g2, left: false)),
+            ]),
           ),
         ),
       ]),
     );
   }
+}
+
+// ribbon ஓரத்தின் சிறு மடிப்பு (HTML ::before / ::after clip-path)
+class _Fold extends CustomPainter {
+  final Color c;
+  final bool left;
+  _Fold(this.c, {required this.left});
+  @override
+  void paint(Canvas cv, Size z) {
+    final p = Path();
+    if (left) {
+      p
+        ..moveTo(z.width, 0)
+        ..lineTo(z.width, z.height)
+        ..lineTo(0, z.height);
+    } else {
+      p
+        ..moveTo(0, 0)
+        ..lineTo(z.width, z.height)
+        ..lineTo(0, z.height);
+    }
+    p.close();
+    cv.drawPath(p, Paint()..color = c);
+  }
+
+  @override
+  bool shouldRepaint(covariant _Fold o) => o.c != c;
 }
 
 Future<void> openStories(List<Map<String, dynamic>> list, int i) async {

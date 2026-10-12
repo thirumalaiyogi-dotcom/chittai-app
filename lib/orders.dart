@@ -24,7 +24,7 @@ String uuid4() {
 final RegExp kUuid = RegExp(r'^[0-9a-f-]{36}$', caseSensitive: false);
 
 // web app-ன் toLocaleString('ta-IN') போல: "12/10/2026, 12:14 PM"
-String fmtDate(DateTime d) => '${d.day}/${d.month}/${d.year}, ${hm12(d)}';
+String fmtDate(DateTime d) => taLocaleString(d); // HTML: new Date().toLocaleString('ta-IN')
 
 // ═══ முகவரி: பிரித்த பகுதிகள் → ஒரே வரி (server-க்கு அப்படியே) ═══
 class AdField {

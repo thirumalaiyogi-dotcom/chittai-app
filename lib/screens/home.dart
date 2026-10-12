@@ -67,22 +67,30 @@ class AppHeader extends StatelessWidget {
             try {
               n = Nt.unread();
             } catch (_) {}
-            return btn(
-              Stack(clipBehavior: Clip.none, children: [
-                const Icon(Icons.notifications, color: Colors.white, size: 25),
-                if (n > 0)
-                  Positioned(
-                    right: -6,
-                    top: -4,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                      constraints: const BoxConstraints(minWidth: 16),
-                      decoration: BoxDecoration(color: const Color(0xFFE53935), borderRadius: BorderRadius.circular(9), border: Border.all(color: Colors.white, width: 1.2)),
-                      child: Text(n > 9 ? '9+' : '$n', textAlign: TextAlign.center, style: ts(9.5, w: w8, c: Colors.white)),
+            // HTML .bell-dot (வரி 1674 + 2245): பொத்தானின் மேல்-வலது top 3 right 2
+            return InkResponse(
+              onTap: () => pushFull(const NotifScreen()),
+              radius: 22,
+              child: SizedBox(
+                width: 40,
+                height: 40,
+                child: Stack(alignment: Alignment.center, clipBehavior: Clip.none, children: [
+                  const Icon(Icons.notifications, color: Colors.white, size: 25),
+                  if (n > 0)
+                    Positioned(
+                      top: 3,
+                      right: 2,
+                      child: Container(
+                        height: 18,
+                        constraints: const BoxConstraints(minWidth: 18),
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(color: const Color(0xFFEF4444), borderRadius: BorderRadius.circular(9), border: Border.all(color: P.hdr, width: 2)),
+                        child: Text(n > 9 ? '9+' : '$n', textAlign: TextAlign.center, style: pop(11.5, c: Colors.white).copyWith(height: 1)),
+                      ),
                     ),
-                  ),
-              ]),
-              () => pushFull(const NotifScreen()),
+                ]),
+              ),
             );
           },
         ),
@@ -346,19 +354,31 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
+            // HTML .hm-x: 38px வட்டம் #eef2f1; எழுத்து இருக்கும்போது mic மறையும் (.hm-x.on~.hm-mic)
             if (_q.text.isNotEmpty)
-              IconButton(
-                icon: const Icon(Icons.close, color: Color(0xFF5D6B68), size: 20),
-                onPressed: () {
+              GestureDetector(
+                onTap: () {
                   _q.clear();
                   _onType('');
                   _f.requestFocus();
                 },
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: const BoxDecoration(color: Color(0xFFEEF2F1), shape: BoxShape.circle),
+                  child: const Icon(Icons.close, color: Color(0xFF5D6B68), size: 20),
+                ),
+              )
+            else
+              GestureDetector(
+                onTap: _voice,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(color: _mic ? const Color(0xFFFFE3E3) : Colors.transparent, shape: BoxShape.circle),
+                  child: Icon(Icons.mic_none, color: _mic ? const Color(0xFFD93025) : (s.dark ? P.g2 : const Color(0xFF00A884))),
+                ),
               ),
-            IconButton(
-              icon: Icon(_mic ? Icons.mic : Icons.mic_none, color: _mic ? const Color(0xFFDC2626) : const Color(0xFF00A884)),
-              onPressed: _voice,
-            ),
           ]),
         ),
       ]),
@@ -368,7 +388,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // ── கண்டுபிடி பகுதி ──
   List<Widget> _discover(AppState s) {
     final out = <Widget>[];
-    if (s.notice.isNotEmpty) out.add(SliverToBoxAdapter(child: NoticeBar(s.notice)));
+    if (s.notice.isNotEmpty) out.add(SliverToBoxAdapter(child: NoticeBar(s.notice, key: ValueKey(s.notice))));
     out.add(const SliverToBoxAdapter(child: BannerCarousel()));
     out.add(const SliverToBoxAdapter(child: ActiveOrderStrip()));
     out.add(const SliverToBoxAdapter(child: StoriesRow()));
@@ -539,54 +559,51 @@ class _HomeScreenState extends State<HomeScreen> {
     final p = s.profRaw();
     final txt = 'வணக்கம் 🙏 இந்தப் பொருட்கள் வேண்டும் — சீட்டின் போட்டோவை இத்துடன் அனுப்புகிறேன்.'
         '${js(p['nm']).isNotEmpty ? '\nபெயர்: ${js(p['nm'])}' : ''}${js(p['ad']).isNotEmpty ? '\nமுகவரி: ${js(p['ad'])}' : ''}';
+    // HTML .eld (வரி 1810-1816) — இரு theme-லும் அதே நிறங்கள்
+    Widget btn(String t, Color bg, Color fg, VoidCallback f, {Border? border}) => Expanded(
+          child: GestureDetector(
+            onTap: f,
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 46),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(14), border: border),
+              child: Text(t, textAlign: TextAlign.center, style: ts(14, w: w8, c: fg)),
+            ),
+          ),
+        );
     return Container(
-      margin: const EdgeInsets.fromLTRB(12, 18, 12, 4),
+      margin: const EdgeInsets.fromLTRB(12, 16, 12, 4),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: s.dark ? [const Color(0xFF2A2416), P.card] : const [Color(0xFFFFF8EC), Colors.white]),
+        gradient: const LinearGradient(colors: [Color(0xFFFFF8EC), Colors.white], begin: Alignment.topLeft, end: Alignment.bottomRight),
         border: Border.all(color: const Color(0xFFF6DFB5)),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('🙏', style: TextStyle(fontSize: 28)),
-          const SizedBox(width: 10),
+          Container(
+            width: 44,
+            height: 44,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: const Color(0xFFFFECC7), borderRadius: BorderRadius.circular(14)),
+            child: const Text('🙏', style: TextStyle(fontSize: 24)),
+          ),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('App-ல் போடத் தெரியவில்லையா?', style: ts(15.5, w: w8)),
-              const SizedBox(height: 3),
+              Text('App-ல் போடத் தெரியவில்லையா?', style: ts(15, w: w8, c: const Color(0xFF5C3B00))),
+              const SizedBox(height: 2),
               Text('சீட்டை எழுதி போட்டோ எடுத்து அனுப்புங்கள், அல்லது அழையுங்கள் — நாங்களே ஆர்டர் போட்டு வீட்டுக்கு அனுப்புகிறோம்',
-                  style: ts(12.5, w: w6, c: P.mu2, h: 1.45)),
+                  style: ts(12.5, c: const Color(0xFF7A5A1E), h: 1.5)),
             ]),
           ),
         ]),
         const SizedBox(height: 12),
         Row(children: [
-          Expanded(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF25D366),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 13),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              onPressed: () => openUrl('https://wa.me/$n?text=${Uri.encodeComponent(txt)}'),
-              child: Text('📷 சீட்டை WhatsApp-ல் அனுப்பு', textAlign: TextAlign.center, style: ts(13, w: w8, c: Colors.white)),
-            ),
-          ),
+          btn('📷 சீட்டை WhatsApp-ல் அனுப்பு', const Color(0xFF25D366), Colors.white, () => openUrl('https://wa.me/$n?text=${Uri.encodeComponent(txt)}')),
           const SizedBox(width: 8),
-          Expanded(
-            child: OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                backgroundColor: s.dark ? P.card : Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 13),
-                side: const BorderSide(color: Color(0xFFF0CF8F), width: 1.5),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              onPressed: () => openUrl('tel:+$n'),
-              child: Text('📞 அழைத்து சொல்லு', textAlign: TextAlign.center, style: ts(13, w: w8, c: s.dark ? P.text : const Color(0xFF5C3B00))),
-            ),
-          ),
+          btn('📞 அழைத்து சொல்லு', Colors.white, const Color(0xFF5C3B00), () => openUrl('tel:+$n'), border: Border.all(color: const Color(0xFFF0CF8F), width: 1.5)),
         ]),
       ]),
     );
@@ -813,17 +830,17 @@ class _ShopListState extends State<ShopList> {
           onTap: () => setState(() => _sort = k),
           child: Container(
             margin: const EdgeInsets.only(right: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
             decoration: BoxDecoration(
               color: eff == k ? P.g : P.card,
-              border: Border.all(color: eff == k ? P.g : P.bd, width: 1.4),
+              border: Border.all(color: eff == k ? P.g : P.bd, width: 1.5),
               borderRadius: BorderRadius.circular(20),
             ),
-            child: Text(l, style: ts(13, w: w8, c: eff == k ? Colors.white : P.mu2)),
+            child: Text(l, style: ts(12, w: w7, c: eff == k ? Colors.white : P.mu2)),
           ),
         );
     return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      Padding(padding: const EdgeInsets.fromLTRB(16, 16, 16, 8), child: Text('$title (${list.length})', style: ts(16, w: w8))),
+      Padding(padding: const EdgeInsets.fromLTRB(14, 16, 14, 10), child: Text('$title (${list.length})', style: ts(14.5, w: w8))),
       if (anyKm || anyRating)
         SizedBox(
           height: 40,
@@ -861,10 +878,19 @@ class ShopCard extends StatelessWidget {
     if (s.coverImage.isNotEmpty) {
       pic = Img(s.coverImage, emoji: kt?.e ?? '🏪', fit: BoxFit.cover, emojiSize: 56);
     } else if (s.logoImage.isNotEmpty) {
-      pic = Padding(padding: const EdgeInsets.all(26), child: Img(s.logoImage, emoji: kt?.e ?? '🏪', fit: BoxFit.contain, emojiSize: 56));
+      // HTML .sc-logo: 108×108 வெள்ளைப் பெட்டி, radius 24, நிழல்
+      pic = Center(
+        child: Container(
+          width: 108,
+          height: 108,
+          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), boxShadow: const [BoxShadow(color: Color(0x24000000), blurRadius: 20, offset: Offset(0, 8))]),
+          clipBehavior: Clip.antiAlias,
+          child: Img(s.logoImage, emoji: kt?.e ?? '🏪', fit: BoxFit.cover, emojiSize: 56),
+        ),
+      );
     } else if (kimg.isNotEmpty) {
       pic = kimg.endsWith('#cut')
-          ? Padding(padding: const EdgeInsets.all(18), child: Img(kimg, emoji: kt?.e ?? '🏪', fit: BoxFit.contain, emojiSize: 56))
+          ? Center(child: SizedBox(width: 120, height: 120, child: Img(kimg, emoji: kt?.e ?? '🏪', fit: BoxFit.contain, emojiSize: 56)))
           : Img(kimg, emoji: kt?.e ?? '🏪', fit: BoxFit.cover, emojiSize: 56);
     } else {
       pic = Center(child: Text(s.logoEmoji(kt?.e ?? '🏪'), style: const TextStyle(fontSize: 64)));
@@ -893,7 +919,8 @@ class ShopCard extends StatelessWidget {
           color: P.card,
           borderRadius: BorderRadius.circular(22),
           border: Border.all(color: active ? P.g : P.bd, width: active ? 1.5 : 1),
-          boxShadow: const [BoxShadow(color: Color(0x14143C32), blurRadius: 18, offset: Offset(0, 6))],
+          // light: HTML 2204 வரி (0 2px 8px .05); dark: .sc2 (0 6px 18px .08)
+          boxShadow: st.dark ? const [BoxShadow(color: Color(0x14143C32), blurRadius: 18, offset: Offset(0, 6))] : const [BoxShadow(color: Color(0x0D143C32), blurRadius: 8, offset: Offset(0, 2))],
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -913,15 +940,15 @@ class ShopCard extends StatelessWidget {
                   ),
                 ),
               Positioned(
-                top: 8,
-                right: 8,
+                top: 10,
+                right: 10,
                 child: GestureDetector(
                   onTap: () => Nav.openShopDetail(s.id),
                   child: Container(
                     width: 36,
                     height: 36,
-                    decoration: const BoxDecoration(color: Color(0xF0FFFFFF), shape: BoxShape.circle),
-                    child: const Icon(Icons.info_outline, size: 20, color: Color(0xFF1B2725)),
+                    decoration: const BoxDecoration(color: Color(0xF0FFFFFF), shape: BoxShape.circle, boxShadow: [BoxShadow(color: Color(0x1A000000), blurRadius: 8, offset: Offset(0, 2))]),
+                    child: const Icon(Icons.info_outline, size: 20, color: Color(0xFF3B4A47)),
                   ),
                 ),
               ),
@@ -943,7 +970,7 @@ class ShopCard extends StatelessWidget {
                 Positioned(
                   left: 12,
                   bottom: 12,
-                  right: 60,
+                  right: 12,
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Container(
@@ -960,15 +987,13 @@ class ShopCard extends StatelessWidget {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
                 Expanded(child: Text(s.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(17.5, w: w8))),
-                if (r != null)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: const Color(0xFF16A34A), borderRadius: BorderRadius.circular(8)),
-                    child: Text('★ ${r.toStringAsFixed(1)}', style: ts(12.5, w: w8, c: Colors.white)),
-                  ),
+                if (r != null) ...[
+                  const SizedBox(width: 10),
+                  Text('★ ${r.toStringAsFixed(1)}', style: ts(15, w: w8, c: const Color(0xFFE08A00))), // HTML .sc-rt
+                ],
               ]),
-              if (sub.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 3), child: Text(sub, maxLines: 2, overflow: TextOverflow.ellipsis, style: ts(13, w: w6, c: P.mu))),
-              const SizedBox(height: 8),
+              if (sub.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 4), child: Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(13.5, w: w6, c: P.mu2))),
+              const SizedBox(height: 10),
               del,
             ]),
           ),

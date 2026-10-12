@@ -139,7 +139,10 @@ class _BootState extends State<Boot> with TickerProviderStateMixin {
             final dots = seg(1500, 300);
             final off = Curves.easeIn.transform(_exit.value);
             final bob = (_loop.value < .5 ? _loop.value : 1 - _loop.value) * 6;
-            return Opacity(
+            return AnnotatedRegion<SystemUiOverlayStyle>(
+              // வெள்ளை splash-ல் light theme: status bar icons கருப்பு
+              value: SystemUiOverlayStyle(statusBarColor: Colors.transparent, statusBarIconBrightness: dark ? Brightness.light : Brightness.dark, statusBarBrightness: dark ? Brightness.dark : Brightness.light),
+              child: Opacity(
               opacity: (1 - (off - .4).clamp(0.0, 1.0) / .6).clamp(0.0, 1.0).toDouble(),
               child: Container(
                 decoration: BoxDecoration(
@@ -223,6 +226,7 @@ class _BootState extends State<Boot> with TickerProviderStateMixin {
                   ),
                 ]),
               ),
+            ),
             );
           },
         ),
@@ -322,7 +326,7 @@ class _ShellState extends State<Shell> {
               observers: [_obs],
               onGenerateInitialRoutes: (_, __) => [MaterialPageRoute(builder: (_) => const TabRoot(), settings: const RouteSettings(name: 'root'))],
             ),
-            const Positioned(left: 0, right: 0, bottom: 0, child: NetBanner()),
+            const Positioned(left: 0, right: 0, top: 0, child: NetBanner()), // HTML .conn-bnr / .net-bnr: மேலே
           ]),
           bottomNavigationBar: const BottomNav(),
         ),
@@ -365,26 +369,40 @@ class BottomNav extends StatelessWidget {
       animation: Listenable.merge([Nav.tab, Nav.innerHl, Orders.I]),
       builder: (_, __) {
         final on = Nav.innerHl.value ?? Nav.tab.value;
-        Widget item(String k, IconData ic, IconData icOn, String lb, {int badge = 0, bool cartLb = false}) {
+        final dk = s.dark;
+        // HTML .bn-it (light: 2222-2226; dark: 1474-1480)
+        Widget item(String k, String svg, String lb, {int badge = 0, bool cartLb = false}) {
           final a = on == k;
-          final col = a ? P.g2 : const Color(0xFF8A9592);
+          final lbCol = dk ? (a ? P.g2 : const Color(0xFF8A9592)) : (a ? const Color(0xFF00856B) : const Color(0xFF64706C));
+          final icCol = dk ? lbCol : (a ? const Color(0xFF00A884) : const Color(0xFF87938F));
           return Expanded(
             child: InkWell(
               onTap: () => Nav.go(k),
               child: Stack(alignment: Alignment.center, children: [
-                if (a) Positioned(top: 0, left: 22, right: 22, child: Container(height: 3.5, decoration: BoxDecoration(color: P.g, borderRadius: const BorderRadius.vertical(bottom: Radius.circular(4))))),
+                if (a)
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    child: FractionallySizedBox(
+                      widthFactor: .48, // left/right 26%
+                      child: Container(height: 3.5, decoration: BoxDecoration(color: dk ? P.g : const Color(0xFF00A884), borderRadius: const BorderRadius.vertical(bottom: Radius.circular(4)))),
+                    ),
+                  ),
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                   Stack(clipBehavior: Clip.none, children: [
-                    Icon(a ? icOn : ic, color: col, size: 25),
+                    LineIcon(svg, size: 25, stroke: a ? 2.4 : 2, color: icCol, fillAlpha: a ? .2 : 0),
                     if (badge > 0)
                       Positioned(
                         right: -9,
                         top: -5,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                          constraints: const BoxConstraints(minWidth: 18),
-                          decoration: BoxDecoration(color: const Color(0xFFE53935), borderRadius: BorderRadius.circular(10), border: Border.all(color: P.card, width: 1.5)),
-                          child: Text(badge > 99 ? '99+' : '$badge', textAlign: TextAlign.center, style: ts(10.5, w: w8, c: Colors.white)),
+                          height: 16,
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          constraints: const BoxConstraints(minWidth: 16),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(color: const Color(0xFFFF3B30), borderRadius: BorderRadius.circular(8)),
+                          child: Text(badge > 99 ? '99+' : '$badge', textAlign: TextAlign.center, style: ts(11, w: w8, c: Colors.white, h: 1)),
                         ),
                       ),
                   ]),
@@ -393,9 +411,9 @@ class BottomNav extends StatelessWidget {
                       ? Container(
                           padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
                           decoration: BoxDecoration(color: P.g, borderRadius: BorderRadius.circular(10)),
-                          child: Text('₹${_r(amt)}', style: ts(11.5, w: w8, c: Colors.white)),
+                          child: Text('₹${_r(amt)}', style: ts(12, w: w8, c: Colors.white)),
                         )
-                      : Text(lb, style: ts(11.5, w: a ? w8 : w7, c: col)),
+                      : Text(lb, style: ts(12, w: w8, c: lbCol)),
                 ]),
               ]),
             ),
@@ -404,19 +422,19 @@ class BottomNav extends StatelessWidget {
 
         return Container(
           decoration: BoxDecoration(
-            color: P.card,
-            border: Border(top: BorderSide(color: P.bd)),
-            boxShadow: const [BoxShadow(color: Color(0x0F000000), blurRadius: 16, offset: Offset(0, -4))],
+            color: dk ? P.card : Colors.white,
+            border: Border(top: BorderSide(color: dk ? P.bd : const Color(0xFFE3EAE7))),
+            boxShadow: [BoxShadow(color: dk ? const Color(0x0F000000) : const Color(0x0A143C32), blurRadius: dk ? 16 : 10, offset: Offset(0, dk ? -4 : -2))],
           ),
           child: SafeArea(
             top: false,
             child: SizedBox(
-              height: 62,
+              height: 64, // HTML --bn: 64px (Home v3, வரி 1413)
               child: Row(children: [
-                item('home', Icons.home_outlined, Icons.home_rounded, 'முகப்பு'),
-                item('shops', Icons.storefront_outlined, Icons.storefront, 'கடைகள்'),
-                item('orders', Icons.receipt_long_outlined, Icons.receipt_long, 'ஆர்டர்கள்', badge: Orders.I.badge),
-                item('cart', Icons.shopping_cart_outlined, Icons.shopping_cart, 'கூடை', badge: n, cartLb: true),
+                item('home', kIcHome, 'முகப்பு'),
+                item('shops', kIcShops, 'கடைகள்'),
+                item('orders', kIcOrders, 'ஆர்டர்கள்', badge: Orders.I.badge),
+                item('cart', kIcCart, 'கூடை', badge: n, cartLb: true),
               ]),
             ),
           ),
@@ -476,16 +494,27 @@ class _NetBannerState extends State<NetBanner> {
   @override
   Widget build(BuildContext context) {
     final s = context.watch<AppState>();
-    if (_off) return _bar('📴 இணைய இணைப்பு இல்லை', const Color(0xFFB91C1C));
-    if (_back) return _bar('✅ இணைய இணைப்பு மீண்டும் கிடைத்தது', const Color(0xFF15803D));
+    final top = MediaQuery.of(context).padding.top;
+    if (_off) return _bar('📴 இணைய இணைப்பு இல்லை', const Color(0xFFC0392B), top);
+    if (_back) return _bar('✅ இணைய இணைப்பு மீண்டும் கிடைத்தது', const Color(0xFF16A34A), top);
     if (s.cloudFail && !s.cloudLoading) {
+      // HTML .net-bnr
       return Material(
-        color: const Color(0xFFFFF7E6),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 6, 6, 6),
+        color: const Color(0xFFFFF4E5),
+        child: Container(
+          padding: EdgeInsets.fromLTRB(12, 8 + top, 12, 8),
+          decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0xFFF0C987)))),
           child: Row(children: [
-            Expanded(child: Text('⚠️ தகவல்களை ஏற்ற முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சி செய்யுங்கள்.', style: ts(12.5, w: w7, c: const Color(0xFF9A5B00)))),
-            TextButton(onPressed: () => s.runCloudLoad(), child: Text('மீண்டும் முயற்சி', style: ts(12.5, w: w8, c: const Color(0xFF9A5B00)))),
+            Expanded(child: Text('⚠️ தகவல்களை ஏற்ற முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சி செய்யுங்கள்.', style: ts(12, w: w7, c: const Color(0xFF8A5300)))),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () => s.runCloudLoad(),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(color: P.or, borderRadius: BorderRadius.circular(8)),
+                child: Text('மீண்டும் முயற்சி', style: ts(12, w: w8, c: Colors.white)),
+              ),
+            ),
           ]),
         ),
       );
@@ -493,8 +522,9 @@ class _NetBannerState extends State<NetBanner> {
     return const SizedBox.shrink();
   }
 
-  Widget _bar(String t, Color c) => Material(
+  // HTML .conn-bnr
+  Widget _bar(String t, Color c, double top) => Material(
         color: c,
-        child: Padding(padding: const EdgeInsets.symmetric(vertical: 7), child: Text(t, textAlign: TextAlign.center, style: ts(13, w: w8, c: Colors.white))),
+        child: Padding(padding: EdgeInsets.fromLTRB(12, 8 + top, 12, 8), child: Text(t, textAlign: TextAlign.center, style: ts(13, w: w8, c: Colors.white))),
       );
 }

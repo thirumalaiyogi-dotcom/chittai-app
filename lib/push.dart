@@ -130,15 +130,16 @@ class PushBlock extends StatelessWidget {
           return Container(
             margin: margin,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(color: P.gc, borderRadius: BorderRadius.circular(12)),
-            child: Text('🔔 நிலை மாறியதும் இந்த phone-க்கு notification வரும்', textAlign: TextAlign.center, style: ts(12.5, w: w8, c: P.g2)),
+            decoration: BoxDecoration(color: P.gc, borderRadius: BorderRadius.circular(10)),
+            child: Text('🔔 நிலை மாறியதும் இந்த phone-க்கு notification வரும்', textAlign: TextAlign.center, style: ts(12.5, w: w7, c: P.g2)),
           );
         }
         return Padding(
           padding: margin,
           child: OutlinedButton(
             style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 13),
+              padding: const EdgeInsets.all(12),
+              backgroundColor: P.card,
               side: BorderSide(color: P.g, width: 1.5),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),

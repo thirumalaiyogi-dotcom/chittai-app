@@ -12,7 +12,8 @@ const String kDefaultShopId = 'grocery';
 // Support WhatsApp எண் (server-ல் app_settings.support_phone இருந்தால் அதுவே)
 const String kDefaultWaNum = '917539967593';
 
-const String kAppVersion = '1.0.0 (Flutter)';
+// HTML: "சிட்டை · பதிப்பு 11-10-2026.3"
+const String kAppVersion = '11-10-2026.3';
 
 // தேடல் வடிகட்டல் அளவுகள்
 const double kSrNearKm = 3;

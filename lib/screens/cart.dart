@@ -164,7 +164,7 @@ class _CartScreenState extends State<CartScreen> {
         ),
       ),
       if (closed) _warn('⛔ ${sh!.name} தற்போது ஆர்டர் ஏற்கவில்லை'),
-      if (closedNow) _warn('🕐 ${sh!.name} இப்போது மூடியுள்ளது — டெலிவரி நேரத்தைத் தேர்ந்தெடுத்து முன்பதிவு செய்யலாம்', bg: const Color(0xFFFFF7E6), fg: const Color(0xFF9A5B00)),
+      if (closedNow) _warn('🕐 ${sh!.name} இப்போது மூடியுள்ளது — கீழே டெலிவரி நேரத்தைத் தேர்ந்தெடுத்து முன்பதிவு செய்யலாம்', bg: const Color(0xFFFFF7E6), fg: const Color(0xFF9A5B00)),
       _freeBar(sh, sub),
       // பொருட்கள்
       _card(
@@ -244,22 +244,32 @@ class _CartScreenState extends State<CartScreen> {
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 26),
             color: P.card,
             child: Column(children: [
-              Row(children: [
-                Icon(Icons.receipt_long_outlined, size: 19, color: P.g2),
-                const SizedBox(width: 6),
-                Text('சிட்டை', style: ts(15, w: w8)),
+              // HTML .cx-bh
+              Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                LineIcon(kIcReceipt, size: 18, stroke: 2.1, color: P.text),
+                const SizedBox(width: 5),
+                Text('சிட்டை', style: ts(16, w: w8)),
                 const Spacer(),
                 Text('பில் விவரம்', style: ts(12, w: w7, c: P.mu)),
               ]),
-              const SizedBox(height: 10),
-              _billRow('பொருட்களின் விலை', '₹${rupee(sub + saved)}'),
-              if (saved > 0) _billRow('தள்ளுபடி', '− ₹${rupee(saved)}', green: true),
-              _billRow('டெலிவரி கட்டணம்', t.del > 0 ? '₹${rupee(t.del)}' : 'இலவசம்', green: t.del <= 0),
-              Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: _dash()),
+              Padding(padding: const EdgeInsets.only(top: 9, bottom: 6), child: _dash()),
+              _billRow(kCxCart, 'பொருட்களின் விலை', '₹${rupee(sub + saved)}'),
+              if (saved > 0) _billRow(kCxTag, 'தள்ளுபடி', '− ₹${rupee(saved)}', green: true),
+              _billRow(kCxTruck, 'டெலிவரி கட்டணம்', t.del > 0 ? '₹${rupee(t.del)}' : 'இலவசம்', green: t.del <= 0),
+              Padding(padding: const EdgeInsets.only(top: 8, bottom: 12), child: _dash()),
+              // HTML .cx-bt: ₹ வட்டம் + மொத்தம் (19px w800)
               Row(children: [
-                Text('மொத்தம்', style: ts(16, w: w9)),
+                Container(
+                  width: 24,
+                  height: 24,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: P.g, shape: BoxShape.circle),
+                  child: Text('₹', style: ts(13, c: Colors.white, h: 1)),
+                ),
+                const SizedBox(width: 9),
+                Text('மொத்தம்', style: ts(19, w: w8)),
                 const Spacer(),
-                Text('₹${rupee(t.tot)}', style: pop(19)),
+                Text('₹${rupee(t.tot)}', style: ts(19, w: w8, c: AppState.I.dark ? P.text : const Color(0xFF075E54))),
               ]),
             ]),
           ),
@@ -289,16 +299,19 @@ class _CartScreenState extends State<CartScreen> {
 
   Widget _dash() => LayoutBuilder(
         builder: (_, c) => Row(
-          children: List.generate((c.maxWidth / 8).floor(), (_) => Container(width: 4, height: 1.2, margin: const EdgeInsets.only(right: 4), color: P.bd)),
+          children: List.generate((c.maxWidth / 8).floor(), (_) => Container(width: 4, height: 2, margin: const EdgeInsets.only(right: 4), color: P.bd)),
         ),
       );
 
-  Widget _billRow(String l, String v, {bool green = false}) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 4),
+  // HTML .cx-br: icon + பெயர் (mu2 w600) · தொகை (w800; g = பச்சை)
+  Widget _billRow(String ic, String l, String v, {bool green = false}) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(children: [
-          Text(l, style: ts(14, w: w6, c: green ? P.g2 : P.mu2)),
+          LineIcon(ic, size: 20, stroke: 2.1, color: P.g2),
+          const SizedBox(width: 9),
+          Text(l, style: ts(14, w: w6, c: P.mu2)),
           const Spacer(),
-          Text(v, style: ts(14, w: w8, c: green ? P.g2 : P.text)),
+          Text(v, style: ts(14, w: w8, c: green ? (AppState.I.dark ? P.g2 : const Color(0xFF16A34A)) : P.text)),
         ]),
       );
 
@@ -474,9 +487,11 @@ class _CartScreenState extends State<CartScreen> {
 
   // ── 🕐 டெலிவரி நேரம்: இப்போதே / பின்னர் (முன்பதிவு) ──
   Widget _schCard(Shop sh, bool closedNow, String eta) {
+    if (closedNow && ckMode == 'now') ckMode = 'later'; // HTML schCardHTML
     final days = ckMode == 'later' ? schDays(sh) : <SchDay>[];
     if (ckDay >= days.length) ckDay = 0;
     final D = days.isNotEmpty ? days[ckDay] : null;
+    // HTML .sch-tg button
     Widget tg(String mode, String t, String sub, {bool disabled = false}) {
       final on = ckMode == mode;
       return Expanded(
@@ -490,21 +505,24 @@ class _CartScreenState extends State<CartScreen> {
                       if (mode == 'now') ckWhen = null;
                     }),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
               decoration: BoxDecoration(
-                color: on ? P.gc : P.card,
-                border: Border.all(color: on ? P.g : P.bd, width: on ? 2 : 1.2),
+                color: on ? P.gc : P.card2,
+                border: Border.all(color: on ? P.g : P.bd, width: 1.5),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Column(children: [
-                Text(t, style: ts(14, w: w8, c: on ? P.g2 : P.text)),
-                Text(sub, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(11.5, w: w6, c: P.mu)),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(t, style: ts(14, w: w8)),
+                const SizedBox(height: 2),
+                Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(11.5, c: P.mu2)),
               ]),
             ),
           ),
         ),
       );
     }
+
+    Widget note(String t) => Padding(padding: const EdgeInsets.only(top: 10), child: Text(t, style: ts(12.5, w: w7, c: P.mu2)));
 
     return _card(
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -516,17 +534,18 @@ class _CartScreenState extends State<CartScreen> {
         const SizedBox(height: 10),
         Row(children: [
           tg('now', '⚡ இப்போதே', closedNow ? 'கடை மூடியுள்ளது' : (eta.isNotEmpty ? eta : 'உடனே'), disabled: closedNow),
-          const SizedBox(width: 10),
+          const SizedBox(width: 8),
           tg('later', '📅 பின்னர்', 'முன்பதிவு · 7 நாள் வரை'),
         ]),
         if (ckMode == 'later') ...[
           if (D == null)
-            Padding(padding: const EdgeInsets.only(top: 10), child: Text('இந்தக் கடைக்கு முன்பதிவு நேரம் இல்லை', style: ts(13, c: P.mu)))
+            note('இந்தக் கடைக்கு முன்பதிவு நேரம் இல்லை')
           else ...[
             const SizedBox(height: 12),
-            SizedBox(
-              height: 58,
-              child: ListView(scrollDirection: Axis.horizontal, children: [
+            // HTML .sch-days
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(children: [
                 for (var i = 0; i < days.length; i++)
                   GestureDetector(
                     onTap: () => setState(() {
@@ -534,44 +553,48 @@ class _CartScreenState extends State<CartScreen> {
                       ckWhen = null;
                     }),
                     child: Container(
-                      width: 74,
+                      constraints: const BoxConstraints(minWidth: 64),
                       margin: const EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                       decoration: BoxDecoration(
-                        color: i == ckDay ? P.g : P.card2,
-                        border: Border.all(color: i == ckDay ? P.g : P.bd),
+                        color: i == ckDay ? P.g : P.card,
+                        border: Border.all(color: i == ckDay ? P.g : P.bd, width: 1.5),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        Text(days[i].chip, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(13, w: w8, c: i == ckDay ? Colors.white : P.text)),
-                        Text(days[i].sub, style: ts(11, w: w6, c: i == ckDay ? Colors.white : P.mu)),
+                      child: Column(children: [
+                        Text(days[i].chip, style: ts(13, w: w8, c: i == ckDay ? Colors.white : P.text)),
+                        Text(days[i].sub, style: ts(11, c: i == ckDay ? const Color(0xD9FFFFFF) : P.mu2)),
                       ]),
                     ),
                   ),
               ]),
             ),
             const SizedBox(height: 10),
-            Wrap(spacing: 8, runSpacing: 8, children: [
-              for (final x in D.slots)
-                GestureDetector(
-                  onTap: () => setState(() {
-                    ckWhen = x;
-                    ckWhenLabel = '${D.full} · ${x.lb}';
-                  }),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
-                    decoration: BoxDecoration(
-                      color: ckWhen?.at == x.at ? P.gc : P.card,
-                      border: Border.all(color: ckWhen?.at == x.at ? P.g : P.bd, width: ckWhen?.at == x.at ? 2 : 1.2),
-                      borderRadius: BorderRadius.circular(12),
+            // HTML .sch-slots: 2 நெடுவரிசை
+            LayoutBuilder(builder: (_, c) {
+              final w = (c.maxWidth - 8) / 2;
+              return Wrap(spacing: 8, runSpacing: 8, children: [
+                for (final x in D.slots)
+                  GestureDetector(
+                    onTap: () => setState(() {
+                      ckWhen = x;
+                      ckWhenLabel = '${D.full} · ${x.lb}';
+                    }),
+                    child: Container(
+                      width: w,
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 11),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: ckWhen?.at == x.at ? P.gc : P.card,
+                        border: Border.all(color: ckWhen?.at == x.at ? P.g : P.bd, width: 1.5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(x.lb, textAlign: TextAlign.center, style: ts(13, w: w7, c: ckWhen?.at == x.at ? P.g2 : P.text)),
                     ),
-                    child: Text(x.lb, style: ts(13, w: w7, c: ckWhen?.at == x.at ? P.g2 : P.text)),
                   ),
-                ),
-            ]),
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: Text(ckWhen != null ? '✅ $ckWhenLabel' : '👆 ஒரு நேரத்தைத் தேர்ந்தெடுங்கள்', style: ts(13, w: w8, c: ckWhen != null ? P.g2 : const Color(0xFFB45309))),
-            ),
+              ]);
+            }),
+            note(ckWhen != null ? '✅ $ckWhenLabel' : '👆 ஒரு நேரத்தைத் தேர்ந்தெடுங்கள்'),
           ],
         ],
       ]),

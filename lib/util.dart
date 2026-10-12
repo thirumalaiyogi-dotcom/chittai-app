@@ -160,6 +160,21 @@ const kTaMonthsShort = ['ஜன', 'பிப்', 'மார்', 'ஏப்', '
 const kTaMonthsLong = ['ஜனவரி', 'பிப்ரவரி', 'மார்ச்', 'ஏப்ரல்', 'மே', 'ஜூன்', 'ஜூலை', 'ஆகஸ்ட்', 'செப்டம்பர்', 'அக்டோபர்', 'நவம்பர்', 'டிசம்பர்'];
 const kTaWeekdays = ['ஞாயிறு', 'திங்கள்', 'செவ்வாய்', 'புதன்', 'வியாழன்', 'வெள்ளி', 'சனி'];
 
+// ═══ HTML toLocale*('ta-IN') வடிவங்கள் (Chrome / CLDR) ═══
+const kTaMonIcu = ['ஜன.', 'பிப்.', 'மார்.', 'ஏப்.', 'மே', 'ஜூன்', 'ஜூலை', 'ஆக.', 'செப்.', 'அக்.', 'நவ.', 'டிச.'];
+// {day:'numeric', month:'short'} → "13 அக்."
+String taDayMon(DateTime d) => '${d.day} ${kTaMonIcu[d.month - 1]}';
+// {day, month:'short', year} → "13 அக்., 2026"
+String taDayMonYear(DateTime d) => '${d.day} ${kTaMonIcu[d.month - 1]}, ${d.year}';
+// {day, month:'long', year} → "13 அக்டோபர், 2026"
+String taDayMonthYear(DateTime d) => '${d.day} ${kTaMonthsLong[d.month - 1]}, ${d.year}';
+// toLocaleString('ta-IN') → "13/10/2026, முற்பகல் 5:18:00"
+String taLocaleString(DateTime d) {
+  final h = d.hour % 12 == 0 ? 12 : d.hour % 12;
+  String p2(int x) => x.toString().padLeft(2, '0');
+  return '${d.day}/${d.month}/${d.year}, ${d.hour < 12 ? 'முற்பகல்' : 'பிற்பகல்'} $h:${p2(d.minute)}:${p2(d.second)}';
+}
+
 String hm12(DateTime d) {
   final h = d.hour % 12 == 0 ? 12 : d.hour % 12;
   return '$h:${d.minute.toString().padLeft(2, '0')} ${d.hour < 12 ? 'AM' : 'PM'}';
