@@ -20,7 +20,7 @@ const double kSrFastMin = 30;
 
 // 🔔 Firebase push (Firebase Console → Project settings → Your apps → Android app)
 // நான்கும் நிரம்பும் வரை push வசதி மறைந்திருக்கும் — app வேறு எதுவும் பாதிக்காது
-const String kFbApiKey = '';
-const String kFbAppId = '';
-const String kFbSenderId = '';
-const String kFbProjectId = '';
+const String kFbApiKey = 'AIzaSyDEqm8v7WzDnfHTcuiEzCw09ENVwV6ZlIU';
+const String kFbAppId = '1:514345808750:android:58b0f6974fb4bd8d7f877f';
+const String kFbSenderId = '514345808750';
+const String kFbProjectId = 'chittai-6536e';
