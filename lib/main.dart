@@ -104,7 +104,9 @@ class _BootState extends State<Boot> with TickerProviderStateMixin {
         onTap: () {
           if (DateTime.now().difference(_t0).inMilliseconds > 500) _end();
         },
-        child: AnimatedBuilder(
+        child: Material(
+          type: MaterialType.transparency,
+          child: AnimatedBuilder(
           animation: Listenable.merge([_in, _loop, _exit]),
           builder: (_, __) {
             final t = _in.value * 1800; // ms
@@ -202,6 +204,7 @@ class _BootState extends State<Boot> with TickerProviderStateMixin {
               ),
             );
           },
+        ),
         ),
       ),
     ]);
