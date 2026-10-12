@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'nav.dart';
 import 'screens/cart.dart';
 import 'orders.dart';
+import 'push.dart';
 import 'screens/home.dart';
 import 'screens/location.dart';
 import 'screens/orders.dart';
@@ -282,6 +283,8 @@ class _ShellState extends State<Shell> {
     });
     // ஆர்டர் badge
     if (AppState.I.ordLocal().isNotEmpty) Orders.I.fetch();
+    // 🔔 Firebase push (அமைக்கப்பட்டிருந்தால் மட்டும்)
+    Push.init().then((_) => Push.linkRecent());
   }
 
   @override

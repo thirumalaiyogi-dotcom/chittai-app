@@ -12,6 +12,7 @@ import '../state.dart';
 import '../theme.dart';
 import '../util.dart';
 import '../widgets.dart';
+import '../push.dart';
 import 'location.dart';
 import 'orders.dart';
 
@@ -697,7 +698,9 @@ class _CartScreenState extends State<CartScreen> {
       Sfx.checkout();
       s.clearCart();
       Orders.I.fetch(force: true);
-      await showOrderSuccess(oNo: oNo, date: fmtDate(now), shopName: sh?.name ?? '', sub: sub, del: del, tot: tot, oid: js(res['id']));
+      // அனுமதி ஏற்கனவே இருந்தால் இந்த ஆர்டரை அமைதியாக push-உடன் இணை
+      Push.enable(js(res['id']), js(p['ph']), silent: true);
+      await showOrderSuccess(oNo: oNo, date: fmtDate(now), shopName: sh?.name ?? '', sub: sub, del: del, tot: tot, oid: js(res['id']), ph: js(p['ph']));
       if (schedLbl.isNotEmpty) toast('📅 முன்பதிவு: $schedLbl');
     } catch (_) {
       toast('⚠️ Network பிரச்சனை — மீண்டும் முயற்சிக்கவும்');

@@ -17,3 +17,10 @@ const String kAppVersion = '1.0.0 (Flutter)';
 // தேடல் வடிகட்டல் அளவுகள்
 const double kSrNearKm = 3;
 const double kSrFastMin = 30;
+
+// 🔔 Firebase push (Firebase Console → Project settings → Your apps → Android app)
+// நான்கும் நிரம்பும் வரை push வசதி மறைந்திருக்கும் — app வேறு எதுவும் பாதிக்காது
+const String kFbApiKey = '';
+const String kFbAppId = '';
+const String kFbSenderId = '';
+const String kFbProjectId = '';

@@ -14,11 +14,12 @@ import '../store.dart';
 import '../theme.dart';
 import '../util.dart';
 import '../widgets.dart';
+import '../push.dart';
 
 Orders get O => Orders.I;
 
 // ═══ ஆர்டர் வெற்றி: ✓, confetti, பின்தொடர ═══
-Future<void> showOrderSuccess({required String oNo, required String date, required String shopName, required double sub, required double del, required double tot, required String oid}) async {
+Future<void> showOrderSuccess({required String oNo, required String date, required String shopName, required double sub, required double del, required double tot, required String oid, String ph = ''}) async {
   final c = Nav.ctx;
   if (c == null) return;
   haptic(40);
@@ -27,7 +28,7 @@ Future<void> showOrderSuccess({required String oNo, required String date, requir
     isScrollControlled: true,
     isDismissible: true,
     backgroundColor: Colors.transparent,
-    builder: (b) => _Success(oNo: oNo, date: date, shopName: shopName, sub: sub, del: del, tot: tot),
+    builder: (b) => _Success(oNo: oNo, date: date, shopName: shopName, sub: sub, del: del, tot: tot, oid: oid, ph: ph),
   );
   if (track == true && kUuid.hasMatch(oid)) {
     openTrack(oid);
@@ -35,9 +36,9 @@ Future<void> showOrderSuccess({required String oNo, required String date, requir
 }
 
 class _Success extends StatefulWidget {
-  final String oNo, date, shopName;
+  final String oNo, date, shopName, oid, ph;
   final double sub, del, tot;
-  const _Success({required this.oNo, required this.date, required this.shopName, required this.sub, required this.del, required this.tot});
+  const _Success({required this.oNo, required this.date, required this.shopName, required this.sub, required this.del, required this.tot, this.oid = '', this.ph = ''});
   @override
   State<_Success> createState() => _SuccessState();
 }
@@ -108,6 +109,7 @@ class _SuccessState extends State<_Success> with TickerProviderStateMixin {
                 _row('பணம்', '💵 பொருள் வந்ததும்'),
               ]),
             ),
+            if (widget.ph.isNotEmpty) PushBlock(oid: widget.oid, ph: widget.ph, margin: const EdgeInsets.only(bottom: 10)),
             GreenButton('🛵 ஆர்டரைப் பின்தொடர', onTap: () => Navigator.pop(context, true)),
             const SizedBox(height: 8),
             OutlinedButton(
@@ -686,6 +688,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with WidgetsBindi
         ],
       ]),
     ));
+    if (o.cloud && active && o.id != null && o.ph.isNotEmpty) kids.add(PushBlock(oid: o.id!, ph: o.ph));
     if (st == 'CANCELLED' && o.cr.isNotEmpty) {
       kids.add(_card(Text.rich(TextSpan(style: ts(13.5, c: const Color(0xFF991B1B)), children: [
         const TextSpan(text: '❌ '),
