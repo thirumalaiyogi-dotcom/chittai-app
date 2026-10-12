@@ -15,6 +15,18 @@ import 'util.dart';
 
 AppState get S => AppState.I;
 
+// இரவு நிறம் மாறியதும் எல்லாத் திரைகளையும் மீண்டும் வரை
+void rebuildAllWidgets() {
+  final c = Nav.root.currentContext;
+  if (c == null) return;
+  void r(Element e) {
+    e.markNeedsBuild();
+    e.visitChildren(r);
+  }
+
+  (c as Element).visitChildren(r);
+}
+
 // ═══ Toast (கீழே சிறிய கருப்புச் செய்தி) ═══
 OverlayEntry? _toastE;
 Timer? _toastT;

@@ -6,14 +6,20 @@ import 'package:provider/provider.dart';
 
 import '../models.dart';
 import '../nav.dart';
+import '../orders.dart';
 import '../search_engine.dart';
 import '../state.dart';
 import '../theme.dart';
 import '../util.dart';
 import '../widgets.dart';
+import 'package:speech_to_text/speech_to_text.dart';
+
+import 'account.dart';
 import 'location.dart';
+import 'notifs.dart';
 import 'orders.dart';
 import 'search.dart';
+import 'stories.dart';
 
 // ═══ பச்சை header: "சிட்டை." + 🔔 ❤️ 👤 ═══
 class AppHeader extends StatelessWidget {
@@ -21,6 +27,11 @@ class AppHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final favN = context.select<AppState, int>((s) => s.favIds.length);
+    context.watch<AppState>();
+    var unread = 0;
+    try {
+      unread = Nt.unread();
+    } catch (_) {}
     Widget btn(Widget ic, VoidCallback f, {bool dot = false}) => InkResponse(
           onTap: f,
           radius: 22,
@@ -49,9 +60,34 @@ class AppHeader extends StatelessWidget {
           ]),
         ),
         const Spacer(),
-        btn(const Icon(Icons.notifications, color: Colors.white, size: 25), () => toast('🔔 அறிவிப்புகள் — அடுத்த பதிப்பில் (Phase 3)')),
-        btn(Icon(favN > 0 ? Icons.favorite : Icons.favorite_border, color: Colors.white, size: 24), () => toast('❤️ விருப்பமானவை — அடுத்த பதிப்பில் (Phase 3)')),
-        btn(const Icon(Icons.account_circle, color: Colors.white, size: 26), () => toast('👤 கணக்கு — அடுத்த பதிப்பில் (Phase 3)')),
+        ListenableBuilder(
+          listenable: Orders.I,
+          builder: (_, __) {
+            var n = unread;
+            try {
+              n = Nt.unread();
+            } catch (_) {}
+            return btn(
+              Stack(clipBehavior: Clip.none, children: [
+                const Icon(Icons.notifications, color: Colors.white, size: 25),
+                if (n > 0)
+                  Positioned(
+                    right: -6,
+                    top: -4,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                      constraints: const BoxConstraints(minWidth: 16),
+                      decoration: BoxDecoration(color: const Color(0xFFE53935), borderRadius: BorderRadius.circular(9), border: Border.all(color: Colors.white, width: 1.2)),
+                      child: Text(n > 9 ? '9+' : '$n', textAlign: TextAlign.center, style: ts(9.5, w: w8, c: Colors.white)),
+                    ),
+                  ),
+              ]),
+              () => pushFull(const NotifScreen()),
+            );
+          },
+        ),
+        btn(Icon(favN > 0 ? Icons.favorite : Icons.favorite_border, color: Colors.white, size: 24), () => pushFull(const FavScreen())),
+        btn(const Icon(Icons.account_circle, color: Colors.white, size: 26), () => pushFull(const AccountScreen())),
       ]),
     );
   }
@@ -72,6 +108,50 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer? _deb;
   final SrCtl _ctl = SrCtl();
   bool _kAll = false;
+  final SpeechToText _stt = SpeechToText();
+  bool _mic = false, _sttReady = false;
+
+  // 🎤 தமிழ் குரல் தேடல் (phone-ன் Google speech)
+  Future<void> _voice() async {
+    if (_mic) {
+      await _stt.stop();
+      if (mounted) setState(() => _mic = false);
+      return;
+    }
+    try {
+      if (!_sttReady) {
+        _sttReady = await _stt.initialize(
+          onError: (_) {
+            if (mounted) setState(() => _mic = false);
+            toast('🎤 கேட்க முடியவில்லை — மீண்டும் முயற்சிக்கவும்');
+          },
+          onStatus: (st) {
+            if ((st == 'done' || st == 'notListening') && mounted) setState(() => _mic = false);
+          },
+        );
+      }
+      if (!_sttReady) {
+        toast('இந்த phone-ல் குரல் தேடல் இல்லை');
+        return;
+      }
+      setState(() => _mic = true);
+      toast('🎤 பேசுங்கள்...');
+      await _stt.listen(
+        localeId: 'ta_IN',
+        onResult: (r) {
+          if (!r.finalResult) return;
+          final t = r.recognizedWords.trim();
+          if (t.isEmpty) return;
+          _q.text = t;
+          _onType(t);
+          _commit(t);
+        },
+      );
+    } catch (_) {
+      if (mounted) setState(() => _mic = false);
+      toast('இந்த phone-ல் குரல் தேடல் இல்லை');
+    }
+  }
   bool _fabTuck = false;
   double _lastY = 0;
 
@@ -80,6 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     TypingHint.attach();
     Nav.homeReset.addListener(_reset);
+    schedulePopup();
     _f.addListener(() {
       if (_f.hasFocus) _enter();
       setState(() {});
@@ -274,8 +355,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
             IconButton(
-              icon: const Icon(Icons.mic_none, color: Color(0xFF00A884)),
-              onPressed: () => toast('🎤 குரல் தேடல் — அடுத்த பதிப்பில் (Phase 3)'),
+              icon: Icon(_mic ? Icons.mic : Icons.mic_none, color: _mic ? const Color(0xFFDC2626) : const Color(0xFF00A884)),
+              onPressed: _voice,
             ),
           ]),
         ),
@@ -289,6 +370,7 @@ class _HomeScreenState extends State<HomeScreen> {
     if (s.notice.isNotEmpty) out.add(SliverToBoxAdapter(child: NoticeBar(s.notice)));
     out.add(const SliverToBoxAdapter(child: BannerCarousel()));
     out.add(const SliverToBoxAdapter(child: ActiveOrderStrip()));
+    out.add(const SliverToBoxAdapter(child: StoriesRow()));
     final allKinds = s.kinds.where((k) => !k.hide).toList();
     if (allKinds.isNotEmpty) {
       final more = allKinds.length > 8 && !_kAll;

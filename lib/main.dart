@@ -11,6 +11,8 @@ import 'orders.dart';
 import 'screens/home.dart';
 import 'screens/location.dart';
 import 'screens/orders.dart';
+import 'screens/stories.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'screens/shops.dart';
 import 'state.dart';
 import 'store.dart';
@@ -21,6 +23,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Store.init();
   AppState.I.loadLocal();
+  Popups.firstRun; // முதல் திறப்பா என்று படித்த பிறகு குறி
+  Popups.markRun();
   runApp(ChangeNotifierProvider<AppState>.value(value: AppState.I, child: const ChittaiApp()));
   unawaited(AppState.I.runCloudLoad());
 }
@@ -296,11 +300,14 @@ class _ShellState extends State<Shell> {
         ),
         child: Scaffold(
           backgroundColor: P.bg,
-          body: Navigator(
-            key: Nav.inner,
-            observers: [_obs],
-            onGenerateInitialRoutes: (_, __) => [MaterialPageRoute(builder: (_) => const TabRoot(), settings: const RouteSettings(name: 'root'))],
-          ),
+          body: Stack(children: [
+            Navigator(
+              key: Nav.inner,
+              observers: [_obs],
+              onGenerateInitialRoutes: (_, __) => [MaterialPageRoute(builder: (_) => const TabRoot(), settings: const RouteSettings(name: 'root'))],
+            ),
+            const Positioned(left: 0, right: 0, bottom: 0, child: NetBanner()),
+          ]),
           bottomNavigationBar: const BottomNav(),
         ),
       ),
@@ -406,4 +413,72 @@ class BottomNav extends StatelessWidget {
     final s = v.toStringAsFixed(2).replaceFirst(RegExp(r'\.?0+$'), '');
     return s.isEmpty ? '0' : s;
   }
+}
+
+// ═══ இணைய இணைப்பு பட்டை + "மீண்டும் முயற்சி" ═══
+class NetBanner extends StatefulWidget {
+  const NetBanner({super.key});
+  @override
+  State<NetBanner> createState() => _NetBannerState();
+}
+
+class _NetBannerState extends State<NetBanner> {
+  StreamSubscription<List<ConnectivityResult>>? _sub;
+  bool _off = false, _back = false;
+  Timer? _t;
+
+  @override
+  void initState() {
+    super.initState();
+    try {
+      Connectivity().checkConnectivity().then(_on);
+      _sub = Connectivity().onConnectivityChanged.listen(_on);
+    } catch (_) {}
+  }
+
+  void _on(List<ConnectivityResult> r) {
+    final off = r.isEmpty || r.every((x) => x == ConnectivityResult.none);
+    if (!mounted) return;
+    if (_off && !off) {
+      _t?.cancel();
+      setState(() => _back = true);
+      _t = Timer(const Duration(milliseconds: 2800), () {
+        if (mounted) setState(() => _back = false);
+      });
+      if (AppState.I.cloudFail && !AppState.I.cloudLoading) AppState.I.runCloudLoad();
+    }
+    setState(() => _off = off);
+  }
+
+  @override
+  void dispose() {
+    _sub?.cancel();
+    _t?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final s = context.watch<AppState>();
+    if (_off) return _bar('📴 இணைய இணைப்பு இல்லை', const Color(0xFFB91C1C));
+    if (_back) return _bar('✅ இணைய இணைப்பு மீண்டும் கிடைத்தது', const Color(0xFF15803D));
+    if (s.cloudFail && !s.cloudLoading) {
+      return Material(
+        color: const Color(0xFFFFF7E6),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 6, 6, 6),
+          child: Row(children: [
+            Expanded(child: Text('⚠️ தகவல்களை ஏற்ற முடியவில்லை. தயவுசெய்து மீண்டும் முயற்சி செய்யுங்கள்.', style: ts(12.5, w: w7, c: const Color(0xFF9A5B00)))),
+            TextButton(onPressed: () => s.runCloudLoad(), child: Text('மீண்டும் முயற்சி', style: ts(12.5, w: w8, c: const Color(0xFF9A5B00)))),
+          ]),
+        ),
+      );
+    }
+    return const SizedBox.shrink();
+  }
+
+  Widget _bar(String t, Color c) => Material(
+        color: c,
+        child: Padding(padding: const EdgeInsets.symmetric(vertical: 7), child: Text(t, textAlign: TextAlign.center, style: ts(13, w: w8, c: Colors.white))),
+      );
 }

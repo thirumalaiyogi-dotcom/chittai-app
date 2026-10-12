@@ -8,7 +8,9 @@ import 'package:provider/provider.dart';
 import '../models.dart';
 import '../nav.dart';
 import '../orders.dart';
+import '../api.dart';
 import '../state.dart';
+import '../store.dart';
 import '../theme.dart';
 import '../util.dart';
 import '../widgets.dart';
@@ -691,6 +693,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with WidgetsBindi
         TextSpan(text: o.cr),
       ])), bg: const Color(0xFFFEF2F2)));
     }
+    if (o.cloud && o.id != null && st == 'DELIVERED') kids.add(RevAsk(o));
     if (o.cloud && st != 'CANCELLED') {
       const rankOf = {'ORDER_RECEIVED': 0, 'SHOP_ACCEPTED': 1, 'PREPARING': 1, 'READY_FOR_PICKUP': 2, 'DELIVERY_ASSIGNED': 2, 'OUT_FOR_DELIVERY': 3, 'DELIVERED': 4};
       final rank = rankOf[st] ?? 0;
@@ -1004,6 +1007,125 @@ class _ActiveOrderStripState extends State<ActiveOrderStrip> {
           ),
         );
       },
+    );
+  }
+}
+
+
+// ═══ ⭐ இந்த ஆர்டர் எப்படி இருந்தது? (ஒருமுறை; பின்னர் மாற்றலாம்) ═══
+const List<String> kRevLbl = ['', 'மோசம் 😞', 'சுமார் 😐', 'பரவாயில்லை 🙂', 'நல்லது 😊', 'மிக அருமை 🤩'];
+
+class RevAsk extends StatefulWidget {
+  final OrderV o;
+  const RevAsk(this.o, {super.key});
+  @override
+  State<RevAsk> createState() => _RevAskState();
+}
+
+class _RevAskState extends State<RevAsk> {
+  bool _edit = false, _busy = false;
+  int _pick = 0;
+  final _txt = TextEditingController();
+
+  @override
+  void dispose() {
+    _txt.dispose();
+    super.dispose();
+  }
+
+  Future<void> _send() async {
+    if (_pick == 0) return;
+    setState(() => _busy = true);
+    final o = widget.o;
+    final r = await Api.rpc('submit_review', {'p_order_id': o.id, 'p_phone': o.ph, 'p_rating': _pick, 'p_comment': _txt.text});
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (r.status == 0) {
+      toast('📴 Network பிரச்சனை — மீண்டும் முயலுங்கள்');
+      return;
+    }
+    final d = r.data is Map ? r.data as Map : null;
+    if (d == null || d['ok'] != true) {
+      toast('⚠️ ${d != null && js(d['msg']).isNotEmpty ? js(d['msg']) : (r.status == 404 ? 'கருத்து வசதி இன்னும் தயாராகவில்லை' : 'அனுப்ப முடியவில்லை — மீண்டும் முயலுங்கள்')}');
+      return;
+    }
+    final m = AppState.I.revDoneMap();
+    m[o.id!] = _pick;
+    Store.setJson(K.revDone, m);
+    setState(() => _edit = false);
+    toast('⭐ நன்றி! உங்கள் கருத்து சேர்க்கப்பட்டது');
+    AppState.I.loadReviews();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final done = AppState.I.revDoneMap()[widget.o.id];
+    final box = BoxDecoration(color: const Color(0xFFFFFBEB), border: Border.all(color: const Color(0xFFFDE68A)), borderRadius: BorderRadius.circular(18));
+    if (done != null && !_edit) {
+      final n = jz(done).toInt();
+      return Container(
+        margin: const EdgeInsets.fromLTRB(14, 12, 14, 0),
+        padding: const EdgeInsets.all(14),
+        decoration: box,
+        child: Row(children: [
+          Text(List.generate(5, (i) => i < n ? '★' : '☆').join(), style: const TextStyle(fontSize: 18, color: Color(0xFFF59E0B))),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('கருத்துக்கு நன்றி!', style: ts(14, w: w8, c: const Color(0xFF78350F))),
+              Text('மற்ற வாடிக்கையாளர்களுக்கு உதவும்', style: ts(12, c: const Color(0xFF92400E))),
+            ]),
+          ),
+          TextButton(
+            onPressed: () => setState(() {
+              _edit = true;
+              _pick = n;
+            }),
+            child: Text('மாற்று', style: ts(13, w: w8, c: const Color(0xFF92400E))),
+          ),
+        ]),
+      );
+    }
+    return Container(
+      margin: const EdgeInsets.fromLTRB(14, 12, 14, 0),
+      padding: const EdgeInsets.all(16),
+      decoration: box,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Text('இந்த ஆர்டர் எப்படி இருந்தது?', textAlign: TextAlign.center, style: ts(16, w: w8, c: const Color(0xFF78350F))),
+        Text('${widget.o.shop.isNotEmpty ? widget.o.shop : 'கடை'} பற்றி உங்கள் மதிப்பீடு', textAlign: TextAlign.center, style: ts(12.5, c: const Color(0xFF92400E))),
+        const SizedBox(height: 8),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          for (var i = 1; i <= 5; i++)
+            GestureDetector(
+              onTap: () {
+                Sfx.click();
+                setState(() => _pick = i);
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text('★', style: TextStyle(fontSize: 38, color: i <= _pick ? const Color(0xFFF59E0B) : const Color(0xFFE5E7EB))),
+              ),
+            ),
+        ]),
+        Text(_pick > 0 ? kRevLbl[_pick] : 'நட்சத்திரத்தைத் தொடுங்கள்', textAlign: TextAlign.center, style: ts(13.5, w: w8, c: const Color(0xFF92400E))),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _txt,
+          maxLength: 300,
+          maxLines: 2,
+          style: ts(14),
+          decoration: InputDecoration(
+            counterText: '',
+            hintText: 'ஒரு வரி எழுதுங்கள் (விருப்பம்) — உதா: பொருட்கள் புதுசா இருந்தது',
+            hintStyle: ts(13, c: P.mu),
+            filled: true,
+            fillColor: Colors.white,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFFDE68A))),
+          ),
+        ),
+        const SizedBox(height: 10),
+        GreenButton(_busy ? '⏳ அனுப்புகிறது...' : 'கருத்தை அனுப்பு', height: 48, onTap: _pick > 0 && !_busy ? _send : null),
+      ]),
     );
   }
 }
