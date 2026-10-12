@@ -1,0 +1,75 @@
+# சிட்டை — ஒவ்வொரு push-க்கும் APK + AAB தானாக உருவாகும்.
+# GitHub → Actions → கடைசி "Build சிட்டை app" → கீழே "Artifacts" → chittai-apk / chittai-aab
+name: Build சிட்டை app
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+    steps:
+      - name: Code-ஐ எடு
+        uses: actions/checkout@v4
+
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Android project உருவாக்கு
+        run: |
+          flutter --version
+          flutter create --org com.chittai --project-name customer --platforms android .
+          rm -rf test
+
+      - name: Android அமைப்புகள் (பெயர், permissions, signing)
+        run: python3 ci/setup_android.py
+
+      - name: Packages
+        run: flutter pub get
+
+      - name: App icon
+        run: dart run flutter_launcher_icons
+
+      - name: Code சோதனை (பிழைகள் இங்கே தெரியும்)
+        run: flutter analyze --no-fatal-infos --no-fatal-warnings
+
+      - name: APK build
+        run: flutter build apk --release --build-number=${{ github.run_number }}
+
+      - name: AAB build (Play Store-க்கு)
+        run: flutter build appbundle --release --build-number=${{ github.run_number }}
+
+      - name: APK-ஐ சேமி
+        uses: actions/upload-artifact@v4
+        with:
+          name: chittai-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
+
+      - name: AAB-ஐ சேமி
+        uses: actions/upload-artifact@v4
+        with:
+          name: chittai-aab
+          path: build/app/outputs/bundle/release/app-release.aab
+          retention-days: 30
