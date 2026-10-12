@@ -7,7 +7,10 @@ import 'package:provider/provider.dart';
 
 import 'nav.dart';
 import 'screens/cart.dart';
+import 'orders.dart';
 import 'screens/home.dart';
+import 'screens/location.dart';
+import 'screens/orders.dart';
 import 'screens/shops.dart';
 import 'state.dart';
 import 'store.dart';
@@ -266,6 +269,18 @@ class _ShellState extends State<Shell> {
   final _obs = _InnerObserver();
 
   @override
+  void initState() {
+    super.initState();
+    // முதல் முறை: "டெலிவரி இடம் எங்கே?" (இடம் உறுதி செய்யும் வரை)
+    Future.delayed(const Duration(milliseconds: 2900), () {
+      if (!mounted) return;
+      if (AppState.I.profRaw()['lat'] == null) showLocationSheet();
+    });
+    // ஆர்டர் badge
+    if (AppState.I.ordLocal().isNotEmpty) Orders.I.fetch();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
@@ -304,7 +319,7 @@ class TabRoot extends StatelessWidget {
           case 'shops':
             return const ShopsTab();
           case 'orders':
-            return const OrdersSoon();
+            return const OrdersScreen();
           case 'cart':
             return const CartScreen();
           default:
@@ -324,7 +339,7 @@ class BottomNav extends StatelessWidget {
     final n = s.cartCount;
     final amt = s.cartAmount;
     return AnimatedBuilder(
-      animation: Listenable.merge([Nav.tab, Nav.innerHl]),
+      animation: Listenable.merge([Nav.tab, Nav.innerHl, Orders.I]),
       builder: (_, __) {
         final on = Nav.innerHl.value ?? Nav.tab.value;
         Widget item(String k, IconData ic, IconData icOn, String lb, {int badge = 0, bool cartLb = false}) {
@@ -377,7 +392,7 @@ class BottomNav extends StatelessWidget {
               child: Row(children: [
                 item('home', Icons.home_outlined, Icons.home_rounded, 'முகப்பு'),
                 item('shops', Icons.storefront_outlined, Icons.storefront, 'கடைகள்'),
-                item('orders', Icons.receipt_long_outlined, Icons.receipt_long, 'ஆர்டர்கள்'),
+                item('orders', Icons.receipt_long_outlined, Icons.receipt_long, 'ஆர்டர்கள்', badge: Orders.I.badge),
                 item('cart', Icons.shopping_cart_outlined, Icons.shopping_cart, 'கூடை', badge: n, cartLb: true),
               ]),
             ),
@@ -390,23 +405,5 @@ class BottomNav extends StatelessWidget {
   static String _r(double v) {
     final s = v.toStringAsFixed(2).replaceFirst(RegExp(r'\.?0+$'), '');
     return s.isEmpty ? '0' : s;
-  }
-}
-
-// Phase 2-ல் வரும்
-class OrdersSoon extends StatelessWidget {
-  const OrdersSoon({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: P.bg,
-      appBar: AppBar(
-        backgroundColor: P.card,
-        surfaceTintColor: Colors.transparent,
-        automaticallyImplyLeading: false,
-        title: Text('என் ஆர்டர்கள்', style: ts(18, w: w8)),
-      ),
-      body: const StateBox('🛵', 'ஆர்டர்கள் பகுதி அடுத்த பதிப்பில் (Phase 2) வரும்', sub: 'இப்போது கடைகள், பொருட்கள், தேடல், கூடை ஆகியவற்றைச் சோதியுங்கள்'),
-    );
   }
 }

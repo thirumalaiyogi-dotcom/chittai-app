@@ -11,6 +11,8 @@ import '../state.dart';
 import '../theme.dart';
 import '../util.dart';
 import '../widgets.dart';
+import 'location.dart';
+import 'orders.dart';
 import 'search.dart';
 
 // ═══ பச்சை header: "சிட்டை." + 🔔 ❤️ 👤 ═══
@@ -214,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         if (!_srActive)
           GestureDetector(
-            onTap: () => toast('📍 இடம் தேர்வு — அடுத்த பதிப்பில் (Phase 2)'),
+            onTap: () => showLocationSheet(),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
               decoration: BoxDecoration(color: Colors.white.withValues(alpha: .10), borderRadius: BorderRadius.circular(12)),
@@ -286,6 +288,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final out = <Widget>[];
     if (s.notice.isNotEmpty) out.add(SliverToBoxAdapter(child: NoticeBar(s.notice)));
     out.add(const SliverToBoxAdapter(child: BannerCarousel()));
+    out.add(const SliverToBoxAdapter(child: ActiveOrderStrip()));
     final allKinds = s.kinds.where((k) => !k.hide).toList();
     if (allKinds.isNotEmpty) {
       final more = allKinds.length > 8 && !_kAll;

@@ -1,13 +1,19 @@
-// சிட்டை — கூடை = Checkout (Phase 1: பொருட்கள், இலவச டெலிவரி பட்டை, பில். ஆர்டர் செய்தல் Phase 2-ல்)
+// சிட்டை — கூடை = Checkout: பொருட்கள், முகவரி, டெலிவரி நேரம் (இப்போதே / முன்பதிவு), பில், ஆர்டர் (place_order)
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../config.dart';
 import '../models.dart';
 import '../nav.dart';
+import '../orders.dart';
 import '../state.dart';
 import '../theme.dart';
 import '../util.dart';
 import '../widgets.dart';
+import 'location.dart';
+import 'orders.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -17,6 +23,12 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   static String ckNote = '';
+  static String ckMode = 'now';
+  static int ckDay = 0;
+  static SchSlot? ckWhen;
+  static String ckWhenLabel = '';
+  static String? ckCid; // ஒரு checkout முயற்சிக்கு ஒரு id: retry செய்தாலும் இரட்டை ஆர்டர் வராது
+  bool _busy = false;
   late final TextEditingController _note = TextEditingController(text: ckNote);
 
   @override
@@ -118,6 +130,7 @@ class _CartScreenState extends State<CartScreen> {
     saved = round2(saved);
     final closed = sh != null && !sh.acceptingOrders;
     final closedNow = sh != null && !closed && !sh.isOpenNow;
+    if (closedNow && ckMode == 'now') ckMode = 'later';
     final eta = sh != null && sh.etaKnown ? '${sh.etaText} நிமிடம்' : '';
     final minO = sh != null ? jz(sh.m['min_order']) : 0.0;
     final below = minO > 0 && sub < minO;
@@ -175,19 +188,8 @@ class _CartScreenState extends State<CartScreen> {
             ),
         ]),
       ),
-      // முகவரி + நேரம் (Phase 2)
-      _card(
-        child: Row(children: [
-          Container(width: 34, height: 34, decoration: BoxDecoration(color: const Color(0xFFFEE2E2), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.location_on_outlined, color: Color(0xFFDC2626), size: 20)),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('டெலிவரி முகவரி & நேரம்', style: ts(14.5, w: w8)),
-              Text('அடுத்த பதிப்பில் (Phase 2) — முகவரி, வரைபட pin, "இப்போதே / பின்னர்"', style: ts(12, c: P.mu)),
-            ]),
-          ),
-        ]),
-      ),
+      _addrCard(s, sh),
+      if (!closed && sh != null) _schCard(sh, closedNow, eta),
       // குறிப்பு
       _card(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -377,9 +379,204 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 
+  static bool profOk(Map<String, dynamic> p) =>
+      js(p['nm']).isNotEmpty && RegExp(r'^[6-9]\d{9}$').hasMatch(js(p['ph'])) && js(p['ad']).length >= 5;
+
+  // ── டெலிவரி முகவரி card ──
+  Widget _addrCard(AppState s, Shop? sh) {
+    final pr = s.profGet();
+    final pinOk = pr != null && pr['lat'] != null;
+    final svc = pinOk && sh != null ? svcCheck(sh, jz(pr['lat']), jz(pr['lng'])) : null;
+    final ph = pr != null ? js(pr['ph']).replaceAllMapped(RegExp(r'^(\d{5})(\d{5})$'), (m) => '${m[1]} ${m[2]}') : '';
+    return _card(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(children: [
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(color: const Color(0xFFFEE2E2), borderRadius: BorderRadius.circular(9)),
+            child: const Icon(Icons.location_on_outlined, color: Color(0xFFDC2626), size: 18),
+          ),
+          const SizedBox(width: 8),
+          Expanded(child: Text('டெலிவரி முகவரி', style: ts(14.5, w: w8))),
+          if (pr != null) TextButton(onPressed: () => showAddressSheet(), child: Text('மாற்று', style: ts(13, w: w8, c: P.g2))),
+        ]),
+        const SizedBox(height: 6),
+        if (pr == null)
+          OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              side: BorderSide(color: P.g, width: 1.5),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onPressed: () => showAddressSheet(),
+            child: Text('+ டெலிவரி முகவரியைச் சேர்க்கவும்', style: ts(14, w: w8, c: P.g2)),
+          )
+        else
+          InkWell(
+            onTap: () => showAddressSheet(),
+            borderRadius: BorderRadius.circular(12),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(color: P.gc, borderRadius: BorderRadius.circular(10)),
+                child: Icon(Icons.home_outlined, color: P.g2),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text('${js(pr['nm'])} · $ph', style: ts(14, w: w8)),
+                  Text('${js(pr['ad'])}${js(pr['area']).isNotEmpty ? ', ${js(pr['area'])}' : ''}', style: ts(12.5, c: P.mu2, h: 1.4)),
+                  const SizedBox(height: 4),
+                  if (!pinOk)
+                    GestureDetector(
+                      onTap: _pinFromCart,
+                      child: Text('📌 வரைபடத்தில் குறிக்க ›', style: ts(12.5, w: w8, c: const Color(0xFFB45309))),
+                    )
+                  else if (svc != null && !svc.ok)
+                    Text('⚠️ ${svc.msg}', style: ts(12.5, w: w8, c: const Color(0xFFB91C1C)))
+                  else
+                    Row(children: [
+                      Icon(Icons.place, size: 14, color: P.g2),
+                      const SizedBox(width: 3),
+                      Text('வரைபடத்தில் குறிக்கப்பட்டது', style: ts(12, w: w7, c: P.g2)),
+                    ]),
+                ]),
+              ),
+              Icon(Icons.chevron_right, color: P.mu),
+            ]),
+          ),
+      ]),
+    );
+  }
+
+  Future<void> _pinFromCart() async {
+    final pin = await openMapPick();
+    if (pin != null) savePinToProfile(pin);
+  }
+
+  // ── 🕐 டெலிவரி நேரம்: இப்போதே / பின்னர் (முன்பதிவு) ──
+  Widget _schCard(Shop sh, bool closedNow, String eta) {
+    final days = ckMode == 'later' ? schDays(sh) : <SchDay>[];
+    if (ckDay >= days.length) ckDay = 0;
+    final D = days.isNotEmpty ? days[ckDay] : null;
+    Widget tg(String mode, String t, String sub, {bool disabled = false}) {
+      final on = ckMode == mode;
+      return Expanded(
+        child: Opacity(
+          opacity: disabled ? .5 : 1,
+          child: GestureDetector(
+            onTap: disabled
+                ? null
+                : () => setState(() {
+                      ckMode = mode;
+                      if (mode == 'now') ckWhen = null;
+                    }),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+              decoration: BoxDecoration(
+                color: on ? P.gc : P.card,
+                border: Border.all(color: on ? P.g : P.bd, width: on ? 2 : 1.2),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Column(children: [
+                Text(t, style: ts(14, w: w8, c: on ? P.g2 : P.text)),
+                Text(sub, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(11.5, w: w6, c: P.mu)),
+              ]),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return _card(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        Row(children: [
+          const Text('🕐', style: TextStyle(fontSize: 18)),
+          const SizedBox(width: 8),
+          Text('டெலிவரி நேரம்', style: ts(14.5, w: w8)),
+        ]),
+        const SizedBox(height: 10),
+        Row(children: [
+          tg('now', '⚡ இப்போதே', closedNow ? 'கடை மூடியுள்ளது' : (eta.isNotEmpty ? eta : 'உடனே'), disabled: closedNow),
+          const SizedBox(width: 10),
+          tg('later', '📅 பின்னர்', 'முன்பதிவு · 7 நாள் வரை'),
+        ]),
+        if (ckMode == 'later') ...[
+          if (D == null)
+            Padding(padding: const EdgeInsets.only(top: 10), child: Text('இந்தக் கடைக்கு முன்பதிவு நேரம் இல்லை', style: ts(13, c: P.mu)))
+          else ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 58,
+              child: ListView(scrollDirection: Axis.horizontal, children: [
+                for (var i = 0; i < days.length; i++)
+                  GestureDetector(
+                    onTap: () => setState(() {
+                      ckDay = i;
+                      ckWhen = null;
+                    }),
+                    child: Container(
+                      width: 74,
+                      margin: const EdgeInsets.only(right: 8),
+                      decoration: BoxDecoration(
+                        color: i == ckDay ? P.g : P.card2,
+                        border: Border.all(color: i == ckDay ? P.g : P.bd),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        Text(days[i].chip, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(13, w: w8, c: i == ckDay ? Colors.white : P.text)),
+                        Text(days[i].sub, style: ts(11, w: w6, c: i == ckDay ? Colors.white : P.mu)),
+                      ]),
+                    ),
+                  ),
+              ]),
+            ),
+            const SizedBox(height: 10),
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              for (final x in D.slots)
+                GestureDetector(
+                  onTap: () => setState(() {
+                    ckWhen = x;
+                    ckWhenLabel = '${D.full} · ${x.lb}';
+                  }),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+                    decoration: BoxDecoration(
+                      color: ckWhen?.at == x.at ? P.gc : P.card,
+                      border: Border.all(color: ckWhen?.at == x.at ? P.g : P.bd, width: ckWhen?.at == x.at ? 2 : 1.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(x.lb, style: ts(13, w: w7, c: ckWhen?.at == x.at ? P.g2 : P.text)),
+                  ),
+                ),
+            ]),
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Text(ckWhen != null ? '✅ $ckWhenLabel' : '👆 ஒரு நேரத்தைத் தேர்ந்தெடுங்கள்', style: ts(13, w: w8, c: ckWhen != null ? P.g2 : const Color(0xFFB45309))),
+            ),
+          ],
+        ],
+      ]),
+    );
+  }
+
   Widget _bar(AppState s) {
     final sh = _shop(s);
-    final t = calcOrderTotals(sh, s.cartAmount);
+    final sub = s.cartAmount;
+    final t = calcOrderTotals(sh, sub);
+    final pr = s.profGet();
+    final closed = sh != null && !sh.acceptingOrders;
+    final closedNow = sh != null && !closed && !sh.isOpenNow;
+    final minO = sh != null ? jz(sh.m['min_order']) : 0.0;
+    final below = minO > 0 && sub < minO;
+    final pinOk = pr != null && pr['lat'] != null;
+    final svc = pinOk && sh != null ? svcCheck(sh, jz(pr['lat']), jz(pr['lng'])) : null;
+    final blocked = below || closed || (svc != null && !svc.ok) || (ckMode == 'later' && ckWhen == null) || (ckMode == 'now' && closedNow);
+    final label = _busy
+        ? '⏳ ஆர்டர் செய்கிறது...'
+        : (pr != null ? (ckMode == 'later' ? '📅 முன்பதிவு செய் →' : 'ஆர்டர் செய் →') : 'முகவரி சேர்த்து தொடர் →');
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
       decoration: BoxDecoration(color: P.card, border: Border(top: BorderSide(color: P.bd)), boxShadow: const [BoxShadow(color: Color(0x0F000000), blurRadius: 16, offset: Offset(0, -4))]),
@@ -391,12 +588,123 @@ class _CartScreenState extends State<CartScreen> {
             Text('₹${rupee(t.tot)}', style: pop(20)),
           ]),
           const SizedBox(width: 14),
-          Expanded(
-            child: GreenButton('ஆர்டர் செய் →', onTap: () => toast('🛵 ஆர்டர் செய்தல் அடுத்த பதிப்பில் (Phase 2) வரும்')),
-          ),
+          Expanded(child: GreenButton(label, onTap: blocked || _busy ? null : _order)),
         ]),
       ),
     );
+  }
+
+  // ── கூடையிலிருந்து நேராக ஆர்டர் (server-ல் விலை, டெலிவரி, மொத்தம் சரிபார்க்கப்படும்) ──
+  Future<void> _order() async {
+    if (_busy) return;
+    final s = AppState.I;
+    final its = s.cart.values.toList();
+    if (its.isEmpty) return;
+    final sh = _shop(s);
+    final sub0 = s.cartAmount;
+    var p = s.profRaw();
+    if (!profOk(p)) {
+      final ok = await showAddressSheet(thenOrder: true, total: calcOrderTotals(sh, sub0).tot);
+      if (!ok || !mounted) return;
+      p = s.profRaw();
+      if (!profOk(p)) return;
+    }
+    setState(() => _busy = true);
+    var again = false;
+    try {
+      ckCid ??= uuid4();
+      final ad = js(p['ad']), area = js(p['area']);
+      final fullAd = ad + (area.isNotEmpty && !ad.contains(area) ? ', $area' : '');
+      final shopId = s.cartShopId ?? kDefaultShopId;
+      final sched = ckMode == 'later' && ckWhen != null;
+      final params = <String, dynamic>{
+        'p_client_order_id': ckCid,
+        'p_shop_id': shopId,
+        'p_name': js(p['nm']),
+        'p_phone': js(p['ph']),
+        'p_address': fullAd,
+        'p_note': ckNote.trim(),
+        'p_items': its.map((i) => {'product_id': i.product.id, 'pack': i.pack.w, 'qty': i.qty}).toList(),
+        'p_expected_total': calcOrderTotals(sh, sub0).tot,
+        'p_lat': p['lat'],
+        'p_lng': p['lng'],
+        if (sched) 'p_sched_at': ckWhen!.at,
+        if (sched) 'p_slot': ckWhenLabel,
+      };
+      final res = await Orders.placeOrder(params);
+      if (res['ok'] != true) {
+        final code = js(res['code']);
+        final msg = js(res['msg']).isNotEmpty ? js(res['msg']) : 'ஆர்டர் செய்ய முடியவில்லை — மீண்டும் முயற்சிக்கவும்';
+        if (code == 'PRICE_CHANGED' || code == 'ITEM_GONE' || code == 'OUT_OF_STOCK') {
+          ckCid = null;
+          toast('⚠️ $msg');
+          await s.runCloudLoad(); // புதிய விலை / கையிருப்பு → கூடை புதுப்பிக்கப்படும்
+          return;
+        }
+        if (code == 'RATE_LIMIT' || code == 'BUSY' || code == 'SHOP_CLOSED' || code == 'SCHED') ckCid = null;
+        if (code == 'SCHED') ckWhen = null;
+        if (code == 'SHOP_CLOSED' && ckMode == 'now' && sh != null && sh.acceptingOrders) {
+          ckMode = 'later';
+          toast('🕐 கடை இப்போது மூடியுள்ளது — 📅 பின்னர் என்பதில் நேரத்தைத் தேர்ந்தெடுங்கள்');
+          return;
+        }
+        toast('⚠️ $msg');
+        if (code == 'NAME' || code == 'PHONE' || code == 'ADDRESS') {
+          if (mounted) setState(() => _busy = false);
+          again = await showAddressSheet(thenOrder: true, total: calcOrderTotals(sh, sub0).tot);
+          return;
+        }
+        if (code == 'OUT_OF_AREA' || code == 'PIN_NEEDED') {
+          if (mounted) setState(() => _busy = false);
+          await _pinFromCart();
+        }
+        return;
+      }
+      // இனி காட்டப்படும் ஒவ்வொரு எண்ணும் server-லிருந்து
+      final oNo = js(res['order_number']);
+      final sub = jz(res['subtotal']), del = jz(res['delivery_fee']), tot = jz(res['total']);
+      final lines = res['items'] is List ? (res['items'] as List).whereType<Map>().toList() : <Map>[];
+      final now = DateTime.now();
+      final schedLbl = sched ? ckWhenLabel : '';
+      Orders.I.saveLocal({
+        'oNo': oNo,
+        'date': fmtDate(now),
+        'ts': now.millisecondsSinceEpoch,
+        'nm': js(p['nm']),
+        'ph': js(p['ph']),
+        'ad': fullAd,
+        'shopId': shopId,
+        'shopName': sh?.name ?? '',
+        'its': lines
+            .map((l) => {'n': js(l['name']), 'full': js(l['name']), 'w': js(l['pack']), 'q': jz(l['qty']), 'up': jz(l['unit_price']), 't': jz(l['total']), 'pid': l['product_id']})
+            .toList(),
+        'sub': sub,
+        'del': del,
+        'tot': tot,
+        'payment': 'COD',
+        'oid': js(res['id']),
+        'cid': ckCid,
+        'nt': ckNote.trim(),
+        'cs': {'o': true, 'i': true},
+        'sched': schedLbl,
+      });
+      ckCid = null;
+      ckNote = '';
+      _note.clear();
+      ckMode = 'now';
+      ckWhen = null;
+      ckDay = 0;
+      Sfx.checkout();
+      s.clearCart();
+      Orders.I.fetch(force: true);
+      await showOrderSuccess(oNo: oNo, date: fmtDate(now), shopName: sh?.name ?? '', sub: sub, del: del, tot: tot, oid: js(res['id']));
+      if (schedLbl.isNotEmpty) toast('📅 முன்பதிவு: $schedLbl');
+    } catch (_) {
+      toast('⚠️ Network பிரச்சனை — மீண்டும் முயற்சிக்கவும்');
+    } finally {
+      if (mounted) setState(() => _busy = false);
+      if (again && mounted) unawaited(_order());
+    }
   }
 }
 

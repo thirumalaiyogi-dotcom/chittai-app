@@ -545,6 +545,11 @@ class AppState extends ChangeNotifier {
     Store.setStr(K.shopChosen, '1');
   }
 
+  Map<String, dynamic> revDoneMap() {
+    final m = Store.json(K.revDone);
+    return m is Map ? Map<String, dynamic>.from(m) : <String, dynamic>{};
+  }
+
   void ping() => notifyListeners();
 
   static String enc(Object o) => jsonEncode(o);
