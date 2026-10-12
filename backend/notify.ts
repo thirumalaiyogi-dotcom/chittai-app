@@ -60,7 +60,10 @@ async function fcmSend(token: string, m: Msg, orderId: string): Promise<"ok" | "
     });
     if (r.ok) return "ok";
     const t = await r.text();
-    return r.status === 404 || t.includes("UNREGISTERED") || t.includes("INVALID_ARGUMENT") ? "gone" : "fail";
+    // token உண்மையில் செல்லாதபோது மட்டும் நீக்கு (வேறு INVALID_ARGUMENT = நம் message பிழை → token-ஐ வைத்திரு)
+    const dead = r.status === 404 || t.includes("UNREGISTERED") ||
+      (t.includes("INVALID_ARGUMENT") && /registration[ -]?token/i.test(t));
+    return dead ? "gone" : "fail";
   } catch {
     return "fail";
   }

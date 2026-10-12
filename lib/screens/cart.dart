@@ -639,7 +639,7 @@ class _CartScreenState extends State<CartScreen> {
         if (code == 'PRICE_CHANGED' || code == 'ITEM_GONE' || code == 'OUT_OF_STOCK') {
           ckCid = null;
           toast('⚠️ $msg');
-          await s.runCloudLoad(); // புதிய விலை / கையிருப்பு → கூடை புதுப்பிக்கப்படும்
+          await s.reloadAndRefreshCart(); // HTML: loadFromSupabase() → refreshCartPrices()
           return;
         }
         if (code == 'RATE_LIMIT' || code == 'BUSY' || code == 'SHOP_CLOSED' || code == 'SCHED') ckCid = null;

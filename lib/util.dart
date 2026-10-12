@@ -37,7 +37,8 @@ bool jsTruthy(dynamic v) {
   return true;
 }
 
-double round2(double n) => (n * 100).roundToDouble() / 100;
+// HTML: Math.round((n+Number.EPSILON)*100)/100
+double round2(double n) => ((n + 2.220446049250313e-16) * 100).roundToDouble() / 100;
 
 // 120 → "120", 12.5 → "12.5", 12.25 → "12.25"
 String rupee(dynamic n) {

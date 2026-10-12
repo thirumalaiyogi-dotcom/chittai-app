@@ -117,7 +117,20 @@ class AppState extends ChangeNotifier {
 
   // ═══ Cloud-லிருந்து புதிய தரவு ═══
   bool _loadingNow = false;
-  Future<void> runCloudLoad() async {
+  Future<void>? _loadFut;
+  // ஏற்கனவே ஏற்றிக்கொண்டிருந்தால் அதே வேலைக்காகக் காத்திரு
+  Future<void> runCloudLoad() => _loadFut ??= _cloudLoad().whenComplete(() => _loadFut = null);
+
+  // HTML ckOrder: ஓடும் load முடியும் வரை காத்திரு → புதிதாக ஏற்று → எப்போதும் கூடை விலை புதுப்பி
+  Future<void> reloadAndRefreshCart() async {
+    final f = _loadFut;
+    if (f != null) await f;
+    await runCloudLoad();
+    refreshCartPrices();
+    ping();
+  }
+
+  Future<void> _cloudLoad() async {
     if (_loadingNow) return;
     _loadingNow = true;
     cloudLoading = true;

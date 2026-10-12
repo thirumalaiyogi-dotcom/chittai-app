@@ -154,6 +154,8 @@ class _SuccessState extends State<_Success> with TickerProviderStateMixin {
 
 // ═══ ஒரு ஆர்டரைத் திற (வெற்றி sheet / முகப்பு strip / அறிவிப்பு) ═══
 Future<void> openTrack(String oid) async {
+  // மேலே திறந்திருக்கும் முழுத் திரைகளை (கணக்கு / அறிவிப்புகள் / கதைகள்) மூடு — ஆர்டர் மறைந்துவிடக்கூடாது
+  Nav.root.currentState?.popUntil((r) => r.isFirst);
   final rows = await O.fetch(force: true);
   final list = O.build(rows);
   final o = list.where((x) => x.id == oid).first0;
@@ -171,7 +173,6 @@ class OrdersScreen extends StatefulWidget {
 class _OrdersScreenState extends State<OrdersScreen> {
   String _tab = '';
   bool _loading = true;
-  List<Map<String, dynamic>>? _rows;
 
   @override
   void initState() {
@@ -180,12 +181,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
   }
 
   Future<void> _load({bool force = false}) async {
-    final r = await O.fetch(force: force);
+    await O.fetch(force: force);
     if (!mounted) return;
-    setState(() {
-      _rows = r;
-      _loading = false;
-    });
+    setState(() => _loading = false);
   }
 
   @override
@@ -194,7 +192,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
     return ListenableBuilder(
       listenable: O,
       builder: (_, __) {
-        final list = O.build(_rows ?? O.cache);
+        // HTML renderOrds: ஒவ்வொரு முறையும் புதிய fetch-லிருந்து; cloud தோல்வி → இந்த phone-ன் ஆர்டர்கள் மட்டும்
+        final list = O.lastFail ? O.build(const []) : O.build();
         return Scaffold(
           backgroundColor: P.bg,
           appBar: AppBar(

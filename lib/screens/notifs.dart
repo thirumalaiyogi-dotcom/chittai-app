@@ -206,7 +206,7 @@ class _NotifScreenState extends State<NotifScreen> {
           final u = e.ts > _seen;
           kids.add(InkWell(
             onTap: () {
-              Navigator.of(context).pop();
+              Navigator.of(context).popUntil((r) => r.isFirst);
               e.go();
             },
             child: Container(
@@ -224,7 +224,7 @@ class _NotifScreenState extends State<NotifScreen> {
                     if (e.actLb != null)
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context).pop();
+                          Navigator.of(context).popUntil((r) => r.isFirst);
                           e.act!();
                         },
                         child: Container(
