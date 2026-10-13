@@ -10,6 +10,7 @@ import 'nav.dart';
 import 'screens/cart.dart';
 import 'orders.dart';
 import 'push.dart';
+import 'scooter.dart';
 import 'screens/home.dart';
 import 'screens/location.dart';
 import 'screens/orders.dart';
@@ -187,12 +188,8 @@ class _BootState extends State<Boot> with TickerProviderStateMixin {
                           ),
                           Transform.translate(
                             offset: Offset(-w * 1.2 * (1 - ride) + w * 1.3 * off, -bob),
-                            // 🛵 emoji இடது பக்கம் பார்க்கிறது; வலது பக்கம் ஓடுவதால் கண்ணாடி போல திருப்பு (web SVG போல)
-                            child: Transform(
-                              alignment: Alignment.center,
-                              transform: Matrix4.diagonal3Values(-1, 1, 1),
-                              child: const Text('🛵', style: TextStyle(fontSize: 92)),
-                            ),
+                            // web SVG (ஓட்டுநருடன் ஸ்கூட்டர்) — வலது பக்கம் பார்க்கும்; சக்கரம் சுழலும்
+                            child: SittaScooter(spin: (_loop.value * 3) % 1),
                           ),
                         ]),
                       ),
