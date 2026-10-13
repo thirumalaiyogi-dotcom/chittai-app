@@ -9,7 +9,7 @@
 
 create or replace function public.save_order_fcm(p_order_id uuid, p_phone text, p_token text)
 returns jsonb language plpgsql security definer set search_path = public as $$
-declare v_ph text; v_st text; v_ep text;
+declare v_ph text; v_st text; v_ep text; v_n int;
 begin
   if p_token is null or length(p_token) < 20 or length(p_token) > 4096 or p_token !~ '^[A-Za-z0-9:_\-]+$' then
     return jsonb_build_object('ok', false, 'msg', 'token தவறு');
@@ -22,6 +22,12 @@ begin
   end if;
   if v_st in ('DELIVERED', 'CANCELLED') then return jsonb_build_object('ok', false, 'msg', 'ஆர்டர் முடிந்துவிட்டது'); end if;
   v_ep := 'fcm:' || p_token;
+  -- ஏற்கனவே இந்த token இருந்தால் சரி; புதியது என்றால் ஒரு ஆர்டருக்கு அதிகபட்சம் 5 FCM token
+  if exists (select 1 from public.order_push_subscriptions where order_id = p_order_id and endpoint = v_ep) then
+    return jsonb_build_object('ok', true);
+  end if;
+  select count(*) into v_n from public.order_push_subscriptions where order_id = p_order_id and endpoint like 'fcm:%';
+  if v_n >= 5 then return jsonb_build_object('ok', false, 'msg', 'அதிகபட்சம் 5 சாதனங்கள்'); end if;
   insert into public.order_push_subscriptions (order_id, endpoint, p256dh, auth)
   select p_order_id, v_ep, 'fcm', 'fcm'
   where not exists (select 1 from public.order_push_subscriptions where order_id = p_order_id and endpoint = v_ep);
@@ -30,6 +36,10 @@ end $$;
 
 revoke all on function public.save_order_fcm(uuid, text, text) from public;
 grant execute on function public.save_order_fcm(uuid, text, text) to anon, authenticated;
+
+-- ── table-ல் தடை உள்ளதா என்று பார்க்க (தனியாக Run செய்யுங்கள்; இவை எதையும் மாற்றாது) ──
+-- select conname, pg_get_constraintdef(oid) from pg_constraint where conrelid = 'public.order_push_subscriptions'::regclass;
+-- select indexname, indexdef from pg_indexes where tablename = 'order_push_subscriptions';
 
 -- சரிபார்ப்பு: fn_ok = true என்று வர வேண்டும்
 select exists(select 1 from pg_proc where proname = 'save_order_fcm') as fn_ok;

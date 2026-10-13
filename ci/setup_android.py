@@ -3,6 +3,8 @@
 #   • app பெயர் "சிட்டை"   • permissions (internet, இடம், mic, notification, அதிர்வு)
 #   • WhatsApp / அழை / இணையதளம் / குரல் தேடல் திறக்க <queries>
 #   • minSdk 23            • KEYSTORE secret இருந்தால் release signing
+#   • அறிவிப்பு channel "orders" + வெள்ளை icon
+#   (KEYSTORE இல்லையெனில் APK மட்டும் சோதனை key-ல்; AAB-ஐ build.yml நிறுத்தும்)
 import os
 import re
 import sys
@@ -81,8 +83,62 @@ def patch_manifest():
         else:
             m = m.replace("</manifest>", "    <queries>\n" + intents + "    </queries>\n</manifest>", 1)
 
+    # 4) அறிவிப்பு: channel "orders" + வெள்ளை சிறிய icon (Firebase இந்த meta-data-வை எடுக்கும்)
+    if "default_notification_channel_id" not in m:
+        meta = (
+            '        <meta-data android:name="com.google.firebase.messaging.default_notification_channel_id"\n'
+            '            android:value="orders"/>\n'
+            '        <meta-data android:name="com.google.firebase.messaging.default_notification_icon"\n'
+            '            android:resource="@drawable/ic_stat_chittai"/>\n'
+        )
+        m = m.replace("</application>", meta + "    </application>", 1)
+
     write(MANIFEST, m)
     print("✅ AndroidManifest.xml மாற்றப்பட்டது")
+
+
+def patch_notification():
+    # வெள்ளை ஒற்றை-நிற icon (status bar-ல் நிறம் வராமல் சதுரமாகத் தெரியாமல் இருக்க)
+    d = os.path.join(APP, "src", "main", "res", "drawable")
+    os.makedirs(d, exist_ok=True)
+    write(os.path.join(d, "ic_stat_chittai.xml"), """<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp" android:height="24dp"
+    android:viewportWidth="24" android:viewportHeight="24">
+    <path android:fillColor="#FFFFFFFF"
+        android:pathData="M12,22c1.1,0 2,-0.9 2,-2h-4c0,1.1 0.89,2 2,2zM18,16v-5c0,-3.07 -1.64,-5.64 -4.5,-6.32V4c0,-0.83 -0.67,-1.5 -1.5,-1.5s-1.5,0.67 -1.5,1.5v0.68C7.63,5.36 6,7.92 6,11v5l-2,2v1h16v-1l-2,-2z"/>
+</vector>
+""")
+    # app தொடங்கும்போதே "orders" channel உருவாக்கு (முக்கியத்துவம் அதிகம்: ஒலி + பாப்-அப்)
+    kdir = os.path.join(APP, "src", "main", "kotlin")
+    main_act = None
+    for root, _, files in os.walk(kdir):
+        if "MainActivity.kt" in files:
+            main_act = os.path.join(root, "MainActivity.kt")
+    if not main_act:
+        print("MainActivity.kt கிடைக்கவில்லை — channel-ஐ Firebase தானே உருவாக்கும்")
+        return
+    pkg = re.search(r"^package\s+([\w.]+)", read(main_act), re.M).group(1)
+    write(main_act, """package %s
+
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
+import android.os.Bundle
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val ch = NotificationChannel("orders", "ஆர்டர் அறிவிப்புகள்", NotificationManager.IMPORTANCE_HIGH)
+            ch.description = "உங்கள் ஆர்டர் நிலை மாற்றங்கள்"
+            getSystemService(NotificationManager::class.java).createNotificationChannel(ch)
+        }
+    }
+}
+""" % pkg)
+    print("✅ அறிவிப்பு channel + icon சேர்க்கப்பட்டது")
 
 
 def patch_gradle():
@@ -143,4 +199,5 @@ def patch_gradle():
 
 if __name__ == "__main__":
     patch_manifest()
+    patch_notification()
     patch_gradle()

@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import 'nav.dart';
@@ -22,6 +23,10 @@ import 'widgets.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // fonts app-க்குள்ளேயே (assets/google_fonts) — முதல் முறை offline-ஆக இருந்தாலும் எழுத்து சரியாக வரும்
+  GoogleFonts.config.allowRuntimeFetching = false;
+  // portrait மட்டும்
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   await Store.init();
   AppState.I.loadLocal();
   Popups.firstRun; // முதல் திறப்பா என்று படித்த பிறகு குறி
@@ -56,7 +61,10 @@ class ChittaiApp extends StatelessWidget {
       navigatorKey: Nav.root,
       theme: buildTheme(dark),
       builder: (c, child) => MediaQuery(
-        data: MediaQuery.of(c).copyWith(textScaler: TextScaler.linear(scale)),
+        // phone-ன் சொந்த எழுத்து அளவை (0.85–1.3 வரை) app-ன் அளவால் பெருக்கு — மாற்றி எழுதாதே
+        data: MediaQuery.of(c).copyWith(
+            textScaler: TextScaler.linear(
+                (MediaQuery.textScalerOf(c).scale(100) / 100).clamp(0.85, 1.3).toDouble() * scale)),
         child: child ?? const SizedBox.shrink(),
       ),
       home: const Boot(),
