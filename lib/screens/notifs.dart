@@ -220,7 +220,7 @@ class _NotifScreenState extends State<NotifScreen> {
                     Text(e.t, style: ts(14.5, w: w8)),
                     for (final x in e.s) Text(x, style: ts(12.5, c: P.mu2)),
                     const SizedBox(height: 3),
-                    Text(_time(e.ts), style: ts(11.5, c: P.mu)),
+                    Text(_time(e.ts), style: ts(12, c: P.mu)),
                     if (e.actLb != null)
                       GestureDetector(
                         onTap: () {
@@ -270,7 +270,7 @@ class _NotifScreenState extends State<NotifScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                   decoration: BoxDecoration(color: const Color(0xFFE53935), borderRadius: BorderRadius.circular(10)),
-                  child: Text(un > 9 ? '9+' : '$un', style: ts(11.5, w: w8, c: Colors.white)),
+                  child: Text(un > 9 ? '9+' : '$un', style: ts(12, w: w8, c: Colors.white)),
                 ),
               ],
             ]),

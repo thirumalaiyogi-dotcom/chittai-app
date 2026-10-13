@@ -67,7 +67,7 @@ class _CartScreenState extends State<CartScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                   decoration: BoxDecoration(color: P.g, borderRadius: BorderRadius.circular(10), border: Border.all(color: P.card, width: 1.5)),
-                  child: Text('$cnt', style: ts(10.5, w: w8, c: Colors.white)),
+                  child: Text('$cnt', style: ts(12, w: w8, c: Colors.white)),
                 ),
               ),
           ]),
@@ -382,13 +382,13 @@ class _CartScreenState extends State<CartScreen> {
                 margin: const EdgeInsets.only(top: 3),
                 padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 1),
                 decoration: BoxDecoration(color: P.card3, borderRadius: BorderRadius.circular(6)),
-                child: Text(pk.w, style: ts(11.5, w: w7, c: P.mu2)),
+                child: Text(pk.w, style: ts(12, w: w7, c: P.mu2)),
               ),
             const SizedBox(height: 3),
             Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 5, children: [
               Text('₹${rupee(pk.price * q)}', style: pop(14.5)),
               if (o != null) Text('₹${rupee(o.mrp * q)}', style: ts(12, c: P.mu, deco: TextDecoration.lineThrough)),
-              if (q > 1) Text('₹${rupee(pk.price)} × $q', style: ts(11.5, c: P.mu)),
+              if (q > 1) Text('₹${rupee(pk.price)} × $q', style: ts(12, c: P.mu)),
             ]),
           ]),
         ),
@@ -514,7 +514,7 @@ class _CartScreenState extends State<CartScreen> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(t, style: ts(14, w: w8)),
                 const SizedBox(height: 2),
-                Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(11.5, c: P.mu2)),
+                Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(12, c: P.mu2)),
               ]),
             ),
           ),
@@ -563,7 +563,7 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                       child: Column(children: [
                         Text(days[i].chip, style: ts(13, w: w8, c: i == ckDay ? Colors.white : P.text)),
-                        Text(days[i].sub, style: ts(11, c: i == ckDay ? const Color(0xD9FFFFFF) : P.mu2)),
+                        Text(days[i].sub, style: ts(12, c: i == ckDay ? const Color(0xD9FFFFFF) : P.mu2)),
                       ]),
                     ),
                   ),
@@ -613,6 +613,18 @@ class _CartScreenState extends State<CartScreen> {
     final pinOk = pr != null && pr['lat'] != null;
     final svc = pinOk && sh != null ? svcCheck(sh, jz(pr['lat']), jz(pr['lng'])) : null;
     final blocked = below || closed || (svc != null && !svc.ok) || (ckMode == 'later' && ckWhen == null) || (ckMode == 'now' && closedNow);
+    String? reason;
+    if (closed) {
+      reason = '⛔ ${sh!.name} தற்போது ஆர்டர் ஏற்கவில்லை';
+    } else if (below) {
+      reason = '🧾 குறைந்தபட்ச ஆர்டர் ₹${rupee(minO)} — இன்னும் ₹${rupee(minO - sub)} பொருட்கள் சேர்க்கவும்';
+    } else if (svc != null && !svc.ok) {
+      reason = '⚠️ ${svc.msg}';
+    } else if (ckMode == 'now' && closedNow) {
+      reason = '🕐 கடை இப்போது மூடியுள்ளது — 📅 பின்னர் என்பதில் நேரத்தைத் தேர்ந்தெடுங்கள்';
+    } else if (ckMode == 'later' && ckWhen == null) {
+      reason = '👆 ஒரு நேரத்தைத் தேர்ந்தெடுங்கள்';
+    }
     final label = _busy
         ? '⏳ ஆர்டர் செய்கிறது...'
         : (pr != null ? (ckMode == 'later' ? '📅 முன்பதிவு செய் →' : 'ஆர்டர் செய் →') : 'முகவரி சேர்த்து தொடர் →');
@@ -621,13 +633,21 @@ class _CartScreenState extends State<CartScreen> {
       decoration: BoxDecoration(color: P.card, border: Border(top: BorderSide(color: P.bd)), boxShadow: const [BoxShadow(color: Color(0x0F000000), blurRadius: 16, offset: Offset(0, -4))]),
       child: SafeArea(
         top: false,
-        child: Row(children: [
-          Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('மொத்தம்', style: ts(12, w: w7, c: P.mu)),
-            Text('₹${rupee(t.tot)}', style: pop(20)),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          // பொத்தான் ஏன் செயல்படவில்லை என்று பொத்தானுக்கு மேலேயே (உள்ள வரிகளே)
+          if (reason != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(reason, style: ts(13, w: w8, c: const Color(0xFFB91C1C), h: 1.4)),
+            ),
+          Row(children: [
+            Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('மொத்தம்', style: ts(13, w: w7, c: P.mu2)),
+              Text('₹${rupee(t.tot)}', style: pop(20)),
+            ]),
+            const SizedBox(width: 14),
+            Expanded(child: GreenButton(label, onTap: blocked || _busy ? null : _order)),
           ]),
-          const SizedBox(width: 14),
-          Expanded(child: GreenButton(label, onTap: blocked || _busy ? null : _order)),
         ]),
       ),
     );

@@ -393,13 +393,13 @@ class _OrderCard extends StatelessWidget {
                   if (n > 0) TextSpan(text: '$n ${n == 1 ? 'பொருள்' : 'பொருட்கள்'} · '),
                   TextSpan(text: '₹${rupee(o.tot)}', style: ts(12.5, w: w8, c: P.text)),
                 ])),
-                Text('${coDate(o)}${o.sched.isNotEmpty ? ' · 📅 ${o.sched}' : ''}', style: ts(11.5, c: P.mu)),
+                Text('${coDate(o)}${o.sched.isNotEmpty ? ' · 📅 ${o.sched}' : ''}', style: ts(12, c: P.mu)),
               ]),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(color: stBg, borderRadius: BorderRadius.circular(10)),
-              child: Text('${st[2] == '✓' || st[2] == '✕' ? '${st[2]} ' : ''}${st[0]}', style: ts(11.5, w: w8, c: stCol)),
+              child: Text('${st[2] == '✓' || st[2] == '✕' ? '${st[2]} ' : ''}${st[0]}', style: ts(12, w: w8, c: stCol)),
             ),
           ]),
           if (o.cloud && o.id != null && o.status == 'DELIVERED' && revDone[o.id] == null)
@@ -800,7 +800,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with WidgetsBindi
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('${i.n}${i.w.isNotEmpty ? ' · ${i.w}' : ''} × ${i.q}',
                     style: ts(13.5, w: w6, c: i.na ? P.mu : P.text, deco: i.na ? TextDecoration.lineThrough : null)),
-                if (i.na) Text('கடையில் இல்லை', style: ts(11.5, w: w8, c: const Color(0xFFB91C1C))),
+                if (i.na) Text('கடையில் இல்லை', style: ts(12, w: w8, c: const Color(0xFFB91C1C))),
               ]),
             ),
             Text('₹${rupee(i.t)}', style: ts(13.5, w: w7, c: i.na ? P.mu : P.text, deco: i.na ? TextDecoration.lineThrough : null)),
@@ -1036,7 +1036,7 @@ class _ActiveOrderStripState extends State<ActiveOrderStrip> {
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(10)),
                   child: Column(children: [
-                    Text('OTP', style: ts(10, w: w8, c: const Color(0xFF9A3412))),
+                    Text('OTP', style: ts(12, w: w8, c: const Color(0xFF9A3412))),
                     Text(o.otp, style: pop(16, c: const Color(0xFF7C2D12))),
                   ]),
                 )

@@ -458,7 +458,7 @@ class RatingSection extends StatelessWidget {
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Text(js(v['name']), style: ts(13.5, w: w8)),
                     if (DateTime.tryParse(js(v['created_at'])) != null)
-                      Text(_d(DateTime.parse(js(v['created_at'])).toLocal()), style: ts(11.5, c: P.mu)),
+                      Text(_d(DateTime.parse(js(v['created_at'])).toLocal()), style: ts(12, c: P.mu)),
                   ]),
                 ),
                 if (jz(v['rating']) > 0) Text(stars(jz(v['rating'])), style: const TextStyle(fontSize: 14, color: Color(0xFFF59E0B))),
@@ -470,7 +470,7 @@ class RatingSection extends StatelessWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(color: P.gc, borderRadius: BorderRadius.circular(8)),
-                    child: Text(src[js(v['source'])]!, style: ts(11, w: w8, c: P.g2)),
+                    child: Text(src[js(v['source'])]!, style: ts(12, w: w8, c: P.g2)),
                   ),
                 ),
             ]),
@@ -672,7 +672,7 @@ class _ShopScreenState extends State<ShopScreen> {
                   child: c.photo.isNotEmpty ? Img(c.photo, emoji: c.e.isNotEmpty ? c.e : '🛍️', emojiSize: 24) : Center(child: Text(c.e, style: const TextStyle(fontSize: 24))),
                 ),
                 const SizedBox(height: 5),
-                Text(c.n, textAlign: TextAlign.center, maxLines: 3, overflow: TextOverflow.ellipsis, style: ts(11, w: a ? w8 : w7, c: a ? P.g : P.mu2, h: 1.3)),
+                Text(c.n, textAlign: TextAlign.center, maxLines: 3, overflow: TextOverflow.ellipsis, style: ts(12, w: a ? w8 : w7, c: a ? P.g : P.mu2, h: 1.3)),
               ]),
             ),
           );
@@ -724,7 +724,7 @@ class _ShopScreenState extends State<ShopScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                 decoration: BoxDecoration(color: const Color(0xFF7CB342), borderRadius: BorderRadius.circular(9)),
-                child: Text('$n', style: ts(11, w: w8, c: Colors.white)),
+                child: Text('$n', style: ts(12, w: w8, c: Colors.white)),
               ),
             ],
           ]),
@@ -813,7 +813,7 @@ class _ShopScreenState extends State<ShopScreen> {
                 ),
                 const SizedBox(height: 7),
                 Text(c.n, maxLines: 2, textAlign: TextAlign.center, overflow: TextOverflow.ellipsis, style: ts(13, w: w8, h: 1.25)),
-                Text('$cnt பொருட்கள்', style: ts(11.5, w: w6, c: P.mu)),
+                Text('$cnt பொருட்கள்', style: ts(12, w: w6, c: P.mu)),
               ]),
             );
           },

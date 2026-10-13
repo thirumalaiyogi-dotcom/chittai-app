@@ -415,7 +415,7 @@ class BottomNav extends StatelessWidget {
                           constraints: const BoxConstraints(minWidth: 16),
                           alignment: Alignment.center,
                           decoration: BoxDecoration(color: const Color(0xFFFF3B30), borderRadius: BorderRadius.circular(8)),
-                          child: Text(badge > 99 ? '99+' : '$badge', textAlign: TextAlign.center, style: ts(11, w: w8, c: Colors.white, h: 1)),
+                          child: Text(badge > 99 ? '99+' : '$badge', textAlign: TextAlign.center, style: ts(12, w: w8, c: Colors.white, h: 1)),
                         ),
                       ),
                   ]),

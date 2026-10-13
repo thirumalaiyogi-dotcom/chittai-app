@@ -389,7 +389,7 @@ class _MapPickScreenState extends State<MapPickScreen> {
                         Text('${accCls == 'good' ? '✅' : '📶'} GPS துல்லியம் ± ${_acc.round()} மீ${_accDone ? '' : '  ⏳ இன்னும் சரிசெய்கிறது...'}', style: ts(12.5, w: w8, c: const Color(0xFF17201D))),
                         if (_accDone && accCls != 'good')
                           Text('வீட்டுக்கு வெளியே / ஜன்னல் அருகில் வந்து மீண்டும் "என்னைக் கண்டுபிடி" அழுத்துங்கள். அல்லது pin-ஐ கையால் உங்கள் வீட்டின் மேல் நகர்த்துங்கள்.',
-                              style: ts(11.5, c: const Color(0xFF475569), h: 1.4)),
+                              style: ts(12, c: const Color(0xFF475569), h: 1.4)),
                       ]),
                     ),
                   if (!_svc.ok)
@@ -412,7 +412,7 @@ class _MapPickScreenState extends State<MapPickScreen> {
                   const SizedBox(height: 6),
                   GestureDetector(
                     onTap: () => openUrl('https://www.openstreetmap.org/copyright'),
-                    child: Text(_sat ? '© Esri · © OpenStreetMap' : '© OpenStreetMap', textAlign: TextAlign.center, style: ts(10.5, c: P.mu)),
+                    child: Text(_sat ? '© Esri · © OpenStreetMap' : '© OpenStreetMap', textAlign: TextAlign.center, style: ts(12, c: P.mu)),
                   ),
                 ]),
               ),
@@ -699,20 +699,44 @@ class _AddrSheetState extends State<_AddrSheet> {
     if (!widget.thenOrder) toast('✅ சேமிக்கப்பட்டது');
   }
 
+  // focus விட்டதும் அந்த ஒரு புலத்தை மட்டும் சரிபார் (_save-ன் அதே விதிகள்)
+  void _checkOne(String key) {
+    String? m;
+    if (key == 'ph') {
+      final ph = _ph.text.trim();
+      if (!RegExp(r'^[6-9]\d{9}$').hasMatch(ph)) m = ph.isEmpty ? 'மொபைல் எண்ணை உள்ளிடுங்கள்' : 'சரியான 10 இலக்க மொபைல் எண்';
+    } else if (key == 'nm') {
+      if (_nm.text.trim().isEmpty) m = 'பெயரை உள்ளிடுங்கள்';
+    } else if (_ad.containsKey(key)) {
+      final a = {for (final f in kAdF) f.k: _ad[f.k]!.text.replaceAll(RegExp(r'\s+'), ' ').trim()};
+      m = adCheck(a)[key];
+    }
+    if (!mounted) return;
+    setState(() {
+      if (m == null) {
+        _err.remove(key);
+      } else {
+        _err[key] = m;
+      }
+    });
+  }
+
   Widget _field(String label, TextEditingController c, String key, {String hint = '', bool req = true, bool numOnly = false, int? max, String? prefix}) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text.rich(TextSpan(style: ts(13, w: w8, c: P.mu2), children: [
         TextSpan(text: label),
-        req ? const TextSpan(text: ' *', style: TextStyle(color: Color(0xFFDC2626))) : TextSpan(text: ' (விருப்பம்)', style: ts(11.5, c: P.mu)),
+        req ? const TextSpan(text: ' *', style: TextStyle(color: Color(0xFFDC2626))) : TextSpan(text: ' (விருப்பம்)', style: ts(12, c: P.mu)),
       ])),
       const SizedBox(height: 5),
-      TextField(
+      Focus(
+        onFocusChange: (f) {
+          if (!f) _checkOne(key);
+        },
+        child: TextField(
         controller: c,
         keyboardType: numOnly ? TextInputType.number : TextInputType.text,
         inputFormatters: [if (numOnly) FilteringTextInputFormatter.digitsOnly, if (max != null) LengthLimitingTextInputFormatter(max)],
-        onChanged: (_) {
-          if (_err.containsKey(key)) setState(() => _err.remove(key));
-        },
+        onChanged: (_) => setState(() => _err.remove(key)),
         style: ts(15, w: w6),
         decoration: InputDecoration(
           hintText: hint,
@@ -726,8 +750,9 @@ class _AddrSheetState extends State<_AddrSheet> {
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: P.bd)),
           enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: _err.containsKey(key) ? const Color(0xFFDC2626) : P.bd)),
           focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: P.g)),
+          suffixIcon: key == 'ph' && RegExp(r'^[6-9]\d{9}$').hasMatch(c.text.trim()) ? const Icon(Icons.check_circle, color: Color(0xFF16A34A), size: 20) : null,
         ),
-      ),
+      )),
       if (_err[key] != null) Padding(padding: const EdgeInsets.only(top: 3), child: Text('⚠️ ${_err[key]}', style: ts(12, w: w7, c: const Color(0xFFDC2626)))),
       const SizedBox(height: 11),
     ]);
@@ -792,7 +817,7 @@ class _AddrSheetState extends State<_AddrSheet> {
           adf('land'),
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: Text('🛵 "அடையாளம்" சரியாக இருந்தால் டெலிவரி நபர் வீட்டை எளிதில் கண்டுபிடிப்பார்.', style: ts(11.5, c: P.mu, h: 1.5)),
+            child: Text('🛵 "அடையாளம்" சரியாக இருந்தால் டெலிவரி நபர் வீட்டை எளிதில் கண்டுபிடிப்பார்.', style: ts(12, c: P.mu, h: 1.5)),
           ),
           GreenButton(widget.thenOrder && widget.total > 0 ? 'சேமித்து ஆர்டர் செய் · ₹${rupee(widget.total)}' : 'சேமி', onTap: _save),
         ]),

@@ -86,7 +86,7 @@ class AppHeader extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 4),
                         alignment: Alignment.center,
                         decoration: BoxDecoration(color: const Color(0xFFEF4444), borderRadius: BorderRadius.circular(9), border: Border.all(color: P.hdr, width: 2)),
-                        child: Text(n > 9 ? '9+' : '$n', textAlign: TextAlign.center, style: pop(11.5, c: Colors.white).copyWith(height: 1)),
+                        child: Text(n > 9 ? '9+' : '$n', textAlign: TextAlign.center, style: pop(12, c: Colors.white).copyWith(height: 1)),
                       ),
                     ),
                 ]),
@@ -448,9 +448,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return out;
   }
 
-  Widget _row(List<Widget> kids, double h) => SizedBox(
-        height: h,
-        child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 14), children: kids),
+  Widget _row(List<Widget> kids, double h) => Builder(
+        builder: (c) => SizedBox(
+          height: h * MediaQuery.textScalerOf(c).scale(1).clamp(1.0, 1.4).toDouble(),
+          child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 14), children: kids),
+        ),
       );
 
   // அருகிலுள்ள கடைகள்: திறந்தவை முதலில், பிறகு தூரம்

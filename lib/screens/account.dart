@@ -320,7 +320,7 @@ class _FavItem extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              if (p.brand.isNotEmpty) Text(p.brand.toUpperCase(), style: ts(11, w: w7, c: P.mu2)),
+              if (p.brand.isNotEmpty) Text(p.brand.toUpperCase(), style: ts(12, w: w7, c: P.mu2)),
               Text(p.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: ts(14.5, w: w8)),
               Text.rich(TextSpan(style: ts(12.5, w: w6, c: P.mu2), children: [
                 if (single) ...[
@@ -332,7 +332,7 @@ class _FavItem extends StatelessWidget {
                   if (fb != null) TextSpan(text: ' ${fb.off}% வரை தள்ளுபடி', style: ts(12, w: w8, c: const Color(0xFF16A34A))),
                 ],
               ])),
-              if (sh != null) Text('🏪 ${sh.name}', style: ts(11.5, c: P.mu)),
+              if (sh != null) Text('🏪 ${sh.name}', style: ts(12, c: P.mu)),
             ]),
           ),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -592,7 +592,7 @@ class _HelpScreenState extends State<HelpScreen> {
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(b, style: ts(14, w: w8, c: const Color(0xFF17201D))),
-                Text(s, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(11, c: const Color(0xFF64706C))),
+                Text(s, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(12, c: const Color(0xFF64706C))),
               ]),
             ),
           ]),
@@ -618,7 +618,7 @@ class _Foot extends StatelessWidget {
           RichText(text: TextSpan(style: pop(22, c: P.g2), children: const [TextSpan(text: 'சிட்டை'), TextSpan(text: '.', style: TextStyle(color: Color(0xFF00A884)))])),
           const SizedBox(height: 4),
           Text('உங்கள் ஊர் கடைகள் — உங்கள் வீட்டு வாசலில்', style: ts(12.5, c: P.mu2)),
-          Text(appVersionText, style: ts(11.5, c: P.mu)),
+          Text(appVersionText, style: ts(12, c: P.mu)),
         ]),
       );
 }
@@ -713,7 +713,7 @@ class _InfoScreenState extends State<InfoScreen> {
                 Icon(f[0] as IconData, color: P.g2),
                 const SizedBox(height: 6),
                 Text(f[1] as String, style: ts(13.5, w: w8)),
-                Text(f[2] as String, style: ts(11.5, c: P.mu)),
+                Text(f[2] as String, style: ts(12, c: P.mu)),
               ]),
             ),
         ],
@@ -932,7 +932,7 @@ class _ProfileFormState extends State<_ProfileForm> {
         padding: const EdgeInsets.only(bottom: 6),
         child: Text.rich(TextSpan(style: ts(13, w: w8, c: P.mu2), children: [
           TextSpan(text: t),
-          req ? const TextSpan(text: ' *', style: TextStyle(color: Color(0xFFDC2626))) : TextSpan(text: ' (விருப்பம்)', style: ts(11.5, c: P.mu)),
+          req ? const TextSpan(text: ' *', style: TextStyle(color: Color(0xFFDC2626))) : TextSpan(text: ' (விருப்பம்)', style: ts(12, c: P.mu)),
         ])),
       );
 
@@ -978,7 +978,7 @@ class _ProfileFormState extends State<_ProfileForm> {
       _adf(f('land')),
       Padding(
         padding: const EdgeInsets.only(bottom: 10),
-        child: Text('🛵 "அடையாளம்" சரியாக இருந்தால் டெலிவரி நபர் வீட்டை எளிதில் கண்டுபிடிப்பார்.', style: ts(11.5, c: P.mu, h: 1.5)),
+        child: Text('🛵 "அடையாளம்" சரியாக இருந்தால் டெலிவரி நபர் வீட்டை எளிதில் கண்டுபிடிப்பார்.', style: ts(12, c: P.mu, h: 1.5)),
       ),
       GreenButton('💾 சேமிக்க', onTap: _submit),
       const SizedBox(height: 10),

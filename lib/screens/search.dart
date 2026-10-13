@@ -133,7 +133,7 @@ class ShopPill extends StatelessWidget {
           const SizedBox(height: 6),
           Text(sh.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(13, w: w8)),
           Text('${sh.isOpenNow ? '🟢 திறந்துள்ளது' : '🔴 மூடியுள்ளது'}${d.isNotEmpty ? ' · $d' : ''}',
-              maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(11.5, w: w7, c: P.mu)),
+              maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(12, w: w7, c: P.mu)),
         ]),
       ),
     );
@@ -311,7 +311,7 @@ class SuggestView extends StatelessWidget {
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(s['label']!, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(14.5, w: w8)),
-                  Text(lb[s['g']] ?? '', style: ts(11.5, w: w7, c: P.mu)),
+                  Text(lb[s['g']] ?? '', style: ts(12, w: w7, c: P.mu)),
                 ]),
               ),
             ]),
@@ -433,7 +433,7 @@ class _ResultsViewState extends State<ResultsView> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                 decoration: BoxDecoration(color: P.g, borderRadius: BorderRadius.circular(10)),
-                child: Text('$badge', style: ts(11, w: w8, c: Colors.white)),
+                child: Text('$badge', style: ts(12, w: w8, c: Colors.white)),
               ),
             ],
           ]),
@@ -442,7 +442,7 @@ class _ResultsViewState extends State<ResultsView> {
 
   List<Widget> _chips() {
     final F = c.F, out = <Widget>[];
-    void x(String lab, VoidCallback f) => out.add(chipBtn(lab, () => _set(f), on: true, trail: Text('✕', style: ts(11, w: w8, c: P.g2))));
+    void x(String lab, VoidCallback f) => out.add(chipBtn(lab, () => _set(f), on: true, trail: Text('✕', style: ts(12, w: w8, c: P.g2))));
     for (final v in List.of(F.shop)) {
       x(S.shopById(v)?.name ?? v, () => F.shop.remove(v));
     }
@@ -532,7 +532,7 @@ class _ResultsViewState extends State<ResultsView> {
                         draft.price = draft.price == o.v ? '' : o.v;
                       }
                     });
-                  }, on: on, trail: Text('${o.n}', style: ts(11, w: w7, c: P.mu)));
+                  }, on: on, trail: Text('${o.n}', style: ts(12, w: w7, c: P.mu)));
                 }).toList(),
               ),
             ]),
@@ -572,7 +572,7 @@ class _ResultsViewState extends State<ResultsView> {
                           ll.add(o.v);
                         }
                       });
-                    }, on: l.contains(o.v), trail: Text('${o.n}', style: ts(11, w: w7, c: P.mu)));
+                    }, on: l.contains(o.v), trail: Text('${o.n}', style: ts(12, w: w7, c: P.mu)));
                   }).toList(),
                 ),
               ]),
@@ -690,7 +690,7 @@ class SrCard extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                         decoration: const BoxDecoration(color: Color(0xFFE8590C), borderRadius: BorderRadius.only(topLeft: Radius.circular(12), bottomRight: Radius.circular(8))),
-                        child: Text('சலுகை', style: ts(9.5, w: w8, c: Colors.white)),
+                        child: Text('சலுகை', style: ts(12, w: w8, c: Colors.white)),
                       ),
                     ),
                 ]),
@@ -698,7 +698,7 @@ class SrCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  if (p.brand.isNotEmpty && !it.n.contains(it.b)) Text(p.brand.toUpperCase(), style: ts(10.5, w: w7, c: P.mu2, ls: .4)),
+                  if (p.brand.isNotEmpty && !it.n.contains(it.b)) Text(p.brand.toUpperCase(), style: ts(12, w: w7, c: P.mu2, ls: .4)),
                   Text(p.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: ts(14.5, w: w8, h: 1.3)),
                   Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(12, w: w6, c: P.mu)),
                   if (grp.length > 1)
@@ -706,7 +706,7 @@ class SrCard extends StatelessWidget {
                       margin: const EdgeInsets.only(top: 4),
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(color: P.gc, borderRadius: BorderRadius.circular(8)),
-                      child: Text('${grp.length} கடைகளில் கிடைக்கும் — விலையை ஒப்பிடுங்கள்', style: ts(11.5, w: w8, c: P.g2)),
+                      child: Text('${grp.length} கடைகளில் கிடைக்கும் — விலையை ஒப்பிடுங்கள்', style: ts(12, w: w8, c: P.g2)),
                     ),
                 ]),
               ),
@@ -753,7 +753,7 @@ class _SrShopRow extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                 decoration: BoxDecoration(color: P.g, borderRadius: BorderRadius.circular(8)),
-                child: Text('$inCart', style: ts(11, w: w8, c: Colors.white)),
+                child: Text('$inCart', style: ts(12, w: w8, c: Colors.white)),
               ),
               const SizedBox(width: 4),
             ],
@@ -775,14 +775,14 @@ class _SrShopRow extends StatelessWidget {
                 const SizedBox(width: 4),
                 Flexible(child: Text(sh.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(13, w: w8))),
               ]),
-              if (meta.isNotEmpty) Text(meta, maxLines: 2, overflow: TextOverflow.ellipsis, style: ts(11.5, w: w6, c: P.mu)),
+              if (meta.isNotEmpty) Text(meta, maxLines: 2, overflow: TextOverflow.ellipsis, style: ts(12, w: w6, c: P.mu)),
             ]),
           ),
           const SizedBox(width: 8),
           Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Text('₹${rupee(it.minP)}', style: pop(15)),
-            if (one && o != null) Text('₹${rupee(o.mrp)}', style: ts(11, c: P.mu, deco: TextDecoration.lineThrough)),
-            if (!one) Text('முதல்', style: ts(10.5, w: w7, c: P.mu)),
+            if (one && o != null) Text('₹${rupee(o.mrp)}', style: ts(12, c: P.mu, deco: TextDecoration.lineThrough)),
+            if (!one) Text('முதல்', style: ts(12, w: w7, c: P.mu)),
           ]),
           const SizedBox(width: 10),
           btn,
@@ -826,9 +826,11 @@ class NoResult extends StatelessWidget {
       ),
       if (rel.isNotEmpty) ...[
         srH('தொடர்புடைய பொருட்கள்'),
-        SizedBox(
-          height: 236,
-          child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 14), children: rel.map((p) => HxCard(p, 0)).toList()),
+        Builder(
+          builder: (c) => SizedBox(
+            height: 236 * MediaQuery.textScalerOf(c).scale(1).clamp(1.0, 1.4).toDouble(),
+            child: ListView(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 14), children: rel.map((p) => HxCard(p, 0)).toList()),
+          ),
         ),
       ],
       if (near.isNotEmpty) ...[srH('அருகிலுள்ள கடைகள்'), shopPillRow(near)],
@@ -1047,7 +1049,7 @@ class _ShopSrItem extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            if (p.brand.isNotEmpty) Text(p.brand.toUpperCase(), style: ts(11.5, w: w7, c: P.cyan, ls: .5)),
+            if (p.brand.isNotEmpty) Text(p.brand.toUpperCase(), style: ts(12, w: w7, c: P.cyan, ls: .5)),
             GestureDetector(onTap: () => Nav.openProduct(p), child: Text(p.name, style: ts(14.5, w: w8))),
             const SizedBox(height: 4),
             for (var i = 0; i < p.packs.length; i++) _packRow(p, i),
@@ -1068,7 +1070,7 @@ class _ShopSrItem extends StatelessWidget {
           child: Wrap(crossAxisAlignment: WrapCrossAlignment.center, spacing: 4, children: [
             Text('${pk.w.isNotEmpty ? '${pk.w} · ' : ''}₹${rupee(pk.price)}', style: ts(13.5, w: w7)),
             if (o != null) Text('₹${rupee(o.mrp)}', style: ts(12, c: P.mu, deco: TextDecoration.lineThrough)),
-            if (o != null) Text('${o.off}% தள்ளுபடி', style: ts(11.5, w: w8, c: const Color(0xFF16A34A))),
+            if (o != null) Text('${o.off}% தள்ளுபடி', style: ts(12, w: w8, c: const Color(0xFF16A34A))),
           ]),
         ),
         q > 0

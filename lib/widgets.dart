@@ -344,6 +344,7 @@ class ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     context.watch<AppState>();
+    final k = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.6).toDouble(); // பெரிய எழுத்தில் வெட்டாமல் இருக்க
     final total = S.totalQtyOf(p);
     final inCart = total > 0;
     final single = p.packs.length == 1;
@@ -409,7 +410,7 @@ class ProductCard extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: const BoxDecoration(color: Color(0xFFE8590C), borderRadius: BorderRadius.only(topRight: Radius.circular(10))),
-                      child: Text('${bo.off}%${single ? '' : ' வரை'} தள்ளுபடி', style: ts(11, w: w8, c: Colors.white)),
+                      child: Text('${bo.off}%${single ? '' : ' வரை'} தள்ளுபடி', style: ts(12, w: w8, c: Colors.white)),
                     ),
                   ),
                 Positioned(right: 1, bottom: 1, child: FavButton(p)),
@@ -420,22 +421,22 @@ class ProductCard extends StatelessWidget {
               decoration: inCart ? BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [P.card, P.card, P.gc], stops: const [0, .6, 1])) : null,
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 SizedBox(
-                  height: 15,
-                  child: Text(p.brand.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(11, w: w7, c: P.mu2, ls: .5)),
+                  height: 15 * k,
+                  child: Text(p.brand.toUpperCase(), maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(12, w: w7, c: P.mu2, ls: .5)),
                 ),
                 SizedBox(
-                  height: 36,
+                  height: 36 * k,
                   child: Text(p.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: ts(12.5, w: w8, h: 1.35)),
                 ),
                 SizedBox(
-                  height: 18,
+                  height: 18 * k,
                   child: Text(single ? p.packs[0].w : '${p.packs.length} அளவுகள்', maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(12, w: w7, c: P.mu2)),
                 ),
                 Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                   Text('₹${rupee(p.minPrice)}', style: pop(16)),
                   const SizedBox(width: 5),
                   if (single && o1 != null) Text('₹${rupee(o1.mrp)}', style: ts(12, c: P.mu, deco: TextDecoration.lineThrough)),
-                  if (!single) Text('முதல்', style: ts(11.5, w: w7, c: P.mu)),
+                  if (!single) Text('முதல்', style: ts(12, w: w7, c: P.mu)),
                 ]),
                 const SizedBox(height: 6),
                 action,
@@ -548,7 +549,7 @@ class HxCard extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
                       decoration: const BoxDecoration(color: Color(0xFF16A34A), borderRadius: BorderRadius.only(bottomRight: Radius.circular(10))),
-                      child: Text(badge, style: ts(11.5, w: w8, c: Colors.white)),
+                      child: Text(badge, style: ts(12, w: w8, c: Colors.white)),
                     ),
                   ),
               ]),
@@ -556,14 +557,14 @@ class HxCard extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           SizedBox(
-            height: 34,
+            height: 34 * MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.6).toDouble(),
             child: Text('${p.brand.isNotEmpty ? '${p.brand} ' : ''}${p.name}', maxLines: 2, overflow: TextOverflow.ellipsis, style: ts(12.5, w: w8, h: 1.3)),
           ),
-          Text(pk.w, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(11.5, w: w7, c: P.mu)),
+          Text(pk.w, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(12, w: w7, c: P.mu)),
           const Spacer(),
           Wrap(crossAxisAlignment: WrapCrossAlignment.end, spacing: 3, children: [
             Text('₹${rupee(pk.price)}', style: pop(14)),
-            if (o != null) Text('₹${rupee(o.mrp)}', style: ts(11, c: P.mu, deco: TextDecoration.lineThrough)),
+            if (o != null) Text('₹${rupee(o.mrp)}', style: ts(12, c: P.mu, deco: TextDecoration.lineThrough)),
           ]),
           const SizedBox(height: 4),
           Align(alignment: Alignment.centerRight, child: HxBtn(p, pi)),
