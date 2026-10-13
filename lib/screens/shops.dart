@@ -354,7 +354,7 @@ class ShopDetailScreen extends StatelessWidget {
           onTap: f,
           borderRadius: BorderRadius.circular(14),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 6),
+            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
             child: Column(children: [
               Container(
                 width: 48,
@@ -363,7 +363,7 @@ class ShopDetailScreen extends StatelessWidget {
                 child: Icon(ic, color: P.g2, size: 22),
               ),
               const SizedBox(height: 6),
-              Text(l, style: ts(12.5, w: w8, c: P.g2)),
+              FittedBox(fit: BoxFit.scaleDown, child: Text(l, maxLines: 1, style: ts(12.5, w: w8, c: P.g2))),
             ]),
           ),
         ),

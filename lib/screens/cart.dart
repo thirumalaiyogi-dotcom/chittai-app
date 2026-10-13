@@ -516,7 +516,7 @@ class _CartScreenState extends State<CartScreen> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(t, style: ts(14, w: w8)),
                 const SizedBox(height: 2),
-                Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(12, c: P.mu2)),
+                Text(sub, style: ts(12, c: P.mu2, h: 1.35)),
               ]),
             ),
           ),
@@ -534,11 +534,11 @@ class _CartScreenState extends State<CartScreen> {
           Text('டெலிவரி நேரம்', style: ts(14.5, w: w8)),
         ]),
         const SizedBox(height: 10),
-        Row(children: [
+        IntrinsicHeight(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
           tg('now', '⚡ இப்போதே', closedNow ? 'கடை மூடியுள்ளது' : (eta.isNotEmpty ? eta : 'உடனே'), disabled: closedNow),
           const SizedBox(width: 8),
           tg('later', '📅 பின்னர்', 'முன்பதிவு · 7 நாள் வரை'),
-        ]),
+        ])),
         if (ckMode == 'later') ...[
           if (D == null)
             note('இந்தக் கடைக்கு முன்பதிவு நேரம் இல்லை')
