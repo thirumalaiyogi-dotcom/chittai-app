@@ -646,7 +646,7 @@ class _ShopScreenState extends State<ShopScreen> {
 
   Widget _sidebar(List<Cat> cats) {
     return Container(
-      width: 84,
+      width: 94, // 84 → 94: "இன்ஸ்டன்ட்", "காய்கறிகள்" போன்ற சொற்கள் நடுவில் உடையாமல்
       decoration: BoxDecoration(color: P.card, border: Border(right: BorderSide(color: P.bd))),
       child: ListView.builder(
         controller: _side,
@@ -658,7 +658,7 @@ class _ShopScreenState extends State<ShopScreen> {
           return InkWell(
             onTap: () => _goCat(c.id),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 2),
               decoration: BoxDecoration(
                 color: a ? const Color(0x1415803D) : null,
                 border: Border(left: BorderSide(color: a ? P.g : Colors.transparent, width: 3), bottom: BorderSide(color: P.bd)),
