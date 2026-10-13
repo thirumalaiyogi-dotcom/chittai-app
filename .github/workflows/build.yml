@@ -65,15 +65,18 @@ jobs:
           path: build/app/outputs/flutter-apk/app-release.apk
           retention-days: 30
 
-      - name: AAB build (Play Store-க்கு — KEYSTORE இல்லையெனில் நிற்கும்)
+      - name: AAB build (Play Store-க்கு — KEYSTORE இருந்தால் மட்டும்)
         run: |
           if [ -z "$KEYSTORE_B64" ]; then
-            echo "::error::KEYSTORE_B64 secret இல்லை. Play Store AAB சோதனை key-ல் sign ஆகக்கூடாது. GitHub → Settings → Secrets-ல் KEYSTORE_B64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD சேர்த்து மீண்டும் run செய்யுங்கள். (APK ஏற்கனவே சேமிக்கப்பட்டது.)"
-            exit 1
+            echo "::warning::KEYSTORE_B64 secret இல்லை — AAB தவிர்க்கப்பட்டது (சோதனை key-ல் sign செய்ய மாட்டோம்). APK தயார். Play Store-க்கு AAB வேண்டுமென்றால் KEYSTORE secrets சேர்க்கவும்."
+            echo "HAVE_AAB=no" >> "$GITHUB_ENV"
+            exit 0
           fi
           flutter build appbundle --release --build-number=${{ github.run_number }}
+          echo "HAVE_AAB=yes" >> "$GITHUB_ENV"
 
       - name: AAB-ஐ சேமி
+        if: env.HAVE_AAB == 'yes'
         uses: actions/upload-artifact@v4
         with:
           name: chittai-aab
