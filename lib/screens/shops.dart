@@ -81,11 +81,11 @@ class _ShopsTabState extends State<ShopsTab> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(18),
-                            border: s.dark ? null : Border.all(color: _f.hasFocus ? const Color(0xFF00A884) : const Color(0xFFE3EAE7)),
+                            border: s.dark ? null : Border.all(color: _f.hasFocus ? AppColors.primary : const Color(0xFFE4E9E5)),
                             boxShadow: [s.dark ? const BoxShadow(color: Color(0x2E00281E), blurRadius: 22, offset: Offset(0, 8)) : const BoxShadow(color: Color(0x12143C32), blurRadius: 14, offset: Offset(0, 4))],
                           ),
                           child: Row(children: [
-                            const Icon(Icons.search, color: Color(0xFF00A884)),
+                            const Icon(Icons.search, color: AppColors.primary),
                             const SizedBox(width: 8),
                             Expanded(
                               child: ValueListenableBuilder<String>(
@@ -96,12 +96,12 @@ class _ShopsTabState extends State<ShopsTab> {
                                   onChanged: (v) => setState(() => _query = v),
                                   textInputAction: TextInputAction.search,
                                   onSubmitted: (_) => _f.unfocus(),
-                                  style: ts(16, w: w6, c: const Color(0xFF17201D)),
+                                  style: ts(16, w: w6, c: const Color(0xFF1C2420)),
                                   decoration: InputDecoration(
                                     isDense: true,
                                     border: InputBorder.none,
                                     hintText: _f.hasFocus ? 'கடையைத் தேடுங்கள்...' : hint,
-                                    hintStyle: ts(15, w: w6, c: const Color(0xFF6B7773)),
+                                    hintStyle: ts(15, w: w6, c: const Color(0xFF6B7570)),
                                   ),
                                 ),
                               ),
@@ -660,7 +660,7 @@ class _ShopScreenState extends State<ShopScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
               decoration: BoxDecoration(
-                color: a ? const Color(0x1400A884) : null,
+                color: a ? const Color(0x1415803D) : null,
                 border: Border(left: BorderSide(color: a ? P.g : Colors.transparent, width: 3), bottom: BorderSide(color: P.bd)),
               ),
               child: Column(children: [
@@ -672,7 +672,7 @@ class _ShopScreenState extends State<ShopScreen> {
                   child: c.photo.isNotEmpty ? Img(c.photo, emoji: c.e.isNotEmpty ? c.e : '🛍️', emojiSize: 24) : Center(child: Text(c.e, style: const TextStyle(fontSize: 24))),
                 ),
                 const SizedBox(height: 5),
-                Text(c.n, textAlign: TextAlign.center, maxLines: 3, overflow: TextOverflow.ellipsis, style: ts(12, w: a ? w8 : w7, c: a ? P.g : P.mu2, h: 1.3)),
+                Text(c.n, textAlign: TextAlign.center, maxLines: 3, overflow: TextOverflow.ellipsis, style: ts(12, w: a ? w8 : w7, c: a ? P.g : P.mu2, h: 1.3, deco: a ? TextDecoration.underline : null).copyWith(decorationThickness: 2)),
               ]),
             ),
           );
@@ -829,7 +829,7 @@ class _ShopScreenState extends State<ShopScreen> {
       child: Container(
         height: 52,
         padding: const EdgeInsets.fromLTRB(14, 7, 8, 7),
-        decoration: BoxDecoration(gradient: kBtnGrad, borderRadius: BorderRadius.circular(26), boxShadow: const [BoxShadow(color: Color(0x59008069), blurRadius: 14, offset: Offset(0, 4))]),
+        decoration: BoxDecoration(color: P.g, borderRadius: BorderRadius.circular(26), boxShadow: const [BoxShadow(color: Color(0x47166534), blurRadius: 16, offset: Offset(0, 6))]),
         child: Row(children: [
           Container(width: 30, height: 30, decoration: const BoxDecoration(color: Color(0x2EFFFFFF), shape: BoxShape.circle), alignment: Alignment.center, child: const Text('🛒', style: TextStyle(fontSize: 16))),
           const SizedBox(width: 10),

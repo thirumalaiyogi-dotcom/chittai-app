@@ -1074,7 +1074,7 @@ class _ShopSrItem extends StatelessWidget {
           ]),
         ),
         q > 0
-            ? QtyStepper(qty: q, height: 32, btnW: 32, font: 14, onMinus: () => CartOps.chg(p, i, -1), onPlus: () => CartOps.chg(p, i, 1))
+            ? QtyStepper(qty: q, height: 38, btnW: 40, font: 14, onMinus: () => CartOps.chg(p, i, -1), onPlus: () => CartOps.chg(p, i, 1))
             : GestureDetector(
                 onTap: () => CartOps.add(p, i),
                 child: Container(

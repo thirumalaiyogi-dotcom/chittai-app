@@ -52,11 +52,15 @@ class _SuccessState extends State<_Success> with TickerProviderStateMixin {
   late final AnimationController _cf = AnimationController(vsync: this, duration: const Duration(milliseconds: 2200));
   final _rnd = math.Random();
   late final List<List<double>> _bits = List.generate(34, (i) => [8 + _rnd.nextDouble() * 84, _rnd.nextDouble() * 120 - 60, _rnd.nextDouble() * 720 - 360, _rnd.nextDouble() * .35, i.toDouble()]);
-  static const _cols = [Color(0xFF00A884), Color(0xFFF59E0B), Color(0xFFEF4444), Color(0xFF3B82F6), Color(0xFFA855F7), Color(0xFF16A34A)];
+  static const _cols = [AppColors.primary, Color(0xFFF59E0B), Color(0xFFEF4444), Color(0xFF3B82F6), Color(0xFFA855F7), Color(0xFF16A34A)];
 
   @override
   void initState() {
     super.initState();
+    if (reducedMotion) {
+      _tick.value = 1; // அசைவு குறைப்பு: ✓ உடனே, கொண்டாட்டம் இல்லை
+      return;
+    }
     Future.delayed(const Duration(milliseconds: 250), () {
       if (mounted) _cf.forward();
     });
@@ -366,7 +370,7 @@ class _OrderCard extends StatelessWidget {
     final st = o.cloud ? (kCoSt[o.status] ?? [o.status, 'w', '🕒']) : ['இந்த phone-ல் மட்டும்', 'n', '📱'];
     final n = o.its.fold<int>(0, (a, i) => a + (i.q > 0 ? i.q : 1));
     final active = coActive(o);
-    final stCol = {'w': const Color(0xFFB45309), 'b': const Color(0xFF0369A1), 'g': const Color(0xFF15803D), 'r': const Color(0xFFB91C1C), 'n': P.mu2}[st[1]]!;
+    final stCol = {'w': const Color(0xFFB45309), 'b': const Color(0xFF0369A1), 'g': AppColors.primary, 'r': const Color(0xFFB91C1C), 'n': P.mu2}[st[1]]!;
     final stBg = {'w': const Color(0xFFFFF7E6), 'b': const Color(0xFFE0F2FE), 'g': const Color(0xFFDCFCE7), 'r': const Color(0xFFFEE2E2), 'n': P.card3}[st[1]]!;
     final revDone = s.revDoneMap();
     return GestureDetector(
@@ -544,7 +548,7 @@ Future<bool> _askAlts(ReoPlan plan) async {
                   Text.rich(TextSpan(style: ts(13, c: P.mu2), children: [
                     TextSpan(text: a.was.isNotEmpty ? a.was : 'பழைய pack', style: const TextStyle(decoration: TextDecoration.lineThrough)),
                     const TextSpan(text: ' இல்லை → '),
-                    TextSpan(text: '${a.now} · ₹${rupee(a.price)}', style: ts(13, w: w8, c: const Color(0xFF0F766E))),
+                    TextSpan(text: '${a.now} · ₹${rupee(a.price)}', style: ts(13, w: w8, c: AppColors.primaryDark)),
                     TextSpan(text: ' × ${a.qty}'),
                   ])),
                 ]),
@@ -673,12 +677,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with WidgetsBindi
         eta = by.isAfter(DateTime.now()) ? '⏱ ${hm12(by)}-க்குள் வந்துவிடும்' : '⏱ சிறிது நேரத்தில் வந்துவிடும்';
       }
     }
-    // HTML .tk-hero (160deg): இயல்பு --hdr→--hdr2, .done #0f766e→#14b8a6, .bad #991b1b→#dc2626
+    // HTML .tk-hero (160deg): இயல்பு --hdr→--hdr2, .done #166534→#22a35a, .bad #991b1b→#dc2626
     final bad = st == 'CANCELLED';
     final heroBg = bad
         ? const [Color(0xFF991B1B), Color(0xFFDC2626)]
         : st == 'DELIVERED'
-            ? const [Color(0xFF0F766E), Color(0xFF14B8A6)]
+            ? const [AppColors.primaryDark, Color(0xFF22A35A)]
             : [P.hdr, P.hdr2];
     final kids = <Widget>[];
     kids.add(Container(
@@ -687,7 +691,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with WidgetsBindi
       decoration: BoxDecoration(
         gradient: LinearGradient(colors: heroBg, begin: const Alignment(-.342, -.94), end: const Alignment(.342, .94)),
         borderRadius: BorderRadius.circular(22),
-        boxShadow: bad ? null : const [BoxShadow(color: Color(0x40008069), blurRadius: 22, offset: Offset(0, 8))],
+        boxShadow: bad ? null : const [BoxShadow(color: Color(0x40166534), blurRadius: 22, offset: Offset(0, 8))],
       ),
       child: Column(children: [
         if (o.cloud && h != null) ...[
@@ -911,7 +915,7 @@ class _LiveIconState extends State<_LiveIcon> with SingleTickerProviderStateMixi
   @override
   void initState() {
     super.initState();
-    if (widget.live) _c.repeat();
+    if (widget.live && !reducedMotion) _c.repeat();
   }
 
   @override

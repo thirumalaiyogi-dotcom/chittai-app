@@ -101,11 +101,11 @@ class StoriesRow extends StatelessWidget {
                         padding: const EdgeInsets.all(3),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          // conic-gradient(from 210deg, #00a884, #7ad8b8, #f59e0b, #00a884)
+                          // conic-gradient(from 210deg, #15803d, #7ad8b8, #f59e0b, #15803d)
                           gradient: isSeen
                               ? null
                               : const SweepGradient(
-                                  colors: [Color(0xFF00A884), Color(0xFF7AD8B8), Color(0xFFF59E0B), Color(0xFF00A884)],
+                                  colors: [AppColors.primary, Color(0xFF7AD8B8), Color(0xFFF59E0B), AppColors.primary],
                                   transform: GradientRotation(120 * 3.141592653589793 / 180),
                                 ),
                           color: isSeen ? const Color(0xFFC9D4D0) : null,
@@ -141,7 +141,7 @@ class StoriesRow extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(colors: [P.g, P.g2], begin: Alignment.topLeft, end: Alignment.bottomRight),
                   borderRadius: const BorderRadius.vertical(bottom: Radius.circular(10)),
-                  boxShadow: const [BoxShadow(color: Color(0x40007A63), blurRadius: 8, offset: Offset(0, 3))],
+                  boxShadow: const [BoxShadow(color: Color(0x40166534), blurRadius: 8, offset: Offset(0, 3))],
                 ),
                 child: Text('இன்று புதிது', style: ts(13, w: w8, c: Colors.white)),
               ),

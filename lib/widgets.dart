@@ -45,7 +45,7 @@ void toast(String msg, {String? action, VoidCallback? onAction}) {
         child: Center(
           child: TweenAnimationBuilder<double>(
             tween: Tween(begin: 0, end: 1),
-            duration: const Duration(milliseconds: 220),
+            duration: reducedMotion ? Duration.zero : const Duration(milliseconds: 220),
             builder: (_, v, ch) => Opacity(opacity: v, child: Transform.translate(offset: Offset(0, 14 * (1 - v)), child: ch)),
             child: Material(
               color: Colors.transparent,
@@ -72,7 +72,7 @@ void toast(String msg, {String? action, VoidCallback? onAction}) {
                             constraints: const BoxConstraints(minHeight: 44),
                             alignment: Alignment.center,
                             padding: const EdgeInsets.only(left: 16),
-                            child: Text(action, style: ts(14, w: w8, c: const Color(0xFF5EEAD4))),
+                            child: Text(action, style: ts(14, w: w8, c: const Color(0xFF86EFAC))),
                           ),
                         ),
                       ]),
@@ -150,21 +150,29 @@ class GreenButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final on = onTap != null;
-    return Opacity(
-      opacity: on ? 1 : .55,
-      child: Material(
-        color: Colors.transparent,
-        child: Ink(
-          height: height,
-          decoration: BoxDecoration(
-            gradient: kBtnGrad,
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: on ? const [BoxShadow(color: Color(0x47008069), blurRadius: 16, offset: Offset(0, 6))] : null,
-          ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(14),
-            onTap: onTap,
-            child: Center(child: Text(label, style: ts(16, w: w8, c: Colors.white))),
+    var focused = false;
+    return StatefulBuilder(
+      builder: (context, set) => Opacity(
+        opacity: on ? 1 : .55,
+        child: Material(
+          color: Colors.transparent,
+          child: Ink(
+            height: height,
+            decoration: BoxDecoration(
+              color: P.g, // திட primary
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                if (on) const BoxShadow(color: Color(0x47166534), blurRadius: 16, offset: Offset(0, 6)),
+                // விசைப்பலகை / D-pad focus: 2.5px வெளிக்கோடு
+                if (focused && FocusManager.instance.highlightMode == FocusHighlightMode.traditional) BoxShadow(color: P.g2, spreadRadius: 3.5),
+              ],
+            ),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: onTap,
+              onFocusChange: (f) => set(() => focused = f),
+              child: Center(child: Text(label, style: ts(16, w: w8, c: Colors.white))),
+            ),
           ),
         ),
       ),
@@ -297,9 +305,9 @@ class QtyStepper extends StatelessWidget {
     return Container(
       height: height,
       decoration: BoxDecoration(
-        gradient: kBtnGrad,
+        color: P.g, // திட primary
         borderRadius: BorderRadius.circular(10),
-        boxShadow: const [BoxShadow(color: Color(0x2E007A63), blurRadius: 10, offset: Offset(0, 4))],
+        boxShadow: const [BoxShadow(color: Color(0x2E166534), blurRadius: 10, offset: Offset(0, 4))],
       ),
       child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         b(minusIcon ?? Text('−', style: ts(font + 5, w: w8, c: Colors.white)), onMinus, minusIcon != null ? 'கூடையிலிருந்து நீக்கு' : 'ஒன்று குறை'),
@@ -318,11 +326,39 @@ class OosTag extends StatelessWidget {
   final String text;
   const OosTag({super.key, this.small = false, this.text = 'கையிருப்பு இல்லை'});
   @override
-  Widget build(BuildContext context) => Container(
-        padding: EdgeInsets.symmetric(horizontal: small ? 9 : 6, vertical: small ? 5 : 8),
-        decoration: BoxDecoration(color: const Color(0xFFFEE2E2), borderRadius: BorderRadius.circular(10)),
-        child: Text(text, textAlign: TextAlign.center, style: ts(small ? 11.5 : 12, w: w8, c: const Color(0xFFB91C1C))),
+  Widget build(BuildContext context) => CustomPaint(
+        foregroundPainter: const _DashedRRect(Color(0xFFFCA5A5), 10),
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: small ? 9 : 6, vertical: small ? 5 : 8),
+          decoration: BoxDecoration(color: const Color(0xFFFEE2E2), borderRadius: BorderRadius.circular(10)),
+          child: Text(text, textAlign: TextAlign.center, style: ts(12, w: w8, c: const Color(0xFFB91C1C))),
+        ),
       );
+}
+
+// 1px புள்ளிக்கோடு எல்லை (கையிருப்பு இல்லை)
+class _DashedRRect extends CustomPainter {
+  final Color color;
+  final double radius;
+  const _DashedRRect(this.color, this.radius);
+  @override
+  void paint(Canvas canvas, Size size) {
+    final path = Path()..addRRect(RRect.fromRectAndRadius(Rect.fromLTWH(.5, .5, size.width - 1, size.height - 1), Radius.circular(radius)));
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1;
+    for (final m in path.computeMetrics()) {
+      double d = 0;
+      while (d < m.length) {
+        canvas.drawPath(m.extractPath(d, d + 4), paint);
+        d += 7;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedRRect o) => o.color != color || o.radius != radius;
 }
 
 // ═══ ♡ விருப்பம் ═══
@@ -395,6 +431,10 @@ class ProductCard extends StatelessWidget {
             backgroundColor: P.card,
             side: BorderSide(color: P.g, width: 1.5),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ).copyWith(
+            // அழுத்தும்போது வெளிர் பச்சை (tint) பின்னணி; focus-ல் 2.5px
+            backgroundColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.pressed) ? P.gc : P.card),
+            side: WidgetStateProperty.resolveWith((s) => BorderSide(color: P.g, width: s.contains(WidgetState.focused) ? 2.5 : 1.5)),
           ),
           onPressed: () => single ? CartOps.add(p, 0) : Nav.openProduct(p),
           child: Text('+ சேர்', style: ts(13.5, w: w8, c: P.g2)),
@@ -409,7 +449,7 @@ class ProductCard extends StatelessWidget {
             color: P.card,
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: inCart ? P.g : P.bd, width: inCart ? 2 : 1),
-            boxShadow: [BoxShadow(color: inCart ? const Color(0x2E00A884) : const Color(0x0D143C32), blurRadius: inCart ? 14 : 8, offset: const Offset(0, 3))],
+            boxShadow: [BoxShadow(color: inCart ? const Color(0x2E15803D) : const Color(0x0D000000), blurRadius: inCart ? 14 : 3, offset: inCart ? const Offset(0, 3) : const Offset(0, 1))],
           ),
           clipBehavior: Clip.antiAlias,
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
@@ -430,7 +470,7 @@ class ProductCard extends StatelessWidget {
                     bottom: 0,
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: const BoxDecoration(color: Color(0xFFE8590C), borderRadius: BorderRadius.only(topRight: Radius.circular(10))),
+                      decoration: const BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.only(topRight: Radius.circular(10))),
                       child: Text('${bo.off}%${single ? '' : ' வரை'} தள்ளுபடி', style: ts(12, w: w8, c: Colors.white)),
                     ),
                   ),
@@ -447,7 +487,7 @@ class ProductCard extends StatelessWidget {
                 ),
                 SizedBox(
                   height: 36 * k,
-                  child: Text(p.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: ts(12.5, w: w8, h: 1.35)),
+                  child: Text(p.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: ts(12.5, w: w7, h: 1.35)),
                 ),
                 SizedBox(
                   height: 18 * k,
@@ -527,7 +567,7 @@ class HxBtn extends StatelessWidget {
         alignment: Alignment.center,
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(color: P.card, border: Border.all(color: P.g, width: 1.5), borderRadius: BorderRadius.circular(9)),
-        child: Text('சேர் +', style: ts(12, w: w8, c: const Color(0xFF00856B))),
+        child: Text('சேர் +', style: ts(12, w: w8, c: AppColors.primaryDark)),
       ),
     ));
   }
@@ -654,7 +694,13 @@ class Skeleton extends StatefulWidget {
 }
 
 class _SkeletonState extends State<Skeleton> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1100))..repeat(reverse: true);
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1100));
+  @override
+  void initState() {
+    super.initState();
+    if (!reducedMotion) _c.repeat(reverse: true); // அசைவு குறைப்பு: நிலையான நிறம்
+  }
+
   @override
   void dispose() {
     _c.dispose();
@@ -778,7 +824,9 @@ class _NoticeBarState extends State<NoticeBar> with SingleTickerProviderStateMix
           const Text('📢', style: TextStyle(fontSize: 16)),
           const SizedBox(width: 8),
           Expanded(
-            child: ClipRect(
+            child: reducedMotion
+                ? Text(widget.text, style: style) // ஓடாமல் நிலையாக
+                : ClipRect(
               child: LayoutBuilder(builder: (_, c) {
                 final tp = TextPainter(text: TextSpan(text: widget.text, style: style), textDirection: TextDirection.ltr, maxLines: 1)..layout();
                 final w = tp.width + 60;
@@ -984,8 +1032,8 @@ class WaToggle extends StatelessWidget {
           width: 52,
           height: 30,
           decoration: BoxDecoration(
-            color: on ? const Color(0xFF00A884) : P.bd,
-            border: Border.all(color: on ? const Color(0xFF00A884) : P.bd),
+            color: on ? AppColors.primary : P.bd,
+            border: Border.all(color: on ? AppColors.primary : P.bd),
             borderRadius: BorderRadius.circular(15),
           ),
           child: AnimatedAlign(

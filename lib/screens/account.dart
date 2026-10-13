@@ -71,7 +71,7 @@ class _AccountScreenState extends State<AccountScreen> {
     final dk = s.dark;
     // HTML .acc-* (வரி 1765-1791; light card நிழல் 2204)
     final cardShadow = dk ? null : const [BoxShadow(color: Color(0x0D143C32), blurRadius: 8, offset: Offset(0, 2))];
-    final cardBd = dk ? P.bd : const Color(0xFFE3EAE7);
+    final cardBd = dk ? P.bd : const Color(0xFFE4E9E5);
     Widget ri(String ic, {bool red = false}) => Container(
           width: 38,
           height: 38,
@@ -132,7 +132,7 @@ class _AccountScreenState extends State<AccountScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: dk ? [P.hdr, const Color(0xFF0A6B52)] : const [Color(0xFF075E54), Color(0xFF00A884)],
+              colors: dk ? [P.hdr, AppColors.primaryDark] : const [AppColors.brand, AppColors.primary],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -585,14 +585,14 @@ class _HelpScreenState extends State<HelpScreen> {
             Container(
               width: 38,
               height: 38,
-              decoration: BoxDecoration(color: wa ? const Color(0xFF25D366) : const Color(0xFF075E54), shape: BoxShape.circle),
+              decoration: BoxDecoration(color: wa ? const Color(0xFF25D366) : AppColors.brand, shape: BoxShape.circle),
               child: Icon(ic, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 8),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(b, style: ts(14, w: w8, c: const Color(0xFF17201D))),
-                Text(s, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(12, c: const Color(0xFF64706C))),
+                Text(b, style: ts(14, w: w8, c: const Color(0xFF1C2420))),
+                Text(s, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(12, c: const Color(0xFF4D5752))),
               ]),
             ),
           ]),
@@ -615,7 +615,7 @@ class _Foot extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.all(22),
         child: Column(children: [
-          RichText(text: TextSpan(style: pop(22, c: P.g2), children: const [TextSpan(text: 'சிட்டை'), TextSpan(text: '.', style: TextStyle(color: Color(0xFF00A884)))])),
+          RichText(text: TextSpan(style: pop(22, c: P.g2), children: const [TextSpan(text: 'சிட்டை'), TextSpan(text: '.', style: TextStyle(color: AppColors.primary))])),
           const SizedBox(height: 4),
           Text('உங்கள் ஊர் கடைகள் — உங்கள் வீட்டு வாசலில்', style: ts(12.5, c: P.mu2)),
           Text(appVersionText, style: ts(12, c: P.mu)),
@@ -680,7 +680,7 @@ class _InfoScreenState extends State<InfoScreen> {
       [Icons.notifications_none, 'உடனடி அறிவிப்பு', 'ஒவ்வொரு நிலையிலும் notification'],
     ];
     return [
-      Center(child: RichText(text: TextSpan(style: pop(30, c: P.g2), children: const [TextSpan(text: 'சிட்டை'), TextSpan(text: '.', style: TextStyle(color: Color(0xFF00A884)))]))),
+      Center(child: RichText(text: TextSpan(style: pop(30, c: P.g2), children: const [TextSpan(text: 'சிட்டை'), TextSpan(text: '.', style: TextStyle(color: AppColors.primary))]))),
       Center(child: Text('உங்கள் ஊர் கடைகள் — உங்கள் வீட்டு வாசலில்', style: ts(13, c: P.mu2))),
       const SizedBox(height: 14),
       _p2('சிட்டை உங்கள் பகுதியில் உள்ள நம்பிக்கையான கடைகளை ஒரே இடத்தில் இணைக்கிறது. நீங்கள் ஆர்டர் செய்தால், கடை பார்சல் செய்து, எங்கள் டெலிவரி நபர் உங்கள் வீட்டுக்குக் கொண்டு வருவார்.'),
@@ -919,14 +919,14 @@ class _ProfileFormState extends State<_ProfileForm> {
         filled: true,
         fillColor: P.card2,
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: P.bd)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: _err.containsKey(key) ? const Color(0xFFDC2626) : P.bd)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: P.g)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: P.inputBd)),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: _err.containsKey(key) ? const Color(0xFFDC2626) : P.inputBd)),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: P.g, width: focusW())),
       );
 
   Widget _errTxt(String key) => _err[key] == null
       ? const SizedBox(height: 12)
-      : Padding(padding: const EdgeInsets.only(top: 4, bottom: 8), child: Text(_err[key]!, style: ts(12, w: w7, c: const Color(0xFFDC2626))));
+      : Padding(padding: const EdgeInsets.only(top: 4, bottom: 8), child: Text(_err[key]!, style: ts(12.5, w: w7, c: const Color(0xFFDC2626))));
 
   Widget _lbl(String t, {bool req = true}) => Padding(
         padding: const EdgeInsets.only(bottom: 6),
@@ -948,7 +948,7 @@ class _ProfileFormState extends State<_ProfileForm> {
           style: ts(15, w: w6),
           decoration: _dec(f.ph, f.k),
         ),
-        _err[f.k] == null ? const SizedBox(height: 11) : Padding(padding: const EdgeInsets.only(top: 3, bottom: 8), child: Text('⚠️ ${_err[f.k]}', style: ts(12, w: w7, c: const Color(0xFFDC2626)))),
+        _err[f.k] == null ? const SizedBox(height: 11) : Padding(padding: const EdgeInsets.only(top: 3, bottom: 8), child: Text('⚠️ ${_err[f.k]}', style: ts(12.5, w: w7, c: const Color(0xFFDC2626)))),
       ]);
 
   @override

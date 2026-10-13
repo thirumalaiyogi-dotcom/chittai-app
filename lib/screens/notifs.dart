@@ -33,13 +33,13 @@ const Map<String, IconData> _ic = {
   'shop': Icons.notifications,
 };
 const Map<String, Color> _col = {
-  'placed': Color(0xFF00A884),
+  'placed': AppColors.primary,
   'acc': Color(0xFF2563EB),
   'ready': Color(0xFFF59E0B),
   'out': Color(0xFF0EA5E9),
   'done': Color(0xFF16A34A),
   'cancel': Color(0xFFDC2626),
-  'sent': Color(0xFF00A884),
+  'sent': AppColors.primary,
   'offer': Color(0xFFE11D48),
   'shop': Color(0xFF64748B),
 };
@@ -238,7 +238,7 @@ class _NotifScreenState extends State<NotifScreen> {
                 ),
                 Column(children: [
                   Icon(Icons.chevron_right, color: P.mu),
-                  if (u) Container(width: 9, height: 9, decoration: BoxDecoration(color: e.k == 'offer' ? const Color(0xFFEF4444) : (e.k == 'cancel' ? const Color(0xFFF59E0B) : const Color(0xFF00A884)), shape: BoxShape.circle)),
+                  if (u) Container(width: 9, height: 9, decoration: BoxDecoration(color: e.k == 'offer' ? const Color(0xFFEF4444) : (e.k == 'cancel' ? const Color(0xFFF59E0B) : AppColors.primary), shape: BoxShape.circle)),
                 ]),
               ]),
             ),

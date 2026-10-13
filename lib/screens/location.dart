@@ -339,7 +339,7 @@ class _MapPickScreenState extends State<MapPickScreen> {
             left: 10,
             child: CircleAvatar(
               backgroundColor: Colors.white,
-              child: IconButton(tooltip: 'பின்செல்', icon: const Icon(Icons.arrow_back, color: Color(0xFF17201D)), onPressed: () => Navigator.of(context).pop()),
+              child: IconButton(tooltip: 'பின்செல்', icon: const Icon(Icons.arrow_back, color: Color(0xFF1C2420)), onPressed: () => Navigator.of(context).pop()),
             ),
           ),
           Positioned(
@@ -349,7 +349,7 @@ class _MapPickScreenState extends State<MapPickScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
               decoration: BoxDecoration(color: const Color(0xE6FFFFFF), borderRadius: BorderRadius.circular(14)),
-              child: Text('வரைபடத்தை நகர்த்தி, pin-ஐ உங்கள் வீட்டின் மேல் வையுங்கள்', style: ts(12.5, w: w7, c: const Color(0xFF17201D))),
+              child: Text('வரைபடத்தை நகர்த்தி, pin-ஐ உங்கள் வீட்டின் மேல் வையுங்கள்', style: ts(12.5, w: w7, c: const Color(0xFF1C2420))),
             ),
           ),
           Positioned(
@@ -386,7 +386,7 @@ class _MapPickScreenState extends State<MapPickScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text('${accCls == 'good' ? '✅' : '📶'} GPS துல்லியம் ± ${_acc.round()} மீ${_accDone ? '' : '  ⏳ இன்னும் சரிசெய்கிறது...'}', style: ts(12.5, w: w8, c: const Color(0xFF17201D))),
+                        Text('${accCls == 'good' ? '✅' : '📶'} GPS துல்லியம் ± ${_acc.round()} மீ${_accDone ? '' : '  ⏳ இன்னும் சரிசெய்கிறது...'}', style: ts(12.5, w: w8, c: const Color(0xFF1C2420))),
                         if (_accDone && accCls != 'good')
                           Text('வீட்டுக்கு வெளியே / ஜன்னல் அருகில் வந்து மீண்டும் "என்னைக் கண்டுபிடி" அழுத்துங்கள். அல்லது pin-ஐ கையால் உங்கள் வீட்டின் மேல் நகர்த்துங்கள்.',
                               style: ts(12, c: const Color(0xFF475569), h: 1.4)),
@@ -434,14 +434,14 @@ class _MapPickScreenState extends State<MapPickScreen> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
           decoration: BoxDecoration(
-            color: on ? const Color(0xFF075E54) : Colors.white,
+            color: on ? AppColors.brand : Colors.white,
             borderRadius: BorderRadius.circular(22),
             boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 8, offset: Offset(0, 2))],
           ),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(ic, size: 19, color: on ? Colors.white : const Color(0xFF007A63)),
+            Icon(ic, size: 19, color: on ? Colors.white : AppColors.primaryDark),
             const SizedBox(width: 6),
-            Text(l, style: ts(13, w: w8, c: on ? Colors.white : const Color(0xFF17201D))),
+            Text(l, style: ts(13, w: w8, c: on ? Colors.white : const Color(0xFF1C2420))),
           ]),
         ),
       );
@@ -573,9 +573,9 @@ class _LocSheetState extends State<_LocSheet> {
               filled: true,
               fillColor: P.card2,
               contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: P.bd)),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: P.bd)),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: P.g)),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: P.inputBd)),
+              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: P.inputBd)),
+              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: P.g, width: focusW())),
             ),
           ),
           if (_wait) Padding(padding: const EdgeInsets.all(14), child: Text('⏳ தேடுகிறது...', style: ts(13.5, c: P.mu))),
@@ -747,13 +747,13 @@ class _AddrSheetState extends State<_AddrSheet> {
           filled: true,
           fillColor: P.card2,
           contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 13),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: P.bd)),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: _err.containsKey(key) ? const Color(0xFFDC2626) : P.bd)),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: P.g)),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: P.inputBd)),
+          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: _err.containsKey(key) ? const Color(0xFFDC2626) : P.inputBd)),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: P.g, width: focusW())),
           suffixIcon: key == 'ph' && RegExp(r'^[6-9]\d{9}$').hasMatch(c.text.trim()) ? const Icon(Icons.check_circle, color: Color(0xFF16A34A), size: 20) : null,
         ),
       )),
-      if (_err[key] != null) Padding(padding: const EdgeInsets.only(top: 3), child: Text('⚠️ ${_err[key]}', style: ts(12, w: w7, c: const Color(0xFFDC2626)))),
+      if (_err[key] != null) Padding(padding: const EdgeInsets.only(top: 3), child: Text('⚠️ ${_err[key]}', style: ts(12.5, w: w7, c: const Color(0xFFDC2626)))),
       const SizedBox(height: 11),
     ]);
   }

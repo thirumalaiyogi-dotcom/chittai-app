@@ -80,7 +80,8 @@ class Boot extends StatefulWidget {
 }
 
 class _BootState extends State<Boot> with TickerProviderStateMixin {
-  bool _done = false, _out = false;
+  // அசைவு குறைப்பு: scooter splash-ஐ முழுவதும் தவிர்
+  bool _done = reducedMotion, _out = reducedMotion;
   final DateTime _t0 = DateTime.now();
   late final AnimationController _in = AnimationController(vsync: this, duration: const Duration(milliseconds: 1800))..forward();
   late final AnimationController _loop = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))..repeat();
@@ -157,7 +158,7 @@ class _BootState extends State<Boot> with TickerProviderStateMixin {
                   gradient: RadialGradient(
                     center: const Alignment(0, -.2),
                     radius: 1.2,
-                    colors: dark ? const [Color(0xFF1F2C34), Color(0xFF111B21)] : const [Colors.white, Color(0xFFEAF8F3), Color(0xFFD6F1E8)],
+                    colors: dark ? const [Color(0xFF111B21), Color(0xFF111B21)] : const [Colors.white, AppColors.tint, Color(0xFFDCEFE1)],
                   ),
                 ),
                 child: Stack(children: [
@@ -175,10 +176,10 @@ class _BootState extends State<Boot> with TickerProviderStateMixin {
                               width: 170,
                               height: 170,
                               decoration: BoxDecoration(
-                                color: dark ? const Color(0xFFE9F7F2) : Colors.white,
+                                color: dark ? AppColors.tint : Colors.white,
                                 shape: BoxShape.circle,
                                 boxShadow: const [
-                                  BoxShadow(color: Color(0x2E007A63), blurRadius: 40, offset: Offset(0, 18)),
+                                  BoxShadow(color: Color(0x2E166534), blurRadius: 40, offset: Offset(0, 18)),
                                   BoxShadow(color: Color(0x8CFFFFFF), spreadRadius: 10),
                                 ],
                               ),
@@ -196,9 +197,9 @@ class _BootState extends State<Boot> with TickerProviderStateMixin {
                         child: Transform.translate(
                           offset: Offset(0, 16 * (1 - name)),
                           child: RichText(
-                            text: TextSpan(style: pop(40, c: dark ? const Color(0xFFE9EDEF) : const Color(0xFF075E54)), children: const [
+                            text: TextSpan(style: pop(40, c: dark ? const Color(0xFFE9EDEF) : AppColors.brand), children: const [
                               TextSpan(text: 'சிட்டை'),
-                              TextSpan(text: '.', style: TextStyle(color: Color(0xFF00A884))),
+                              TextSpan(text: '.', style: TextStyle(color: AppColors.primary)),
                             ]),
                           ),
                         ),
@@ -227,7 +228,7 @@ class _BootState extends State<Boot> with TickerProviderStateMixin {
                             width: 8,
                             height: 8,
                             transform: Matrix4.translationValues(0, -4 * _wave(_loop.value - i * .15), 0),
-                            decoration: const BoxDecoration(color: Color(0xFF00A884), shape: BoxShape.circle),
+                            decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
                           ),
                       ]),
                     ),
@@ -251,7 +252,7 @@ class _BootState extends State<Boot> with TickerProviderStateMixin {
   Widget _blob(double s, bool dark) => Container(
         width: s,
         height: s,
-        decoration: BoxDecoration(shape: BoxShape.circle, color: (dark ? const Color(0xFF0B3D34) : const Color(0xFFBFE9DA)).withValues(alpha: .55)),
+        decoration: BoxDecoration(shape: BoxShape.circle, color: (dark ? const Color(0xFF0B3D34) : const Color(0xFFC8E6CF)).withValues(alpha: .55)),
       );
 }
 
@@ -381,8 +382,8 @@ class BottomNav extends StatelessWidget {
         // HTML .bn-it (light: 2222-2226; dark: 1474-1480)
         Widget item(String k, String svg, String lb, {int badge = 0, bool cartLb = false}) {
           final a = on == k;
-          final lbCol = dk ? (a ? P.g2 : const Color(0xFF8A9592)) : (a ? const Color(0xFF00856B) : const Color(0xFF64706C));
-          final icCol = dk ? lbCol : (a ? const Color(0xFF00A884) : const Color(0xFF87938F));
+          final lbCol = dk ? (a ? P.g2 : const Color(0xFF8A9592)) : (a ? AppColors.primaryDark : const Color(0xFF4D5752));
+          final icCol = dk ? lbCol : (a ? AppColors.primary : const Color(0xFF6B7570));
           return Expanded(
             child: Semantics(
               button: true,
@@ -399,7 +400,7 @@ class BottomNav extends StatelessWidget {
                     right: 0,
                     child: FractionallySizedBox(
                       widthFactor: .48, // left/right 26%
-                      child: Container(height: 3.5, decoration: BoxDecoration(color: dk ? P.g : const Color(0xFF00A884), borderRadius: const BorderRadius.vertical(bottom: Radius.circular(4)))),
+                      child: Container(height: 3.5, decoration: BoxDecoration(color: dk ? P.g : AppColors.primary, borderRadius: const BorderRadius.vertical(bottom: Radius.circular(4)))),
                     ),
                   ),
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -426,7 +427,7 @@ class BottomNav extends StatelessWidget {
                           decoration: BoxDecoration(color: P.g, borderRadius: BorderRadius.circular(10)),
                           child: Text('₹${_r(amt)}', style: ts(12, w: w8, c: Colors.white)),
                         )
-                      : Text(lb, style: ts(13, w: w8, c: lbCol)),
+                      : Text(lb, style: ts(13, w: a ? w9 : w8, c: lbCol)),
                 ]),
               ]),
             ),
@@ -437,7 +438,7 @@ class BottomNav extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
             color: dk ? P.card : Colors.white,
-            border: Border(top: BorderSide(color: dk ? P.bd : const Color(0xFFE3EAE7))),
+            border: Border(top: BorderSide(color: dk ? P.bd : const Color(0xFFE4E9E5))),
             boxShadow: [BoxShadow(color: dk ? const Color(0x0F000000) : const Color(0x0A143C32), blurRadius: dk ? 16 : 10, offset: Offset(0, dk ? -4 : -2))],
           ),
           child: SafeArea(

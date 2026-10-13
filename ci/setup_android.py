@@ -197,7 +197,22 @@ def patch_gradle():
         sys.exit(1)
 
 
+def patch_launch():
+    # native splash: வெளிர் பச்சை (#ECF6EF) — கருப்பு/அடர்பச்சை மின்னல் இல்லை; இருட்டு system theme-ல் #111B21
+    def layer(color):
+        return ('<?xml version="1.0" encoding="utf-8"?>\n'
+                '<layer-list xmlns:android="http://schemas.android.com/apk/res/android">\n'
+                '    <item android:drawable="@android:color/transparent"><shape android:shape="rectangle"><solid android:color="%s"/></shape></item>\n'
+                '</layer-list>\n' % color)
+    res = os.path.join(APP, "src", "main", "res")
+    for d, col in [("drawable", "#ECF6EF"), ("drawable-v21", "#ECF6EF"), ("drawable-night", "#111B21"), ("drawable-night-v21", "#111B21")]:
+        os.makedirs(os.path.join(res, d), exist_ok=True)
+        write(os.path.join(res, d, "launch_background.xml"), layer(col))
+    print("✅ native splash நிறம் மாற்றப்பட்டது")
+
+
 if __name__ == "__main__":
     patch_manifest()
     patch_notification()
+    patch_launch()
     patch_gradle()

@@ -329,14 +329,14 @@ class _HomeScreenState extends State<HomeScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: _f.hasFocus ? const Color(0xFF00A884) : const Color(0xFFE3EAE7)),
+            border: Border.all(color: _f.hasFocus ? AppColors.primary : const Color(0xFFE4E9E5)),
             boxShadow: const [BoxShadow(color: Color(0x12143C32), blurRadius: 14, offset: Offset(0, 4))],
           ),
           child: Row(children: [
             if (_srActive)
-              IconButton(tooltip: 'பின்செல்', icon: const Icon(Icons.arrow_back, color: Color(0xFF00A884)), onPressed: _exit)
+              IconButton(tooltip: 'பின்செல்', icon: const Icon(Icons.arrow_back, color: AppColors.primary), onPressed: _exit)
             else
-              const Icon(Icons.search, color: Color(0xFF00A884), size: 24),
+              const Icon(Icons.search, color: AppColors.primary, size: 24),
             const SizedBox(width: 8),
             Expanded(
               child: ValueListenableBuilder<String>(
@@ -347,13 +347,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   onChanged: _onType,
                   onSubmitted: _commit,
                   textInputAction: TextInputAction.search,
-                  style: ts(16, w: w6, c: const Color(0xFF17201D)),
-                  cursorColor: const Color(0xFF00A884),
+                  style: ts(16, w: w6, c: const Color(0xFF1C2420)),
+                  cursorColor: AppColors.primary,
                   decoration: InputDecoration(
                     isDense: true,
                     border: InputBorder.none,
                     hintText: _f.hasFocus || _srActive ? 'பொருள், கடை அல்லது வகையைத் தேடுங்கள்...' : hint,
-                    hintStyle: ts(15, w: w6, c: const Color(0xFF6B7773)),
+                    hintStyle: ts(15, w: w6, c: const Color(0xFF6B7570)),
                   ),
                 ),
               ),
@@ -385,7 +385,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(color: _mic ? const Color(0xFFFFE3E3) : Colors.transparent, shape: BoxShape.circle),
-                    child: Icon(Icons.mic_none, color: _mic ? const Color(0xFFD93025) : (s.dark ? P.g2 : const Color(0xFF00A884))),
+                    child: Icon(Icons.mic_none, color: _mic ? const Color(0xFFD93025) : (s.dark ? P.g2 : AppColors.primary)),
                   ),
                 ),
               ),

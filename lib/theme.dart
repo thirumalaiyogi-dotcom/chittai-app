@@ -4,14 +4,36 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'state.dart';
 
+// ═══ SITTA PRO v3 — நிறங்கள் ஒரே இடத்தில் ═══
+class AppColors {
+  AppColors._();
+  static const Color brand = Color(0xFF14532D); // header, brand
+  static const Color primary = Color(0xFF15803D); // பொத்தான்கள்
+  static const Color primaryDark = Color(0xFF166534); // வெளிர் பச்சை மேல் எழுத்து
+  static const Color tint = Color(0xFFECF6EF);
+  static const Color bg = Color(0xFFF6F7F4);
+  static const Color card = Color(0xFFFFFFFF);
+  static const Color text = Color(0xFF1C2420);
+  static const Color muted = Color(0xFF6B7570);
+  static const Color muted2 = Color(0xFF4D5752);
+  static const Color border = Color(0xFFE4E9E5);
+  static const Color inputBorder = Color(0xFFD6DDD8);
+  // dark mode மட்டும்
+  static const Color darkPrimary = Color(0xFF22A35A);
+  static const Color darkPrimaryDark = Color(0xFF4ADE80);
+  static const Color darkTint = Color(0x2922A35A); // primary 16%
+  static const Color darkPrice = Color(0xFF86EFAC);
+}
+
 class Pal {
-  final Color bg, card, card2, card3, bd, text, mu, mu2, g, g2, gc, cyan, pink, or, red, hdr, hdr2;
+  final Color bg, card, card2, card3, bd, inputBd, text, mu, mu2, g, g2, gc, cyan, pink, or, red, hdr, hdr2;
   const Pal({
     required this.bg,
     required this.card,
     required this.card2,
     required this.card3,
     required this.bd,
+    required this.inputBd,
     required this.text,
     required this.mu,
     required this.mu2,
@@ -28,37 +50,40 @@ class Pal {
 }
 
 const Pal kLight = Pal(
-  bg: Color(0xFFF5F7F8),
-  card: Color(0xFFFFFFFF),
-  card2: Color(0xFFF8FAFA),
-  card3: Color(0xFFEEF3F1),
-  bd: Color(0xFFE3EAE7),
-  text: Color(0xFF17201D),
-  mu: Color(0xFF6B7773), // முன்பு #87938F (3.2:1) → 4.65:1
-  mu2: Color(0xFF64706C),
-  g: Color(0xFF00A884),
-  g2: Color(0xFF007A63),
-  gc: Color(0xFFEAF8F3),
+  bg: AppColors.bg,
+  card: AppColors.card,
+  card2: Color(0xFFF9FAF8),
+  card3: Color(0xFFEFF3EF),
+  bd: AppColors.border,
+  inputBd: AppColors.inputBorder,
+  text: AppColors.text,
+  mu: AppColors.muted,
+  mu2: AppColors.muted2,
+  g: AppColors.primary,
+  g2: AppColors.primaryDark,
+  gc: AppColors.tint,
   cyan: Color(0xFF0891B2),
   pink: Color(0xFFDC2626),
   or: Color(0xFFD97706),
   red: Color(0xFFDC2626),
-  hdr: Color(0xFF075E54),
-  hdr2: Color(0xFF007A63),
+  hdr: AppColors.brand,
+  hdr2: AppColors.primaryDark,
 );
 
+// dark: primary / primaryDark / tint மட்டும் மாறும்; மற்றவை முன்பு போல
 const Pal kDark = Pal(
   bg: Color(0xFF111B21),
   card: Color(0xFF1F2C34),
   card2: Color(0xFF182229),
   card3: Color(0xFF0D1418),
   bd: Color(0xFF2A3942),
+  inputBd: Color(0xFF2A3942),
   text: Color(0xFFE9EDEF),
   mu: Color(0xFF8696A0),
   mu2: Color(0xFFAEBAC1),
-  g: Color(0xFF00A884),
-  g2: Color(0xFF008F72),
-  gc: Color(0x2600A884),
+  g: AppColors.darkPrimary,
+  g2: AppColors.darkPrimaryDark,
+  gc: AppColors.darkTint,
   cyan: Color(0xFF53BDEB),
   pink: Color(0xFFEF9A9A),
   or: Color(0xFFFFB74D),
@@ -70,12 +95,12 @@ const Pal kDark = Pal(
 // இப்போதைய நிறங்கள்
 Pal get P => AppState.I.dark ? kDark : kLight;
 
-// பச்சை header gradient (#075e54 → #00a884)
+// பச்சை header gradient (#14532d → #15803d)
 LinearGradient get kHeroGrad => AppState.I.dark
     ? const LinearGradient(colors: [Color(0xFF1F2C34), Color(0xFF182229)], begin: Alignment.topLeft, end: Alignment.bottomRight)
-    : const LinearGradient(colors: [Color(0xFF075E54), Color(0xFF00A884)], begin: Alignment.topLeft, end: Alignment.bottomRight);
+    : const LinearGradient(colors: [Color(0xFF14532D), Color(0xFF15803D)], begin: Alignment.topLeft, end: Alignment.bottomRight);
 
-const LinearGradient kBtnGrad = LinearGradient(colors: [Color(0xFF008069), Color(0xFF006E5A)], begin: Alignment.topLeft, end: Alignment.bottomRight);
+const LinearGradient kBtnGrad = LinearGradient(colors: [Color(0xFF15803D), Color(0xFF166534)], begin: Alignment.topLeft, end: Alignment.bottomRight);
 
 Color hexColor(String s, [Color fb = const Color(0xFFE3F3E6)]) {
   var h = s.trim().replaceAll('#', '');
@@ -89,8 +114,21 @@ Color hexColor(String s, [Color fb = const Color(0xFFE3F3E6)]) {
 TextStyle ts(double size, {FontWeight w = FontWeight.w400, Color? c, double? h, TextDecoration? deco, double? ls}) =>
     TextStyle(fontSize: size, fontWeight: w, color: c ?? P.text, height: h, decoration: deco, decorationColor: c, letterSpacing: ls);
 
-TextStyle pop(double size, {FontWeight w = FontWeight.w800, Color? c, TextDecoration? deco}) =>
-    GoogleFonts.poppins(fontSize: size, fontWeight: w, color: c ?? P.text, decoration: deco, decorationColor: c);
+// விலை/மொத்தம்: எண்கள் ஒரே அகலம் (tabular), dark-ல் விலை #86EFAC
+TextStyle pop(double size, {FontWeight w = FontWeight.w800, Color? c, TextDecoration? deco}) => GoogleFonts.poppins(
+      fontSize: size,
+      fontWeight: w,
+      color: c ?? (AppState.I.dark ? AppColors.darkPrice : P.text),
+      decoration: deco,
+      decorationColor: c,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
+
+// phone-ல் "அசைவுகளை நீக்கு" (Remove animations) இயக்கப்பட்டிருந்தால் true
+bool get reducedMotion => WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations;
+
+// விசைப்பலகை / D-pad focus: 2.5px primary வெளிக்கோடு (தொடுதிரையில் சாதாரண அளவு)
+double focusW() => FocusManager.instance.highlightMode == FocusHighlightMode.traditional ? 2.5 : 1.5;
 
 const FontWeight w6 = FontWeight.w600, w7 = FontWeight.w700, w8 = FontWeight.w800, w9 = FontWeight.w900;
 
@@ -122,11 +160,16 @@ ThemeData buildTheme(bool dark) {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         textStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+      ).copyWith(
+        side: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.focused) ? BorderSide(color: p.g, width: 2.5) : BorderSide(color: p.bd, width: 1.5)),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(foregroundColor: p.g2, textStyle: const TextStyle(fontWeight: FontWeight.w800)),
+      style: TextButton.styleFrom(foregroundColor: p.g2, textStyle: const TextStyle(fontWeight: FontWeight.w800)).copyWith(
+        side: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.focused) ? BorderSide(color: p.g, width: 2.5) : null),
+      ),
     ),
+    focusColor: p.g.withValues(alpha: .18),
     // HTML .acc-row / பட்டியல் வரிசைகள்
     listTileTheme: ListTileThemeData(
       contentPadding: const EdgeInsets.symmetric(horizontal: 14),
@@ -138,7 +181,7 @@ ThemeData buildTheme(bool dark) {
     ),
     switchTheme: SwitchThemeData(
       thumbColor: const WidgetStatePropertyAll(Colors.white),
-      trackColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? const Color(0xFF00A884) : p.bd),
+      trackColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? const Color(0xFF15803D) : p.bd),
       trackOutlineColor: WidgetStatePropertyAll(p.bd),
     ),
   );
