@@ -465,16 +465,22 @@ class ProductCard extends StatelessWidget {
                   ),
                 ),
                 if (bo != null)
+                  // card அகலத்துக்குள்ளேயே இருக்கும்; நீளமான உரை இரண்டு வரியாக மடியும் (வெட்டுப்படாது)
                   Positioned(
                     left: 0,
+                    right: 0,
                     bottom: 0,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: const BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.only(topRight: Radius.circular(10))),
-                      child: Text('${bo.off}%${single ? '' : ' வரை'} தள்ளுபடி', style: ts(12, w: w8, c: Colors.white)),
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: const BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.only(topRight: Radius.circular(10))),
+                        child: Text('${bo.off}%${single ? '' : ' வரை'} தள்ளுபடி', maxLines: 2, overflow: TextOverflow.ellipsis, style: ts(12, w: w8, c: Colors.white, h: 1.25)),
+                      ),
                     ),
                   ),
-                Positioned(right: 1, bottom: 1, child: FavButton(p)),
+                // ♡ மேல்-இடது: கீழே தள்ளுபடி பட்டையுடன் மோதாது; ✕ (மேல்-வலது) உடனும் மோதாது
+                Positioned(left: 0, top: 0, child: FavButton(p)),
               ]),
             ),
             Container(
@@ -606,11 +612,15 @@ class HxCard extends StatelessWidget {
                 if (badge.isNotEmpty)
                   Positioned(
                     left: 0,
+                    right: 0,
                     top: 0,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                      decoration: const BoxDecoration(color: Color(0xFF16A34A), borderRadius: BorderRadius.only(bottomRight: Radius.circular(10))),
-                      child: Text(badge, style: ts(12, w: w8, c: Colors.white)),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                        decoration: const BoxDecoration(color: Color(0xFF16A34A), borderRadius: BorderRadius.only(bottomRight: Radius.circular(10))),
+                        child: Text(badge, maxLines: 2, overflow: TextOverflow.ellipsis, style: ts(12, w: w8, c: Colors.white, h: 1.25)),
+                      ),
                     ),
                   ),
               ]),
