@@ -101,7 +101,7 @@ class _ShopsTabState extends State<ShopsTab> {
                                     isDense: true,
                                     border: InputBorder.none,
                                     hintText: _f.hasFocus ? 'கடையைத் தேடுங்கள்...' : hint,
-                                    hintStyle: ts(15, w: w6, c: const Color(0xFF87938F)),
+                                    hintStyle: ts(15, w: w6, c: const Color(0xFF6B7773)),
                                   ),
                                 ),
                               ),

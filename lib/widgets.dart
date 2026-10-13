@@ -260,10 +260,18 @@ class QtyStepper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget b(Widget c, VoidCallback f) => SizedBox(
+    // தொடு இலக்கு: குறைந்தது 36 உயரம் × 34 அகலம் (முன்பு 28×24 வரை)
+    final height = this.height < 36 ? 36.0 : this.height;
+    final btnW = this.btnW < 34 ? 34.0 : this.btnW;
+    Widget b(Widget c, VoidCallback f, String label) => SizedBox(
           width: btnW,
           height: height,
-          child: Material(color: Colors.transparent, child: InkWell(onTap: f, child: Center(child: c))),
+          child: Semantics(
+            button: true,
+            label: label,
+            excludeSemantics: true,
+            child: Material(color: Colors.transparent, child: InkWell(onTap: f, child: Center(child: c))),
+          ),
         );
     return Container(
       height: height,
@@ -273,12 +281,12 @@ class QtyStepper extends StatelessWidget {
         boxShadow: const [BoxShadow(color: Color(0x2E007A63), blurRadius: 10, offset: Offset(0, 4))],
       ),
       child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-        b(minusIcon ?? Text('−', style: ts(font + 5, w: w8, c: Colors.white)), onMinus),
+        b(minusIcon ?? Text('−', style: ts(font + 5, w: w8, c: Colors.white)), onMinus, minusIcon != null ? 'கூடையிலிருந்து நீக்கு' : 'ஒன்று குறை'),
         ConstrainedBox(
           constraints: const BoxConstraints(minWidth: 18),
-          child: Text('$qty', textAlign: TextAlign.center, style: pop(font, c: Colors.white, w: FontWeight.w700)),
+          child: Semantics(label: '$qty எண்ணிக்கை', excludeSemantics: true, child: Text('$qty', textAlign: TextAlign.center, style: pop(font, c: Colors.white, w: FontWeight.w700))),
         ),
-        b(Text('+', style: ts(font + 5, w: w8, c: Colors.white)), onPlus),
+        b(Text('+', style: ts(font + 5, w: w8, c: Colors.white)), onPlus, 'ஒன்று கூட்டு'),
       ]),
     );
   }
@@ -304,14 +312,18 @@ class FavButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final on = context.select<AppState, bool>((s) => s.favHas(p));
-    return GestureDetector(
+    return Semantics(
+      button: true,
+      label: on ? 'விருப்பமானவையிலிருந்து நீக்கு' : 'விருப்பமானவையில் சேர்',
+      excludeSemantics: true,
+      child: GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
         final add = S.favToggle(p);
         toast(add ? '❤️ விருப்பமானவையில் சேர்க்கப்பட்டது' : 'விருப்பமானவையிலிருந்து நீக்கப்பட்டது');
       },
       child: Padding(
-        padding: const EdgeInsets.all(4),
+        padding: EdgeInsets.all(size < 40 ? (44 - size) / 2 : 4), // தொடு இலக்கு ≥ 44dp, தோற்றம் அதே
         child: Container(
           width: size,
           height: size,
@@ -320,7 +332,7 @@ class FavButton extends StatelessWidget {
           child: Text(on ? '❤️' : '♡', style: TextStyle(fontSize: size * .55, color: on ? const Color(0xFFE0245E) : const Color(0xFF8696A0), height: 1.1)),
         ),
       ),
-    );
+    ));
   }
 }
 
@@ -436,11 +448,16 @@ class ProductCard extends StatelessWidget {
         Positioned(
           top: -9,
           right: -9,
-          child: GestureDetector(
+          child: Semantics(
+            button: true,
+            label: 'கூடையிலிருந்து நீக்கு',
+            excludeSemantics: true,
+            child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: () => CartOps.rmAll(p),
             child: Container(
-              width: 30,
-              height: 30,
+              width: 34,
+              height: 34,
               decoration: BoxDecoration(
                 color: const Color(0xFFDC2626),
                 shape: BoxShape.circle,
@@ -448,10 +465,10 @@ class ProductCard extends StatelessWidget {
                 boxShadow: const [BoxShadow(color: Color(0x59DC2626), blurRadius: 8, offset: Offset(0, 3))],
               ),
               alignment: Alignment.center,
-              child: const Text('✕', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800)),
+              child: const Text('✕', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800)),
             ),
           ),
-        ),
+        )),
     ]);
   }
 }
@@ -476,14 +493,21 @@ class HxBtn extends StatelessWidget {
     if (q > 0) {
       return QtyStepper(qty: q, height: 28, btnW: 24, font: 13, onMinus: () => CartOps.chg(p, pi, -1), onPlus: () => CartOps.chg(p, pi, 1));
     }
-    return GestureDetector(
+    return Semantics(
+      button: true,
+      label: 'கூடையில் சேர்',
+      excludeSemantics: true,
+      child: GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () => CartOps.add(p, pi, showToast: false),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        constraints: const BoxConstraints(minHeight: 36, minWidth: 64),
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
         decoration: BoxDecoration(color: P.card, border: Border.all(color: P.g, width: 1.5), borderRadius: BorderRadius.circular(9)),
         child: Text('சேர் +', style: ts(12, w: w8, c: const Color(0xFF00856B))),
       ),
-    );
+    ));
   }
 }
 
@@ -537,15 +561,12 @@ class HxCard extends StatelessWidget {
           ),
           Text(pk.w, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(11.5, w: w7, c: P.mu)),
           const Spacer(),
-          Row(children: [
-            Expanded(
-              child: Wrap(crossAxisAlignment: WrapCrossAlignment.end, spacing: 3, children: [
-                Text('₹${rupee(pk.price)}', style: pop(14)),
-                if (o != null) Text('₹${rupee(o.mrp)}', style: ts(11, c: P.mu, deco: TextDecoration.lineThrough)),
-              ]),
-            ),
-            HxBtn(p, pi),
+          Wrap(crossAxisAlignment: WrapCrossAlignment.end, spacing: 3, children: [
+            Text('₹${rupee(pk.price)}', style: pop(14)),
+            if (o != null) Text('₹${rupee(o.mrp)}', style: ts(11, c: P.mu, deco: TextDecoration.lineThrough)),
           ]),
+          const SizedBox(height: 4),
+          Align(alignment: Alignment.centerRight, child: HxBtn(p, pi)),
         ]),
       ),
     );

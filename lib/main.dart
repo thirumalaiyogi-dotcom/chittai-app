@@ -384,7 +384,12 @@ class BottomNav extends StatelessWidget {
           final lbCol = dk ? (a ? P.g2 : const Color(0xFF8A9592)) : (a ? const Color(0xFF00856B) : const Color(0xFF64706C));
           final icCol = dk ? lbCol : (a ? const Color(0xFF00A884) : const Color(0xFF87938F));
           return Expanded(
-            child: InkWell(
+            child: Semantics(
+              button: true,
+              selected: a,
+              label: lb,
+              excludeSemantics: true,
+              child: InkWell(
               onTap: () => Nav.go(k),
               child: Stack(alignment: Alignment.center, children: [
                 if (a)
@@ -424,6 +429,7 @@ class BottomNav extends StatelessWidget {
                       : Text(lb, style: ts(12, w: w8, c: lbCol)),
                 ]),
               ]),
+            ),
             ),
           );
         }

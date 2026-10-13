@@ -349,7 +349,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     isDense: true,
                     border: InputBorder.none,
                     hintText: _f.hasFocus || _srActive ? 'பொருள், கடை அல்லது வகையைத் தேடுங்கள்...' : hint,
-                    hintStyle: ts(15, w: w6, c: const Color(0xFF87938F)),
+                    hintStyle: ts(15, w: w6, c: const Color(0xFF6B7773)),
                   ),
                 ),
               ),

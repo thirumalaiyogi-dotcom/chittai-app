@@ -34,7 +34,7 @@ const Pal kLight = Pal(
   card3: Color(0xFFEEF3F1),
   bd: Color(0xFFE3EAE7),
   text: Color(0xFF17201D),
-  mu: Color(0xFF87938F),
+  mu: Color(0xFF6B7773), // முன்பு #87938F (3.2:1) → 4.65:1
   mu2: Color(0xFF64706C),
   g: Color(0xFF00A884),
   g2: Color(0xFF007A63),
@@ -75,7 +75,7 @@ LinearGradient get kHeroGrad => AppState.I.dark
     ? const LinearGradient(colors: [Color(0xFF1F2C34), Color(0xFF182229)], begin: Alignment.topLeft, end: Alignment.bottomRight)
     : const LinearGradient(colors: [Color(0xFF075E54), Color(0xFF00A884)], begin: Alignment.topLeft, end: Alignment.bottomRight);
 
-const LinearGradient kBtnGrad = LinearGradient(colors: [Color(0xFF00A884), Color(0xFF007A63)], begin: Alignment.topLeft, end: Alignment.bottomRight);
+const LinearGradient kBtnGrad = LinearGradient(colors: [Color(0xFF008069), Color(0xFF006E5A)], begin: Alignment.topLeft, end: Alignment.bottomRight);
 
 Color hexColor(String s, [Color fb = const Color(0xFFE3F3E6)]) {
   var h = s.trim().replaceAll('#', '');
