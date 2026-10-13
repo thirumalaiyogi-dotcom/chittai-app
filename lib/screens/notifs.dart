@@ -262,7 +262,7 @@ class _NotifScreenState extends State<NotifScreen> {
           appBar: AppBar(
             backgroundColor: P.card,
             surfaceTintColor: Colors.transparent,
-            leading: IconButton(icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Navigator.of(context).maybePop()),
+            leading: IconButton(tooltip: 'பின்செல்', icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Navigator.of(context).maybePop()),
             title: Row(children: [
               Text('அறிவிப்புகள்', style: ts(18, w: w8)),
               if (un > 0) ...[

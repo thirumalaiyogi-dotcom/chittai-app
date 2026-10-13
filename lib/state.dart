@@ -462,6 +462,17 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  // நீக்கியதை மீண்டும் சேர் (undo). இடைப்பட்ட நேரத்தில் வேறு கடை பொருள் சேர்ந்திருந்தால் எதுவும் செய்யாது.
+  void restoreLines(List<CartLine> ls) {
+    if (ls.isEmpty) return;
+    if (cart.values.any((c) => c.product.shopId != ls.first.product.shopId)) return;
+    for (final l in ls) {
+      cart.putIfAbsent(l.key, () => l);
+    }
+    _saveCart();
+    notifyListeners();
+  }
+
   void clearCart() {
     cart.clear();
     _saveCart();

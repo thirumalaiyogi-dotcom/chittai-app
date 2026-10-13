@@ -203,7 +203,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
           appBar: AppBar(
             backgroundColor: P.card,
             surfaceTintColor: Colors.transparent,
-            leading: IconButton(icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Nav.back()),
+            leading: IconButton(tooltip: 'பின்செல்', icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Nav.back()),
             title: Text('ஆர்டர்கள்', style: ts(18, w: w8)),
             actions: [
               TextButton.icon(
@@ -628,7 +628,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with WidgetsBindi
           appBar: AppBar(
             backgroundColor: P.card,
             surfaceTintColor: Colors.transparent,
-            leading: IconButton(icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Navigator.of(context).maybePop()),
+            leading: IconButton(tooltip: 'பின்செல்', icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Navigator.of(context).maybePop()),
             title: Text('ஆர்டர் விவரங்கள்', style: ts(18, w: w8)),
           ),
           body: o == null ? const StateBox('🧾', 'இந்த ஆர்டர் கிடைக்கவில்லை') : RefreshIndicator(color: P.g, onRefresh: () => O.fetch(force: true), child: _body(o)),

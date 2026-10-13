@@ -23,7 +23,7 @@ Future<T?> pushFull<T>(Widget w) => Nav.push<T>(w, hl: '');
 AppBar plainBar(BuildContext context, String title, {List<Widget>? actions}) => AppBar(
       backgroundColor: P.card,
       surfaceTintColor: Colors.transparent,
-      leading: IconButton(icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Navigator.of(context).maybePop()),
+      leading: IconButton(tooltip: 'பின்செல்', icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Navigator.of(context).maybePop()),
       title: Text(title, style: ts(18, w: w8)),
       actions: actions,
     );

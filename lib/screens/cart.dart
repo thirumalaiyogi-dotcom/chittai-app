@@ -50,7 +50,7 @@ class _CartScreenState extends State<CartScreen> {
         backgroundColor: P.card,
         surfaceTintColor: Colors.transparent,
         automaticallyImplyLeading: false,
-        leading: IconButton(icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Nav.back()),
+        leading: IconButton(tooltip: 'பின்செல்', icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Nav.back()),
         titleSpacing: 0,
         title: Row(children: [
           Stack(clipBehavior: Clip.none, children: [
@@ -400,7 +400,9 @@ class _CartScreenState extends State<CartScreen> {
           minusIcon: q == 1 ? const Icon(Icons.delete_outline, color: Colors.white, size: 18) : null,
           onMinus: () {
             Sfx.remove();
+            final snap = q == 1 ? [CartLine(p, c.packIdx, 1)] : null;
             S.change(p, c.packIdx, -1);
+            if (snap != null) toast('🗑️ கூடையிலிருந்து நீக்கப்பட்டது', action: 'மீண்டும் சேர்', onAction: () => S.restoreLines(snap));
           },
           onPlus: () => CartOps.chg(p, c.packIdx, 1, stock: false),
         ),

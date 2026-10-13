@@ -102,7 +102,7 @@ class _ProductSheet extends StatelessWidget {
               ]),
             ),
             FavButton(p, size: 34),
-            IconButton(icon: Icon(Icons.close, color: P.mu2), onPressed: () => Navigator.pop(context)),
+            IconButton(tooltip: 'மூடு', icon: Icon(Icons.close, color: P.mu2), onPressed: () => Navigator.pop(context)),
           ]),
         ),
         Divider(height: 1, color: P.bd),

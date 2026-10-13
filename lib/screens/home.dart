@@ -68,7 +68,11 @@ class AppHeader extends StatelessWidget {
               n = Nt.unread();
             } catch (_) {}
             // HTML .bell-dot (வரி 1674 + 2245): பொத்தானின் மேல்-வலது top 3 right 2
-            return InkResponse(
+            return Semantics(
+              button: true,
+              label: n > 0 ? 'அறிவிப்புகள், $n புதியவை' : 'அறிவிப்புகள்',
+              excludeSemantics: true,
+              child: InkResponse(
               onTap: () => pushFull(const NotifScreen()),
               radius: 22,
               child: SizedBox(
@@ -91,7 +95,7 @@ class AppHeader extends StatelessWidget {
                     ),
                 ]),
               ),
-            );
+            ));
           },
         ),
         btn(Icon(favN > 0 ? Icons.favorite : Icons.favorite_border, color: Colors.white, size: 24), () => pushFull(const FavScreen())),
@@ -330,7 +334,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           child: Row(children: [
             if (_srActive)
-              IconButton(icon: const Icon(Icons.arrow_back, color: Color(0xFF00A884)), onPressed: _exit)
+              IconButton(tooltip: 'பின்செல்', icon: const Icon(Icons.arrow_back, color: Color(0xFF00A884)), onPressed: _exit)
             else
               const Icon(Icons.search, color: Color(0xFF00A884), size: 24),
             const SizedBox(width: 8),
@@ -370,13 +374,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               )
             else
-              GestureDetector(
-                onTap: _voice,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(color: _mic ? const Color(0xFFFFE3E3) : Colors.transparent, shape: BoxShape.circle),
-                  child: Icon(Icons.mic_none, color: _mic ? const Color(0xFFD93025) : (s.dark ? P.g2 : const Color(0xFF00A884))),
+              Semantics(
+                button: true,
+                label: 'குரலில் தேடு',
+                excludeSemantics: true,
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: _voice,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(color: _mic ? const Color(0xFFFFE3E3) : Colors.transparent, shape: BoxShape.circle),
+                    child: Icon(Icons.mic_none, color: _mic ? const Color(0xFFD93025) : (s.dark ? P.g2 : const Color(0xFF00A884))),
+                  ),
                 ),
               ),
           ]),
@@ -438,10 +448,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ));
     }
+    out.add(SliverToBoxAdapter(child: _elder(s))); // முதியோருக்கான அழை/WhatsApp வழி மேலே (முன்பு கடைசியில்)
     out.add(SliverToBoxAdapter(child: _nearShops(s)));
     out.add(SliverToBoxAdapter(child: _again(s)));
     out.add(SliverToBoxAdapter(child: KeyedSubtree(key: Nav.dealsKey, child: _deals(s))));
-    out.add(SliverToBoxAdapter(child: _elder(s)));
     // HTML: வகைகள் இருக்கும்போது home-list மறைந்திருக்கும் (ஏற்றுதல் / பிழைப் பெட்டிகள் ShopList-க்குள்)
     if (allKinds.isEmpty) out.add(const SliverToBoxAdapter(child: ShopList(type: '')));
     out.add(const SliverToBoxAdapter(child: SizedBox(height: 90)));

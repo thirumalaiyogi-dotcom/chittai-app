@@ -431,7 +431,7 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
                       if (ago.isNotEmpty) Text(ago, style: ts(12, c: const Color(0xCCFFFFFF))),
                     ]),
                   ),
-                  IconButton(icon: const Icon(Icons.close, color: Colors.white), onPressed: _close),
+                  IconButton(tooltip: 'மூடு', icon: const Icon(Icons.close, color: Colors.white), onPressed: _close),
                 ]),
               ),
               Positioned(

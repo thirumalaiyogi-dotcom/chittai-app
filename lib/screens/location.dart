@@ -339,7 +339,7 @@ class _MapPickScreenState extends State<MapPickScreen> {
             left: 10,
             child: CircleAvatar(
               backgroundColor: Colors.white,
-              child: IconButton(icon: const Icon(Icons.arrow_back, color: Color(0xFF17201D)), onPressed: () => Navigator.of(context).pop()),
+              child: IconButton(tooltip: 'பின்செல்', icon: const Icon(Icons.arrow_back, color: Color(0xFF17201D)), onPressed: () => Navigator.of(context).pop()),
             ),
           ),
           Positioned(
@@ -552,7 +552,7 @@ class _LocSheetState extends State<_LocSheet> {
               ]),
             ),
             Column(children: [
-              IconButton(icon: Icon(Icons.close, color: P.mu2), onPressed: () => Navigator.pop(context)),
+              IconButton(tooltip: 'மூடு', icon: Icon(Icons.close, color: P.mu2), onPressed: () => Navigator.pop(context)),
               Container(
                 width: 84,
                 height: 84,

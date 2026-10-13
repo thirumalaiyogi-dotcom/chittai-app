@@ -270,7 +270,7 @@ class ShopDetailScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: P.card,
         surfaceTintColor: Colors.transparent,
-        leading: IconButton(icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Navigator.of(context).maybePop()),
+        leading: IconButton(tooltip: 'பின்செல்', icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Navigator.of(context).maybePop()),
         title: Text('கடை விவரம்', style: ts(18, w: w8)),
       ),
       body: Stack(children: [
@@ -598,7 +598,7 @@ class _ShopScreenState extends State<ShopScreen> {
       color: P.card,
       padding: EdgeInsets.fromLTRB(4, MediaQuery.of(context).padding.top + 4, 8, 6),
       child: Row(children: [
-        IconButton(icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Navigator.of(context).maybePop()),
+        IconButton(tooltip: 'பின்செல்', icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Navigator.of(context).maybePop()),
         GestureDetector(
           onTap: () => Nav.openShopDetail(widget.shopId),
           child: Container(
@@ -627,7 +627,7 @@ class _ShopScreenState extends State<ShopScreen> {
             ]),
           ),
         ),
-        IconButton(icon: Icon(Icons.search, color: P.text), onPressed: () => Nav.push(ShopSearchScreen(shopId: widget.shopId))),
+        IconButton(tooltip: 'தேடு', icon: Icon(Icons.search, color: P.text), onPressed: () => Nav.push(ShopSearchScreen(shopId: widget.shopId))),
         GestureDetector(
           onTap: () => Nav.openShops(),
           child: Container(

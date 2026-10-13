@@ -426,7 +426,7 @@ class BottomNav extends StatelessWidget {
                           decoration: BoxDecoration(color: P.g, borderRadius: BorderRadius.circular(10)),
                           child: Text('₹${_r(amt)}', style: ts(12, w: w8, c: Colors.white)),
                         )
-                      : Text(lb, style: ts(12, w: w8, c: lbCol)),
+                      : Text(lb, style: ts(13, w: w8, c: lbCol)),
                 ]),
               ]),
             ),

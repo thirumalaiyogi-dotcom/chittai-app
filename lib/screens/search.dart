@@ -907,7 +907,7 @@ class _ShopSearchScreenState extends State<ShopSearchScreen> {
             color: P.card,
             padding: const EdgeInsets.fromLTRB(4, 8, 10, 8),
             child: Row(children: [
-              IconButton(icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Navigator.of(context).maybePop()),
+              IconButton(tooltip: 'பின்செல்', icon: Icon(Icons.arrow_back, color: P.text), onPressed: () => Navigator.of(context).maybePop()),
               Expanded(
                 child: Container(
                   height: 46,

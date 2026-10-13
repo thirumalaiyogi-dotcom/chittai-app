@@ -30,7 +30,7 @@ void rebuildAllWidgets() {
 // ═══ Toast (கீழே சிறிய கருப்புச் செய்தி) ═══
 OverlayEntry? _toastE;
 Timer? _toastT;
-void toast(String msg) {
+void toast(String msg, {String? action, VoidCallback? onAction}) {
   final ov = Nav.root.currentState?.overlay;
   if (ov == null) return;
   _toastT?.cancel();
@@ -41,6 +41,7 @@ void toast(String msg) {
       right: 16,
       bottom: MediaQuery.of(c).padding.bottom + 140,
       child: IgnorePointer(
+        ignoring: action == null,
         child: Center(
           child: TweenAnimationBuilder<double>(
             tween: Tween(begin: 0, end: 1),
@@ -55,7 +56,26 @@ void toast(String msg) {
                   borderRadius: BorderRadius.circular(10),
                   boxShadow: const [BoxShadow(color: Color(0x40000000), blurRadius: 8, offset: Offset(0, 2))],
                 ),
-                child: Text(msg, textAlign: TextAlign.center, style: ts(14, w: w7, c: const Color(0xFFE9EDEF), h: 1.45)),
+                child: action == null
+                    ? Text(msg, textAlign: TextAlign.center, style: ts(14, w: w7, c: const Color(0xFFE9EDEF), h: 1.45))
+                    : Row(mainAxisSize: MainAxisSize.min, children: [
+                        Flexible(child: Text(msg, style: ts(14, w: w7, c: const Color(0xFFE9EDEF), h: 1.45))),
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            _toastT?.cancel();
+                            _toastE?.remove();
+                            _toastE = null;
+                            onAction?.call();
+                          },
+                          child: Container(
+                            constraints: const BoxConstraints(minHeight: 44),
+                            alignment: Alignment.center,
+                            padding: const EdgeInsets.only(left: 16),
+                            child: Text(action, style: ts(14, w: w8, c: const Color(0xFF5EEAD4))),
+                          ),
+                        ),
+                      ]),
               ),
             ),
           ),
@@ -64,7 +84,7 @@ void toast(String msg) {
     ),
   );
   ov.insert(_toastE!);
-  _toastT = Timer(const Duration(milliseconds: 2600), () {
+  _toastT = Timer(Duration(milliseconds: action == null ? 2600 : 4500), () {
     _toastE?.remove();
     _toastE = null;
   });
@@ -113,8 +133,8 @@ class Img extends StatelessWidget {
     return CachedNetworkImage(
       imageUrl: u,
       fit: fit,
-      fadeInDuration: const Duration(milliseconds: 250),
-      placeholder: (_, __) => const SizedBox.shrink(),
+      fadeInDuration: Duration.zero, // அசைவு இல்லை
+      placeholder: (_, __) => ColoredBox(color: P.card3, child: _emo()),
       errorWidget: (_, __, ___) => _emo(),
     );
   }
@@ -244,9 +264,10 @@ class CartOps {
   }
 
   static void rmAll(Product p) {
+    final snap = S.cart.values.where((c) => c.product.key == p.key).map((c) => CartLine(c.product, c.packIdx, c.qty)).toList();
     S.removeAll(p);
     Sfx.remove();
-    toast('🗑️ கூடையிலிருந்து நீக்கப்பட்டது');
+    toast('🗑️ கூடையிலிருந்து நீக்கப்பட்டது', action: snap.isEmpty ? null : 'மீண்டும் சேர்', onAction: () => S.restoreLines(snap));
   }
 }
 
