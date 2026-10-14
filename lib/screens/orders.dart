@@ -227,8 +227,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 ? ListView(children: const [StateBox('⏳', 'ஏற்றுகிறது...')])
                 : list.isEmpty
                     ? ListView(children: [
-                        const StateBox('📋', 'இன்னும் எந்த ஆர்டரும் இல்லை'),
-                        Center(child: SizedBox(width: 220, child: GreenButton('🛍️ பொருட்களை பார்க்க', onTap: _browse))),
+                        const StateBox('📋', 'இன்னும் எந்த ஆர்டரும் இல்லை', sub: 'உங்களுக்குப் பிடித்த பொருட்களைத் தேடி உங்கள் முதல் ஆர்டரைத் தொடங்குங்கள்.'),
+                        Center(child: SizedBox(width: 220, child: GreenButton('🛍️ பொருட்களைப் பார்க்க', onTap: _browse))),
                       ])
                     : _list(list),
           ),

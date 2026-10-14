@@ -1002,6 +1002,9 @@ class ShopCard extends StatelessWidget {
                 if (r != null) ...[
                   const SizedBox(width: 10),
                   Text('★ ${r.toStringAsFixed(1)}', style: ts(15, w: w8, c: const Color(0xFFE08A00))), // HTML .sc-rt
+                ] else ...[
+                  const SizedBox(width: 10),
+                  Text('புதிய கடை', style: ts(12.5, w: w8, c: P.g2)), // மதிப்பீடு இல்லை → போலி 5.0 காட்டாதே
                 ],
               ]),
               if (sub.isNotEmpty) Padding(padding: const EdgeInsets.only(top: 4), child: Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: ts(13.5, w: w6, c: P.mu2))),
