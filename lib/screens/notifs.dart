@@ -258,7 +258,7 @@ class _NotifScreenState extends State<NotifScreen> {
               ),
             );
         return Scaffold(
-          backgroundColor: P.bg,
+          backgroundColor: Colors.transparent,
           appBar: AppBar(
             backgroundColor: P.card,
             surfaceTintColor: Colors.transparent,

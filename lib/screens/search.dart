@@ -899,7 +899,7 @@ class _ShopSearchScreenState extends State<ShopSearchScreen> {
     context.watch<AppState>();
     final sh = S.shopById(widget.shopId);
     return Scaffold(
-      backgroundColor: P.bg,
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         bottom: false,
         child: Column(children: [

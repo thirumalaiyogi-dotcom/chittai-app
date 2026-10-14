@@ -56,7 +56,7 @@ class _AccountScreenState extends State<AccountScreen> {
     final s = context.watch<AppState>();
     if (_editing) {
       return Scaffold(
-        backgroundColor: P.bg,
+        backgroundColor: Colors.transparent,
         appBar: plainBar(context, 'என் விவரங்கள்'),
         body: _ProfileForm(onDone: () => setState(() => _editing = false)),
       );
@@ -123,7 +123,7 @@ class _AccountScreenState extends State<AccountScreen> {
           ),
         );
     return Scaffold(
-      backgroundColor: P.bg,
+      backgroundColor: Colors.transparent,
       appBar: plainBar(context, 'கணக்கு'),
       body: ListView(padding: const EdgeInsets.fromLTRB(0, 14, 0, 0), children: [
         // HTML .acc-top
@@ -265,7 +265,7 @@ class FavScreen extends StatelessWidget {
       if (p != null && !p.hidden && p.packs.isNotEmpty) list.add(p);
     }
     return Scaffold(
-      backgroundColor: P.bg,
+      backgroundColor: Colors.transparent,
       appBar: plainBar(context, 'விருப்பமானவை'),
       body: list.isEmpty
           ? Center(
@@ -424,7 +424,7 @@ class _HelpScreenState extends State<HelpScreen> {
     ];
     final st = o != null && o.cloud ? (kCoSt[o.status]?[0] ?? '') : '';
     return Scaffold(
-      backgroundColor: P.bg,
+      backgroundColor: Colors.transparent,
       appBar: plainBar(context, 'உதவி மையம்'),
       body: ListView(padding: const EdgeInsets.only(bottom: 30), children: [
         Container(
@@ -801,7 +801,7 @@ class _InfoScreenState extends State<InfoScreen> {
     const lbl = {'about': 'பற்றி', 'privacy': 'தனியுரிமை', 'terms': 'விதிமுறைகள்'};
     final body = _p == 'privacy' ? _privacy() : (_p == 'terms' ? _terms() : _about());
     return Scaffold(
-      backgroundColor: P.bg,
+      backgroundColor: Colors.transparent,
       appBar: plainBar(context, _titles[_p]!),
       body: ListView(padding: const EdgeInsets.fromLTRB(16, 12, 16, 30), children: [
         Container(

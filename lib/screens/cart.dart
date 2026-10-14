@@ -45,7 +45,7 @@ class _CartScreenState extends State<CartScreen> {
     final its = s.cart.values.toList();
     final cnt = s.cartCount;
     return Scaffold(
-      backgroundColor: P.bg,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: P.card,
         surfaceTintColor: Colors.transparent,

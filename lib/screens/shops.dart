@@ -60,7 +60,7 @@ class _ShopsTabState extends State<ShopsTab> {
         var type = type0;
         if (!multi || !kinds.any((k) => k.key.id == type)) type = '';
         return Scaffold(
-          backgroundColor: P.bg,
+          backgroundColor: Colors.transparent,
           body: Column(children: [
             const AppHeader(),
             Expanded(
@@ -266,7 +266,7 @@ class ShopDetailScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      backgroundColor: P.bg,
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         backgroundColor: P.card,
         surfaceTintColor: Colors.transparent,
@@ -573,7 +573,7 @@ class _ShopScreenState extends State<ShopScreen> {
       child: AnnotatedRegion<SystemUiOverlayStyle>(
         value: s.dark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
         child: Scaffold(
-        backgroundColor: P.bg,
+        backgroundColor: Colors.transparent,
         body: Column(children: [
           _bar(s, sh),
           Expanded(

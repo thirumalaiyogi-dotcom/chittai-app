@@ -203,7 +203,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
         // HTML renderOrds: ஒவ்வொரு முறையும் புதிய fetch-லிருந்து; cloud தோல்வி → இந்த phone-ன் ஆர்டர்கள் மட்டும்
         final list = O.lastFail ? O.build(const []) : O.build();
         return Scaffold(
-          backgroundColor: P.bg,
+          backgroundColor: Colors.transparent,
           appBar: AppBar(
             backgroundColor: P.card,
             surfaceTintColor: Colors.transparent,
@@ -628,7 +628,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with WidgetsBindi
       builder: (_, __) {
         final o = _find();
         return Scaffold(
-          backgroundColor: P.bg,
+          backgroundColor: Colors.transparent,
           appBar: AppBar(
             backgroundColor: P.card,
             surfaceTintColor: Colors.transparent,

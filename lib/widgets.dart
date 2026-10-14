@@ -1085,3 +1085,26 @@ const Map<String, String> kAccIc = {
   'share': '<circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/>',
   'del': '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
 };
+
+
+// ═══ பின்னணி: மெல்லிய கடை / டெலிவரி கோட்டு ஓவியங்கள் (WhatsApp போன்ற doodle பாணி, நமது சொந்த வடிவம்) ═══
+class BgPattern extends StatelessWidget {
+  final Widget child;
+  const BgPattern({super.key, required this.child});
+  @override
+  Widget build(BuildContext context) {
+    final dark = context.select<AppState, bool>((s) => s.dark);
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: P.bg,
+        image: DecorationImage(
+          image: AssetImage(dark ? 'assets/bg_dark.png' : 'assets/bg_light.png'),
+          repeat: ImageRepeat.repeat,
+          scale: 2.0,
+          alignment: Alignment.topLeft,
+        ),
+      ),
+      child: child,
+    );
+  }
+}

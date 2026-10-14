@@ -60,7 +60,7 @@ class Nav {
   static Future<T?> push<T>(Widget page, {String hl = 'shops'}) {
     final n = inner.currentState;
     if (n == null) return Future.value(null);
-    return n.push<T>(MaterialPageRoute(builder: (_) => page, settings: RouteSettings(name: hl)));
+    return n.push<T>(MaterialPageRoute(builder: (_) => BgPattern(child: page), settings: RouteSettings(name: hl)));
   }
 
   // கீழ் பட்டையில் ஒளிரும் tab (உள் திரை இருந்தால் அதன் hl)
@@ -79,7 +79,7 @@ class Nav {
     S.setActiveShop(shopId);
     final n = inner.currentState;
     if (n == null) return;
-    final page = MaterialPageRoute(builder: (_) => ShopScreen(shopId: shopId), settings: const RouteSettings(name: 'shops'));
+    final page = MaterialPageRoute(builder: (_) => BgPattern(child: ShopScreen(shopId: shopId)), settings: const RouteSettings(name: 'shops'));
     if (n.canPop()) {
       n.pushReplacement(page);
     } else {

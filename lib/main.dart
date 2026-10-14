@@ -329,18 +329,18 @@ class _ShellState extends State<Shell> {
           systemNavigationBarColor: P.card,
           systemNavigationBarIconBrightness: AppState.I.dark ? Brightness.light : Brightness.dark,
         ),
-        child: Scaffold(
-          backgroundColor: P.bg,
+        child: BgPattern(child: Scaffold(
+          backgroundColor: Colors.transparent,
           body: Stack(children: [
             Navigator(
               key: Nav.inner,
               observers: [_obs],
-              onGenerateInitialRoutes: (_, __) => [MaterialPageRoute(builder: (_) => const TabRoot(), settings: const RouteSettings(name: 'root'))],
+              onGenerateInitialRoutes: (_, __) => [MaterialPageRoute(builder: (_) => const BgPattern(child: TabRoot()), settings: const RouteSettings(name: 'root'))],
             ),
             const Positioned(left: 0, right: 0, top: 0, child: NetBanner()), // HTML .conn-bnr / .net-bnr: மேலே
           ]),
           bottomNavigationBar: const BottomNav(),
-        ),
+        )),
       ),
     );
   }

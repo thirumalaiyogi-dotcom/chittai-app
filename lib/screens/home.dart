@@ -253,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final s = context.watch<AppState>();
     final searching = _srActive || _query.trim().isNotEmpty;
     return Scaffold(
-      backgroundColor: P.bg,
+      backgroundColor: Colors.transparent,
       body: Stack(children: [
         Column(children: [
           const AppHeader(),
