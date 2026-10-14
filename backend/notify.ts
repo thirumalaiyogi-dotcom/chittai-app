@@ -1,4 +1,4 @@
-// சிட்டை — "notify" Edge Function (v10: + 📱 Play Store app-க்கு Firebase (FCM) notification · v9: + 🧾 கடை பில் கையிருப்பு எச்சரிக்கை · v8: + 🌙 இரவு சுருக்கம் · v7: + 📦 கையிருப்பு எச்சரிக்கை · 📅 முன்பதிவு · ⚡ தானியங்கி ஏற்பு · ரத்து ஆனால் கடை / delivery / அட்மினுக்கும் தகவல்)
+// Crispy — "notify" Edge Function (v10: + 📱 Play Store app-க்கு Firebase (FCM) notification · v9: + 🧾 கடை பில் கையிருப்பு எச்சரிக்கை · v8: + 🌙 இரவு சுருக்கம் · v7: + 📦 கையிருப்பு எச்சரிக்கை · 📅 முன்பதிவு · ⚡ தானியங்கி ஏற்பு · ரத்து ஆனால் கடை / delivery / அட்மினுக்கும் தகவல்)
 // Supabase Dashboard → Edge Functions → notify → Code → index.ts-ல் உள்ளதை முழுவதும் அழித்து இதை paste → Deploy.
 // Called only by the database trigger. Sends push notifications to the right phones.
 import webpush from "npm:web-push@3.6.7";
@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
     await Promise.all((subs ?? []).map(async (s: Sub & { user_id: string }) => {
       try {
         await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
-          JSON.stringify({ title: "🔔 சோதனை notification", body: "சிட்டை notification இந்த phone-ல் சரியாக வேலை செய்கிறது ✅", url: page, tag: "sitta-test" }), { TTL: 600, urgency: "high" });
+          JSON.stringify({ title: "🔔 சோதனை notification", body: "Crispy notification இந்த phone-ல் சரியாக வேலை செய்கிறது ✅", url: page, tag: "sitta-test" }), { TTL: 600, urgency: "high" });
         n++;
       } catch (e) {
         const code = (e as { statusCode?: number }).statusCode;
@@ -203,7 +203,7 @@ Deno.serve(async (req) => {
   } else if (ev === "picked") {
     custMsg = { title: `🛵 உங்கள் ஆர்டர் புறப்பட்டது!`, body: `${dName ? dName + " கொண்டு வருகிறார்" : "Delivery நபர் கொண்டு வருகிறார்"} · ₹${rs(o.total)} தயாராக வைத்திருங்கள் (COD)`, url: "./", tag: `c-${o.id}`, sticky: true };
   } else if (ev === "delivered") {
-    custMsg = { title: `🎉 டெலிவரி முடிந்தது`, body: `சிட்டை-யைத் தேர்ந்தெடுத்ததற்கு நன்றி! · ${no}`, url: "./", tag: `c-${o.id}` };
+    custMsg = { title: `🎉 டெலிவரி முடிந்தது`, body: `Crispy-ஐத் தேர்ந்தெடுத்ததற்கு நன்றி! · ${no}`, url: "./", tag: `c-${o.id}` };
   } else if (ev === "low_stock") { // 📦 கையிருப்பு குறைவு / தீர்ந்தது (stock.sql trigger)
     const gone = sQty === 0;
     extra.push({ ids: await staff("merchant", (q) => q.eq("shop_id", o.shop_id)),
