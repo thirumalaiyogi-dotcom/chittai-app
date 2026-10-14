@@ -75,7 +75,7 @@ class _SuccessState extends State<_Success> with TickerProviderStateMixin {
 
   Widget _row(String l, String v) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 5),
-        child: Row(children: [Text(l, style: ts(13.5, c: P.mu2)), const Spacer(), Flexible(child: Text(v, textAlign: TextAlign.right, style: ts(13.5, w: w8)))]),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(l, style: ts(13.5, c: P.mu2, h: 1.4)), const SizedBox(width: 14), Expanded(child: Text(v, textAlign: TextAlign.right, style: ts(13.5, w: w8, h: 1.4)))]),
       );
 
   @override

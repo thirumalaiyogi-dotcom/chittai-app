@@ -407,44 +407,59 @@ class _HomeScreenState extends State<HomeScreen> {
       final more = allKinds.length > 8 && !_kAll;
       final show = more ? allKinds.take(7).toList() : allKinds;
       out.add(SliverToBoxAdapter(child: SecHead('எதை வாங்கப் போகிறீர்கள்?', more: 'கடைகள்', onMore: () => Nav.go('shops'))));
+      // வரிசை உயரம் உள்ளடக்கத்துக்கு ஏற்ப (முன்பு நிலையான விகிதம் → தேவையற்ற இடைவெளி)
+      final cells = <Widget>[
+        for (final k in show)
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => Nav.pickType(k.id),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              LayoutBuilder(builder: (_, c) => KindCircle(k, size: c.maxWidth.clamp(40.0, 72.0).toDouble())),
+              const SizedBox(height: 6),
+              Text(k.n, maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: ts(12.5, w: w8, h: 1.25)),
+            ]),
+          ),
+        if (more)
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () => setState(() => _kAll = true),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              LayoutBuilder(
+                builder: (_, c) {
+                  final z = c.maxWidth.clamp(40.0, 72.0).toDouble();
+                  return Container(
+                    width: z,
+                    height: z,
+                    decoration: BoxDecoration(color: P.gc, shape: BoxShape.circle),
+                    alignment: Alignment.center,
+                    child: Text('+${allKinds.length - 7}', style: ts(18, w: w8, c: P.g2)),
+                  );
+                },
+              ),
+              const SizedBox(height: 6),
+              Text('மேலும்', style: ts(12.5, w: w8)),
+            ]),
+          ),
+      ];
+      final nRows = (cells.length + 3) ~/ 4;
       out.add(SliverPadding(
         padding: const EdgeInsets.symmetric(horizontal: 14),
-        sliver: SliverGrid.count(
-          crossAxisCount: 4,
-          mainAxisSpacing: 14,
-          crossAxisSpacing: 8,
-          childAspectRatio: .66,
-          children: [
-            for (final k in show)
-              GestureDetector(
-                onTap: () => Nav.pickType(k.id),
-                child: Column(children: [
-                  LayoutBuilder(builder: (_, c) => KindCircle(k, size: c.maxWidth.clamp(40.0, 72.0).toDouble())),
-                  const SizedBox(height: 6),
-                  Text(k.n, maxLines: 2, overflow: TextOverflow.ellipsis, textAlign: TextAlign.center, style: ts(12.5, w: w8, h: 1.25)),
-                ]),
-              ),
-            if (more)
-              GestureDetector(
-                onTap: () => setState(() => _kAll = true),
-                child: Column(children: [
-                  LayoutBuilder(
-                    builder: (_, c) {
-                      final z = c.maxWidth.clamp(40.0, 72.0).toDouble();
-                      return Container(
-                        width: z,
-                        height: z,
-                        decoration: BoxDecoration(color: P.gc, shape: BoxShape.circle),
-                        alignment: Alignment.center,
-                        child: Text('+${allKinds.length - 7}', style: ts(18, w: w8, c: P.g2)),
-                      );
-                    },
+        sliver: SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (_, r) => Padding(
+              padding: EdgeInsets.only(bottom: r == nRows - 1 ? 0 : 12),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                for (var c = 0; c < 4; c++)
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: r * 4 + c < cells.length ? cells[r * 4 + c] : const SizedBox.shrink(),
+                    ),
                   ),
-                  const SizedBox(height: 6),
-                  Text('மேலும்', style: ts(12.5, w: w8)),
-                ]),
-              ),
-          ],
+              ]),
+            ),
+            childCount: nRows,
+          ),
         ),
       ));
     }
