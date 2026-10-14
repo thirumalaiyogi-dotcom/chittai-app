@@ -60,7 +60,7 @@ class _ShopsTabState extends State<ShopsTab> {
         var type = type0;
         if (!multi || !kinds.any((k) => k.key.id == type)) type = '';
         return Scaffold(
-          backgroundColor: AppState.I.dark ? const Color(0xFF111B21) : const Color(0xFFF7F3EA), // கடைகள் பக்கம்: தெளிவான சுத்த cream (doodle இல்லை)
+          backgroundColor: Colors.transparent,
           body: Column(children: [
             const AppHeader(),
             Expanded(

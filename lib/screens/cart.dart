@@ -91,7 +91,7 @@ class _CartScreenState extends State<CartScreen> {
             const SizedBox(height: 10),
             Text('உங்கள் கூடை காலியாக உள்ளது', style: ts(17, w: w8)),
             const SizedBox(height: 6),
-            Text('உங்களுக்குத் தேவையான பொருட்களைச் சேர்த்து ஷாப்பிங் தொடங்குங்கள்.', textAlign: TextAlign.center, style: ts(13, c: P.mu)),
+            Text('உங்களுக்குத் தேவையான பொருட்களைச் சேர்த்து ஷாப்பிங் தொடங்குங்கள்.', textAlign: TextAlign.center, style: ts(13.5, w: w6, c: P.text, h: 1.45)),
             const SizedBox(height: 20),
             SizedBox(width: 220, child: GreenButton('🛍️ பொருட்களைப் பார்க்க', onTap: Nav.leave)),
           ]),

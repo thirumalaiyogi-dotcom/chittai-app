@@ -682,8 +682,8 @@ class StateBox extends StatelessWidget {
         child: Column(children: [
           Text(ic, style: const TextStyle(fontSize: 40)),
           const SizedBox(height: 8),
-          Text(title, textAlign: TextAlign.center, style: ts(15, w: w8)),
-          if (sub.isNotEmpty) ...[const SizedBox(height: 4), Text(sub, textAlign: TextAlign.center, style: ts(12.5, c: P.mu))],
+          Text(title, textAlign: TextAlign.center, style: ts(15.5, w: w8)),
+          if (sub.isNotEmpty) ...[const SizedBox(height: 6), Text(sub, textAlign: TextAlign.center, style: ts(13.5, w: w6, c: P.text, h: 1.45))],
           if (retry) ...[
             const SizedBox(height: 14),
             ElevatedButton(
@@ -1096,7 +1096,7 @@ class BgPattern extends StatelessWidget {
     final dark = context.select<AppState, bool>((s) => s.dark);
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: dark ? const Color(0xFF0B141A) : const Color(0xFFEFEAE2), // WhatsApp chat பின்னணி போல
+        color: dark ? const Color(0xFF0B141A) : const Color(0xFFF8F2E7), // மென் cream (reference Option 4)
         image: DecorationImage(
           image: AssetImage(dark ? 'assets/bg_dark.png' : 'assets/bg_light.png'),
           repeat: ImageRepeat.repeat,
