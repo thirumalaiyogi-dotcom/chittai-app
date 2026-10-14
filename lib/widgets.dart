@@ -1096,7 +1096,7 @@ class BgPattern extends StatelessWidget {
     final dark = context.select<AppState, bool>((s) => s.dark);
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: P.bg,
+        color: dark ? const Color(0xFF0B141A) : const Color(0xFFEFEAE2), // WhatsApp chat பின்னணி போல
         image: DecorationImage(
           image: AssetImage(dark ? 'assets/bg_dark.png' : 'assets/bg_light.png'),
           repeat: ImageRepeat.repeat,
