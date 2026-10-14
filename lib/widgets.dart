@@ -1,4 +1,4 @@
-// சிட்டை — பல திரைகளில் பயன்படும் பொதுப் பகுதிகள்
+// Crispy — பல திரைகளில் பயன்படும் பொதுப் பகுதிகள்
 import 'dart:async';
 import 'dart:convert';
 
@@ -104,7 +104,7 @@ Future<void> openUrl(String url) async {
 void waHelp([String? msg]) {
   final n = js(S.waNum).replaceAll(RegExp(r'\D'), '');
   final full = n.length == 10 ? '91$n' : n;
-  openUrl('https://wa.me/$full?text=${Uri.encodeComponent(msg ?? 'வணக்கம் சிட்டை, எனக்கு உதவி வேண்டும்.')}');
+  openUrl('https://wa.me/$full?text=${Uri.encodeComponent(msg ?? 'வணக்கம் Crispy, எனக்கு உதவி வேண்டும்.')}');
 }
 
 // ═══ படம்: ஏற்றும் வரை மறைந்து, பிறகு மெல்லத் தெரியும்; உடைந்தால் emoji ═══

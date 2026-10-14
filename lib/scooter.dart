@@ -1,4 +1,4 @@
-// சிட்டை — splash-ல் ஓடும் ஸ்கூட்டர் + ஓட்டுநர் (index.html-ன் .sp-sc SVG-யை அப்படியே வரைகிறது)
+// Crispy — splash-ல் ஓடும் ஸ்கூட்டர் + ஓட்டுநர் (index.html-ன் .sp-sc SVG-யை அப்படியே வரைகிறது)
 // viewBox "0 -6 150 106"; நிறங்கள் Pro v3 palette-க்கு மாற்றப்பட்டவை.
 import 'dart:math' as math;
 
@@ -56,11 +56,11 @@ class _ScooterPainter extends CustomPainter {
     c.scale(size.width / 150, size.height / 106);
     c.translate(0, 6); // viewBox y = -6
 
-    // பின் பெட்டி + "சி"
+    // பின் பெட்டி + "C"
     c.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTWH(14, 22, 32, 28), const Radius.circular(6)), _fill(_g));
     c.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTWH(14, 22, 32, 8), const Radius.circular(4)), _fill(_dk));
     final tp = TextPainter(
-      text: const TextSpan(text: 'சி', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.white)),
+      text: const TextSpan(text: 'C', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.white)),
       textDirection: TextDirection.ltr,
     )..layout();
     tp.paint(c, Offset(30 - tp.width / 2, 44 - tp.computeDistanceToActualBaseline(TextBaseline.alphabetic)));

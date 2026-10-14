@@ -1,4 +1,4 @@
-// சிட்டை — என் ஆர்டர்கள், ஆர்டர் பின்தொடர்தல் (timeline, OTP, delivery நபர்), ரத்து, மீண்டும் வாங்க, ஆர்டர் வெற்றி sheet
+// Crispy — என் ஆர்டர்கள், ஆர்டர் பின்தொடர்தல் (timeline, OTP, delivery நபர்), ரத்து, மீண்டும் வாங்க, ஆர்டர் வெற்றி sheet
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -658,10 +658,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with WidgetsBindi
     final shop = s.shopById(o.shopId ?? '');
     final st = o.status, active = coActive(o);
     const hh = {
-      'ORDER_RECEIVED': ['🧾', 'ஆர்டர் பெறப்பட்டது', 'சிட்டை உங்கள் ஆர்டரை உறுதி செய்கிறது'],
+      'ORDER_RECEIVED': ['🧾', 'ஆர்டர் பெறப்பட்டது', 'Crispy உங்கள் ஆர்டரை உறுதி செய்கிறது'],
       'READY_FOR_PICKUP': ['🛍️', 'பார்சல் ரெடி!', 'Delivery நபர் கடையிலிருந்து எடுக்க வருகிறார்'],
       'DELIVERY_ASSIGNED': ['🛍️', 'பார்சல் ரெடி!', 'Delivery நபர் கடையிலிருந்து எடுக்க வருகிறார்'],
-      'DELIVERED': ['🎉', 'டெலிவரி முடிந்தது', 'சிட்டை-யைத் தேர்ந்தெடுத்ததற்கு நன்றி!'],
+      'DELIVERED': ['🎉', 'டெலிவரி முடிந்தது', 'Crispy-ஐத் தேர்ந்தெடுத்ததற்கு நன்றி!'],
       'CANCELLED': ['❌', 'ஆர்டர் ரத்து செய்யப்பட்டது', 'கேள்விகள் இருந்தால் கீழே உதவி பட்டனைத் தட்டுங்கள்'],
     };
     List<String>? h = hh[st];
@@ -898,7 +898,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> with WidgetsBindi
     final wn = js(AppState.I.waNum).replaceAll(RegExp(r'\D'), '');
     final full = wn.length == 10 ? '91$wn' : wn;
     await openUrl('https://wa.me/$full?text=${Uri.encodeComponent('ஆர்டர் எண்: ${o.no} — இதை ரத்து செய்ய விரும்புகிறேன்.')}');
-    toast('ℹ️ ரத்து கோரிக்கையை சிட்டை-க்கு WhatsApp-ல் அனுப்புங்கள்');
+    toast('ℹ️ ரத்து கோரிக்கையை Crispy-க்கு WhatsApp-ல் அனுப்புங்கள்');
   }
 }
 

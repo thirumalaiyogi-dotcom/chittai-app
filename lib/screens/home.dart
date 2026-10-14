@@ -1,4 +1,4 @@
-// சிட்டை — முகப்பு: header, இடம், தேடல், அறிவிப்பு, banners, கடை வகைகள், அருகிலுள்ள கடைகள், மீண்டும் வாங்க, சலுகைகள், பெரியவர் card
+// Crispy — முகப்பு: header, இடம், தேடல், அறிவிப்பு, banners, கடை வகைகள், அருகிலுள்ள கடைகள், மீண்டும் வாங்க, சலுகைகள், பெரியவர் card
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -21,7 +21,7 @@ import 'orders.dart';
 import 'search.dart';
 import 'stories.dart';
 
-// ═══ பச்சை header: "சிட்டை." + 🔔 ❤️ 👤 ═══
+// ═══ பச்சை header: "Crispy." + 🔔 ❤️ 👤 ═══
 class AppHeader extends StatelessWidget {
   const AppHeader({super.key});
   @override
@@ -55,7 +55,7 @@ class AppHeader extends StatelessWidget {
       child: Row(children: [
         RichText(
           text: TextSpan(style: pop(23, c: Colors.white), children: const [
-            TextSpan(text: 'சிட்டை'),
+            TextSpan(text: 'Crispy'),
             TextSpan(text: '.', style: TextStyle(color: Color(0xD9FFFFFF))),
           ]),
         ),

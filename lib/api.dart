@@ -1,4 +1,4 @@
-// சிட்டை — Supabase அழைப்புகள். index.html-ல் உள்ள அதே URL, அதே headers (anon key மட்டும்).
+// Crispy — Supabase அழைப்புகள். index.html-ல் உள்ள அதே URL, அதே headers (anon key மட்டும்).
 import 'dart:async';
 import 'dart:convert';
 

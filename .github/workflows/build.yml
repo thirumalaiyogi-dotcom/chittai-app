@@ -1,6 +1,6 @@
-# சிட்டை — ஒவ்வொரு push-க்கும் APK + AAB தானாக உருவாகும்.
-# GitHub → Actions → கடைசி "Build சிட்டை app" → கீழே "Artifacts" → chittai-apk / chittai-aab
-name: Build சிட்டை app
+# Crispy — ஒவ்வொரு push-க்கும் APK + AAB தானாக உருவாகும்.
+# GitHub → Actions → கடைசி "Build Crispy app" → கீழே "Artifacts" → chittai-apk / chittai-aab
+name: Build Crispy app
 
 on:
   push:

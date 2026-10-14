@@ -1,4 +1,4 @@
-// சிட்டை — 📱 Firebase push: ஆர்டர் நிலை மாறியதும் app மூடியிருந்தாலும் notification
+// Crispy — 📱 Firebase push: ஆர்டர் நிலை மாறியதும் app மூடியிருந்தாலும் notification
 // server பகுதி: backend/push_fcm.sql (save_order_fcm) + backend/notify.ts (v10)
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -84,7 +84,7 @@ class Push {
       } else {
         final s = await fm.requestPermission();
         if (s.authorizationStatus != AuthorizationStatus.authorized) {
-          toast('⚠️ Notification அனுமதி மறுக்கப்பட்டது — Phone Settings → Apps → சிட்டை → Notifications → Allow');
+          toast('⚠️ Notification அனுமதி மறுக்கப்பட்டது — Phone Settings → Apps → Crispy → Notifications → Allow');
           return false;
         }
       }

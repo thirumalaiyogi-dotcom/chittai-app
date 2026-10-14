@@ -1,4 +1,4 @@
-// சிட்டை — கூடை = Checkout: பொருட்கள், முகவரி, டெலிவரி நேரம் (இப்போதே / முன்பதிவு), பில், ஆர்டர் (place_order)
+// Crispy — கூடை = Checkout: பொருட்கள், முகவரி, டெலிவரி நேரம் (இப்போதே / முன்பதிவு), பில், ஆர்டர் (place_order)
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -248,7 +248,7 @@ class _CartScreenState extends State<CartScreen> {
               Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                 LineIcon(kIcReceipt, size: 18, stroke: 2.1, color: P.text),
                 const SizedBox(width: 5),
-                Text('சிட்டை', style: ts(16, w: w8)),
+                Text('Crispy', style: ts(16, w: w8)),
                 const Spacer(),
                 Text('பில் விவரம்', style: ts(12, w: w7, c: P.mu)),
               ]),

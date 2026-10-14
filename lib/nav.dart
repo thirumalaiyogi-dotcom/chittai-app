@@ -1,4 +1,4 @@
-// சிட்டை — திரைகளுக்கு இடையே செல்லுதல் + Android back பட்டன் விதிகள்
+// Crispy — திரைகளுக்கு இடையே செல்லுதல் + Android back பட்டன் விதிகள்
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -259,7 +259,7 @@ Future<bool?> showExitSheet(BuildContext context) {
         const SizedBox(height: 8),
         TextButton(
           onPressed: () => Navigator.pop(c, true),
-          child: Text('சிட்டை-யிலிருந்து வெளியேறு', style: ts(14, w: w7, c: P.mu2)),
+          child: Text('Crispy-லிருந்து வெளியேறு', style: ts(14, w: w7, c: P.mu2)),
         ),
       ]),
     ),

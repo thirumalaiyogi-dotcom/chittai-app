@@ -1,4 +1,4 @@
-// சிட்டை — பொருள் விவரம் sheet: ஒவ்வொரு அளவுக்கும் "சேர்" / − n +, விளக்கம், பெரிய படம்
+// Crispy — பொருள் விவரம் sheet: ஒவ்வொரு அளவுக்கும் "சேர்" / − n +, விளக்கம், பெரிய படம்
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

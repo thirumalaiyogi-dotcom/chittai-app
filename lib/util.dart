@@ -1,4 +1,4 @@
-// சிட்டை — பொது உதவி functions (index.html-ல் உள்ள அதே கணக்கு விதிகள்)
+// Crispy — பொது உதவி functions (index.html-ல் உள்ள அதே கணக்கு விதிகள்)
 import 'dart:math' as math;
 import 'dart:typed_data';
 

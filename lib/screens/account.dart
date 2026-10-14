@@ -1,4 +1,4 @@
-// சிட்டை — கணக்கு, விருப்பமானவை, உதவி மையம், சிட்டை பற்றி / தனியுரிமை / விதிமுறைகள்
+// Crispy — கணக்கு, விருப்பமானவை, உதவி மையம், Crispy பற்றி / தனியுரிமை / விதிமுறைகள்
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +30,7 @@ AppBar plainBar(BuildContext context, String title, {List<Widget>? actions}) => 
 
 Future<void> shareApp() async {
   try {
-    await Share.share(appShareText, subject: 'சிட்டை');
+    await Share.share(appShareText, subject: 'Crispy');
   } catch (_) {
     openUrl('https://wa.me/?text=${Uri.encodeComponent(appShareText)}');
   }
@@ -225,11 +225,11 @@ class _AccountScreenState extends State<AccountScreen> {
           row('moon', 'இரவு நிறம்', sub: dk ? 'ஆன்' : 'ஆஃப்', onTap: () => _dark(!dk), right: WaToggle(on: dk, onChanged: _dark)),
         ]),
         group([
-          row('help', 'உதவி & ஆதரவு', sub: 'சிட்டை WhatsApp', onTap: () => pushFull(const HelpScreen())),
+          row('help', 'உதவி & ஆதரவு', sub: 'Crispy WhatsApp', onTap: () => pushFull(const HelpScreen())),
           row('share', 'நண்பர்களுக்குப் பகிருங்கள்', onTap: shareApp),
         ]),
         group([
-          row('info', 'சிட்டை பற்றி', onTap: () => pushFull(const InfoScreen(page: 'about'))),
+          row('info', 'Crispy பற்றி', onTap: () => pushFull(const InfoScreen(page: 'about'))),
           row('lock', 'தனியுரிமைக் கொள்கை', onTap: () => pushFull(const InfoScreen(page: 'privacy'))),
           row('doc', 'விதிமுறைகள்', onTap: () => pushFull(const InfoScreen(page: 'terms'))),
         ]),
@@ -437,7 +437,7 @@ class _HelpScreenState extends State<HelpScreen> {
             const SizedBox(height: 14),
             if (appN.isNotEmpty)
               Row(children: [
-                Expanded(child: _heroBtn(Icons.chat, 'WhatsApp', 'எங்களுடன் பேசுங்கள்', () => openUrl(wa('வணக்கம், சிட்டை app-ல் உதவி தேவை.')), wa: true)),
+                Expanded(child: _heroBtn(Icons.chat, 'WhatsApp', 'எங்களுடன் பேசுங்கள்', () => openUrl(wa('வணக்கம், Crispy app-ல் உதவி தேவை.')), wa: true)),
                 const SizedBox(width: 10),
                 Expanded(child: _heroBtn(Icons.call, 'அழைக்க', 'நேரடியாக பேச', () => openUrl('tel:+$appN'))),
               ])
@@ -557,7 +557,7 @@ class _HelpScreenState extends State<HelpScreen> {
         _card(
           Column(children: [
             for (final x in const [
-              ['about', 'சிட்டை பற்றி', 'நாங்கள் யார், எப்படி வேலை செய்கிறது'],
+              ['about', 'Crispy பற்றி', 'நாங்கள் யார், எப்படி வேலை செய்கிறது'],
               ['privacy', 'தனியுரிமைக் கொள்கை', 'உங்கள் தகவல் எப்படிப் பாதுகாக்கப்படுகிறது'],
               ['terms', 'விதிமுறைகள்', 'ஆர்டர், டெலிவரி, பணம், ரத்து'],
             ])
@@ -615,7 +615,7 @@ class _Foot extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.all(22),
         child: Column(children: [
-          RichText(text: TextSpan(style: pop(22, c: P.g2), children: const [TextSpan(text: 'சிட்டை'), TextSpan(text: '.', style: TextStyle(color: AppColors.primary))])),
+          RichText(text: TextSpan(style: pop(22, c: P.g2), children: const [TextSpan(text: 'Crispy'), TextSpan(text: '.', style: TextStyle(color: AppColors.primary))])),
           const SizedBox(height: 4),
           Text('உங்கள் ஊர் கடைகள் — உங்கள் வீட்டு வாசலில்', style: ts(12.5, c: P.mu2)),
           Text(appVersionText, style: ts(12, c: P.mu)),
@@ -623,7 +623,7 @@ class _Foot extends StatelessWidget {
       );
 }
 
-// ═══ சிட்டை பற்றி / தனியுரிமை / விதிமுறைகள் ═══
+// ═══ Crispy பற்றி / தனியுரிமை / விதிமுறைகள் ═══
 class InfoScreen extends StatefulWidget {
   final String page;
   const InfoScreen({super.key, required this.page});
@@ -634,7 +634,7 @@ class InfoScreen extends StatefulWidget {
 class _InfoScreenState extends State<InfoScreen> {
   late String _p = widget.page;
   static const _upd = 'கடைசியாகப் புதுப்பித்தது: அக்டோபர் 2026';
-  static const _titles = {'about': 'சிட்டை பற்றி', 'privacy': 'தனியுரிமைக் கொள்கை', 'terms': 'விதிமுறைகள்'};
+  static const _titles = {'about': 'Crispy பற்றி', 'privacy': 'தனியுரிமைக் கொள்கை', 'terms': 'விதிமுறைகள்'};
 
   Widget _li(String t) => Padding(
         padding: const EdgeInsets.only(bottom: 6),
@@ -670,7 +670,7 @@ class _InfoScreenState extends State<InfoScreen> {
     const steps = [
       [Icons.storefront_outlined, 'கடையைத் தேர்ந்தெடுங்கள்', 'உங்கள் அருகிலுள்ள மளிகை, காய்கறி, பழம், உணவகம்…'],
       [Icons.shopping_bag_outlined, 'கூடையில் சேருங்கள்', 'விலை, அளவு எல்லாம் தெளிவாக'],
-      [Icons.check_circle_outline, 'ஆர்டர் செய்யுங்கள்', 'சிட்டை உறுதி செய்து கடைக்கு அனுப்பும்'],
+      [Icons.check_circle_outline, 'ஆர்டர் செய்யுங்கள்', 'Crispy உறுதி செய்து கடைக்கு அனுப்பும்'],
       [Icons.local_shipping_outlined, 'வீட்டு வாசலில் பெறுங்கள்', 'நேரலையாகப் பின்தொடருங்கள்; வந்ததும் பணம்'],
     ];
     const feats = [
@@ -680,10 +680,10 @@ class _InfoScreenState extends State<InfoScreen> {
       [Icons.notifications_none, 'உடனடி அறிவிப்பு', 'ஒவ்வொரு நிலையிலும் notification'],
     ];
     return [
-      Center(child: RichText(text: TextSpan(style: pop(30, c: P.g2), children: const [TextSpan(text: 'சிட்டை'), TextSpan(text: '.', style: TextStyle(color: AppColors.primary))]))),
+      Center(child: RichText(text: TextSpan(style: pop(30, c: P.g2), children: const [TextSpan(text: 'Crispy'), TextSpan(text: '.', style: TextStyle(color: AppColors.primary))]))),
       Center(child: Text('உங்கள் ஊர் கடைகள் — உங்கள் வீட்டு வாசலில்', style: ts(13, c: P.mu2))),
       const SizedBox(height: 14),
-      _p2('சிட்டை உங்கள் பகுதியில் உள்ள நம்பிக்கையான கடைகளை ஒரே இடத்தில் இணைக்கிறது. நீங்கள் ஆர்டர் செய்தால், கடை பார்சல் செய்து, எங்கள் டெலிவரி நபர் உங்கள் வீட்டுக்குக் கொண்டு வருவார்.'),
+      _p2('Crispy உங்கள் பகுதியில் உள்ள நம்பிக்கையான கடைகளை ஒரே இடத்தில் இணைக்கிறது. நீங்கள் ஆர்டர் செய்தால், கடை பார்சல் செய்து, எங்கள் டெலிவரி நபர் உங்கள் வீட்டுக்குக் கொண்டு வருவார்.'),
       const SizedBox(height: 8),
       Text('எப்படி வேலை செய்கிறது?', style: ts(15, w: w8)),
       const SizedBox(height: 8),
@@ -695,7 +695,7 @@ class _InfoScreenState extends State<InfoScreen> {
           subtitle: Text(steps[i][2] as String, style: ts(12.5, c: P.mu)),
         ),
       const SizedBox(height: 8),
-      Text('ஏன் சிட்டை?', style: ts(15, w: w8)),
+      Text('ஏன் Crispy?', style: ts(15, w: w8)),
       const SizedBox(height: 8),
       GridView.count(
         crossAxisCount: 2,
@@ -751,7 +751,7 @@ class _InfoScreenState extends State<InfoScreen> {
           _li('அடுத்த முறை விவரங்களைத் தானாக நிரப்ப'),
         ]),
         _secN(3, 'யார் பார்க்க முடியும்', [
-          _li('சிட்டை நிர்வாகம் — ஆர்டரை உறுதி செய்ய'),
+          _li('Crispy நிர்வாகம் — ஆர்டரை உறுதி செய்ய'),
           _li('கடை — உங்கள் பெயரும் பொருட்களும் மட்டும்; மொபைல், முகவரி காட்டப்படாது'),
           _li('டெலிவரி நபர் — உங்கள் ஆர்டருக்கு மட்டும்: பெயர், மொபைல், முகவரி, இடம்'),
         ]),
@@ -767,7 +767,7 @@ class _InfoScreenState extends State<InfoScreen> {
           ]),
           const SizedBox(height: 8),
           _p2('ஆப்பில் தெரியும் 4 இலக்க டெலிவரி OTP-ஐ மட்டும், பார்சலைக் கையில் வாங்கி பணம் கொடுத்த பிறகு delivery நண்பரிடம் சொல்லலாம்.'),
-          _p2('சிட்டை பெயரில் யாராவது இவற்றைக் கேட்டால் கொடுக்க வேண்டாம்.'),
+          _p2('Crispy பெயரில் யாராவது இவற்றைக் கேட்டால் கொடுக்க வேண்டாம்.'),
         ]),
         _secN(6, 'உங்கள் உரிமைகள்', [
           _li('கணக்கு பகுதியில் உங்கள் தகவலை மாற்றலாம் / நீக்கலாம்'),
@@ -779,9 +779,9 @@ class _InfoScreenState extends State<InfoScreen> {
 
   List<Widget> _terms() => [
         _hero(Icons.description_outlined, 'பயன்பாட்டு விதிமுறைகள்'),
-        _secN(1, 'பயன்பாடு', [_p2('சிட்டை மூலம் உங்கள் பகுதிக் கடைகளில் ஆர்டர் செய்யலாம். சரியான பெயர், மொபைல் எண், முகவரி, டெலிவரி இடம் கொடுப்பது உங்கள் பொறுப்பு.')]),
+        _secN(1, 'பயன்பாடு', [_p2('Crispy மூலம் உங்கள் பகுதிக் கடைகளில் ஆர்டர் செய்யலாம். சரியான பெயர், மொபைல் எண், முகவரி, டெலிவரி இடம் கொடுப்பது உங்கள் பொறுப்பு.')]),
         _secN(2, 'ஆர்டர் எப்படி நடக்கிறது', [
-          _li('நீங்கள் ஆர்டர் செய்ததும் சிட்டை அதைச் சரிபார்த்து உறுதி செய்யும்'),
+          _li('நீங்கள் ஆர்டர் செய்ததும் Crispy அதைச் சரிபார்த்து உறுதி செய்யும்'),
           _li('கடை பொருட்களைப் பார்சல் செய்யும்'),
           _li('டெலிவரி நபர் உங்களிடம் கொண்டு வருவார்'),
           _li('பொருள் இருப்பு இல்லையெனில் ஆர்டர் மாற்றப்படலாம் அல்லது ரத்தாகலாம்'),
@@ -838,7 +838,7 @@ class _InfoScreenState extends State<InfoScreen> {
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF25D366), foregroundColor: Colors.white),
-                onPressed: () => openUrl('https://wa.me/$appN?text=${Uri.encodeComponent('வணக்கம், சிட்டை app பற்றி ஒரு கேள்வி.')}'),
+                onPressed: () => openUrl('https://wa.me/$appN?text=${Uri.encodeComponent('வணக்கம், Crispy app பற்றி ஒரு கேள்வி.')}'),
                 child: Text('💬 WhatsApp', style: ts(13, w: w8, c: Colors.white)),
               ),
             ]),

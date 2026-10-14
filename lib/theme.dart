@@ -1,4 +1,4 @@
-// சிட்டை — நிறங்கள் (WhatsApp பாணி light / dark — index.html THEMES-ன் அதே மதிப்புகள்) + எழுத்துரு
+// Crispy — நிறங்கள் (WhatsApp பாணி light / dark — index.html THEMES-ன் அதே மதிப்புகள்) + எழுத்துரு
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 

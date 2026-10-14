@@ -1,4 +1,4 @@
-// சிட்டை — கடைகள் tab, கடை விவரம் (Google Business பாணி), கடைக்குள் (வகைகள் + பொருட்கள்)
+// Crispy — கடைகள் tab, கடை விவரம் (Google Business பாணி), கடைக்குள் (வகைகள் + பொருட்கள்)
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -418,7 +418,7 @@ class RatingSection extends StatelessWidget {
       return List.generate(5, (i) => i < f ? '★' : '☆').join();
     }
 
-    const src = {'app': '✓ சிட்டை ஆர்டர்', 'whatsapp': 'WhatsApp-ல் பெறப்பட்டது', 'phone': 'போனில் பெறப்பட்டது'};
+    const src = {'app': '✓ Crispy ஆர்டர்', 'whatsapp': 'WhatsApp-ல் பெறப்பட்டது', 'phone': 'போனில் பெறப்பட்டது'};
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 14, 16, 0),
       padding: const EdgeInsets.all(16),

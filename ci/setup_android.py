@@ -1,6 +1,6 @@
-# சிட்டை — GitHub Actions-ல் `flutter create` உருவாக்கிய android/ folder-ஐ நமக்கு ஏற்றபடி மாற்றுகிறது.
+# Crispy — GitHub Actions-ல் `flutter create` உருவாக்கிய android/ folder-ஐ நமக்கு ஏற்றபடி மாற்றுகிறது.
 # (நீங்கள் இதைத் தொட வேண்டியதில்லை. ஒவ்வொரு build-லும் தானாக ஓடும்.)
-#   • app பெயர் "சிட்டை"   • permissions (internet, இடம், mic, notification, அதிர்வு)
+#   • app பெயர் "Crispy"   • permissions (internet, இடம், mic, notification, அதிர்வு)
 #   • WhatsApp / அழை / இணையதளம் / குரல் தேடல் திறக்க <queries>
 #   • minSdk 23            • KEYSTORE secret இருந்தால் release signing
 #   • அறிவிப்பு channel "orders" + வெள்ளை icon
@@ -31,7 +31,7 @@ def patch_manifest():
     m = read(MANIFEST)
 
     # 1) app பெயர்
-    m = re.sub(r'android:label="[^"]*"', 'android:label="சிட்டை"', m, count=1)
+    m = re.sub(r'android:label="[^"]*"', 'android:label="Crispy"', m, count=1)
 
     # 2) permissions
     perms = [

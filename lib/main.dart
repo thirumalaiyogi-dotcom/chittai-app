@@ -1,4 +1,4 @@
-// சிட்டை — வாடிக்கையாளர் app (Flutter). தொடக்கம், splash, கீழ் பட்டை, tab-கள்.
+// Crispy — வாடிக்கையாளர் app (Flutter). தொடக்கம், splash, கீழ் பட்டை, tab-கள்.
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -57,7 +57,7 @@ class ChittaiApp extends StatelessWidget {
     final dark = context.select<AppState, bool>((s) => s.dark);
     final scale = context.select<AppState, double>((s) => s.textScale);
     return MaterialApp(
-      title: 'சிட்டை',
+      title: 'Crispy',
       debugShowCheckedModeBanner: false,
       navigatorKey: Nav.root,
       theme: buildTheme(dark),
@@ -73,7 +73,7 @@ class ChittaiApp extends StatelessWidget {
   }
 }
 
-// ═══ Splash: scooter ஓடி வருகிறது → "சிட்டை." → app ═══
+// ═══ Splash: scooter ஓடி வருகிறது → "Crispy." → app ═══
 class Boot extends StatefulWidget {
   const Boot({super.key});
   @override
@@ -200,7 +200,7 @@ class _BootState extends State<Boot> with TickerProviderStateMixin {
                           offset: Offset(0, 16 * (1 - name)),
                           child: RichText(
                             text: TextSpan(style: pop(40, c: dark ? const Color(0xFFE9EDEF) : AppColors.brand), children: const [
-                              TextSpan(text: 'சிட்டை'),
+                              TextSpan(text: 'Crispy'),
                               TextSpan(text: '.', style: TextStyle(color: AppColors.primary)),
                             ]),
                           ),

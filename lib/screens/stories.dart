@@ -1,4 +1,4 @@
-// சிட்டை — "இன்று புதிது" stories (WhatsApp status பாணி) + ஆப் திறக்கும்போது வரும் poster (popup)
+// Crispy — "இன்று புதிது" stories (WhatsApp status பாணி) + ஆப் திறக்கும்போது வரும் poster (popup)
 import 'dart:async';
 import 'dart:ui' as ui;
 
@@ -331,9 +331,9 @@ class _StoryViewerState extends State<StoryViewer> with SingleTickerProviderStat
   Future<void> _share() async {
     _p.stop();
     final s = _s;
-    final txt = '${js(s['caption']).isNotEmpty ? js(s['caption']) : stLabel(s)} — சிட்டை ஆப்பில் பாருங்கள்: $kPlayLink';
+    final txt = '${js(s['caption']).isNotEmpty ? js(s['caption']) : stLabel(s)} — Crispy ஆப்பில் பாருங்கள்: $kPlayLink';
     try {
-      await Share.share(txt, subject: 'சிட்டை · இன்று புதிது');
+      await Share.share(txt, subject: 'Crispy · இன்று புதிது');
     } catch (_) {
       openUrl('https://wa.me/?text=${Uri.encodeComponent(txt)}');
     }
@@ -577,8 +577,8 @@ void linkGo(String t, String v) {
   }
 }
 
-String get appShareText => '🛒 சிட்டை — அருகிலுள்ள கடைகளில் எளிதாக ஆர்டர் செய்ய: $kPlayLink';
-String get appVersionText => 'சிட்டை · பதிப்பு $kAppVersion';
+String get appShareText => '🛒 Crispy — அருகிலுள்ள கடைகளில் எளிதாக ஆர்டர் செய்ய: $kPlayLink';
+String get appVersionText => 'Crispy · பதிப்பு $kAppVersion';
 
 // ஏற்றும் முன் popups தரவு வந்ததா என்று காத்திருந்து
 Future<void> schedulePopup() async {

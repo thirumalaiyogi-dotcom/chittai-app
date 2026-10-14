@@ -1,4 +1,4 @@
-// சிட்டை — அறிவிப்புகள்: ஆர்டர் நிலைகள், கடை சலுகைகள், புதிய கடைகள் (இந்த phone-ல் உள்ள தரவிலிருந்தே)
+// Crispy — அறிவிப்புகள்: ஆர்டர் நிலைகள், கடை சலுகைகள், புதிய கடைகள் (இந்த phone-ல் உள்ள தரவிலிருந்தே)
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -102,7 +102,7 @@ class Nt {
       }
       final cAt = DateTime.tryParse(sh.createdAt)?.millisecondsSinceEpoch ?? 0;
       if (cAt > 0 && now - cAt < 14 * 864e5) {
-        ev.add(NtEv('n${sh.id}', cAt, 'off', 'shop', 'புதிய கடை சேர்க்கப்பட்டுள்ளது', ['${sh.name} இப்போது சிட்டை ஆப்பில்'], () => Nav.openShop(sh.id)));
+        ev.add(NtEv('n${sh.id}', cAt, 'off', 'shop', 'புதிய கடை சேர்க்கப்பட்டுள்ளது', ['${sh.name} இப்போது Crispy ஆப்பில்'], () => Nav.openShop(sh.id)));
       }
     }
     if (ch) Store.setJson(K.ntOff, seenOff);

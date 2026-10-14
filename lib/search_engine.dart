@@ -1,4 +1,4 @@
-// சிட்டை — SMART SEARCH ENGINE (index.html-ல் உள்ள அதே விதிகள், Dart-ல்)
+// Crispy — SMART SEARCH ENGINE (index.html-ல் உள்ள அதே விதிகள், Dart-ல்)
 // தமிழ் / ஆங்கிலம் / Tanglish (paal → பால்), எழுத்துப் பிழை பொறுத்தல், மதிப்பெண், வடிகட்டல், வரிசை.
 import 'config.dart';
 import 'models.dart';

@@ -1,4 +1,4 @@
-// சிட்டை — phone-ல் சேமிப்பு (web app-ன் localStorage key பெயர்களே)
+// Crispy — phone-ல் சேமிப்பு (web app-ன் localStorage key பெயர்களே)
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
