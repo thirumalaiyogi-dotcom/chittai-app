@@ -777,7 +777,7 @@ class _ShopScreenState extends State<ShopScreen> {
 
   Widget _landingView(AppState s, Shop? sh, List<Cat> cats) {
     return Container(
-      color: P.bg,
+      color: Colors.transparent,
       child: ListView(padding: const EdgeInsets.fromLTRB(12, 16, 12, 110), children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4),

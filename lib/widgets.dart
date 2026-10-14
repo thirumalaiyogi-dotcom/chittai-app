@@ -465,17 +465,21 @@ class ProductCard extends StatelessWidget {
                   ),
                 ),
                 if (bo != null)
-                  // card அகலத்துக்குள்ளேயே இருக்கும்; நீளமான உரை இரண்டு வரியாக மடியும் (வெட்டுப்படாது)
+                  // சிறிய pill: படத்தை மறைக்காது; அகலம் போதாவிட்டால் எழுத்து தானே சுருங்கி ஒரே வரியில் நிற்கும்
                   Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
+                    left: 6,
+                    right: 6,
+                    bottom: 6,
                     child: Align(
                       alignment: Alignment.bottomLeft,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: const BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.only(topRight: Radius.circular(10))),
-                        child: Text('${bo.off}%${single ? '' : ' வரை'} தள்ளுபடி', maxLines: 2, overflow: TextOverflow.ellipsis, style: ts(12, w: w8, c: Colors.white, h: 1.25)),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.bottomLeft,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(color: const Color(0xEB15803D), borderRadius: BorderRadius.circular(8)),
+                          child: Text('${bo.off}%${single ? '' : ' வரை'} தள்ளுபடி', maxLines: 1, style: ts(10.5, w: w8, c: Colors.white, h: 1.25)),
+                        ),
                       ),
                     ),
                   ),
